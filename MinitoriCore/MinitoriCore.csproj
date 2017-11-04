@@ -5,4 +5,20 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Discord.Addons.EmojiTools" Version="2.0.1" />
+    <PackageReference Include="Discord.Net.Commands" Version="2.0.0-alpha-build-00840" />
+    <PackageReference Include="Discord.Net.Core" Version="2.0.0-alpha-build-00840" />
+    <PackageReference Include="Discord.Net.Rest" Version="2.0.0-alpha-build-00840" />
+    <PackageReference Include="Discord.Net.WebSocket" Version="2.0.0-alpha-build-00840" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="RestSharp.NetCore" Version="105.2.4-rc4-24214-01" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.IO" Version="4.3.0" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+  </ItemGroup>
+
 </Project>
