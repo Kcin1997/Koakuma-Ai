@@ -65,7 +65,7 @@ namespace MinitoriCore
 
         private async Task Client_GuildAvailable(SocketGuild arg)
         {
-            if (arg.Id == 110373943822540800 || arg.Id == 212053857306542080 || arg.Id == 132720341058453504)
+            if (arg.Id == 110373943822540800 || arg.Id == 212053857306542080 || arg.Id == 132720341058453504 || arg.Id == 103028520011190272)
             {
 
             }
@@ -75,7 +75,7 @@ namespace MinitoriCore
 
         private async Task Client_JoinedGuild(SocketGuild arg)
         {
-            if (arg.Id == 110373943822540800 || arg.Id == 212053857306542080 || arg.Id == 132720341058453504)
+            if (arg.Id == 110373943822540800 || arg.Id == 212053857306542080 || arg.Id == 132720341058453504 || arg.Id == 103028520011190272)
             {
 
             }
