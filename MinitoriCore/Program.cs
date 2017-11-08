@@ -42,9 +42,7 @@ namespace MinitoriCore
 
             await client.LoginAsync(TokenType.Bot, config.Token);
             await client.StartAsync();
-
-            client.JoinedGuild += Client_JoinedGuild;
-            client.GuildAvailable += Client_GuildAvailable;
+            
             client.UserJoined += Client_UserJoined;
 
             handler = new CommandHandler();
@@ -62,39 +60,7 @@ namespace MinitoriCore
             if (user.Guild.Id == 110373943822540800 && user.IsBot)
                 await user.AddRoleAsync(user.Guild.GetRole(318748748010487808));
         }
-
-        private async Task Client_GuildAvailable(SocketGuild arg)
-        {
-            if (arg.Id == 110373943822540800 || arg.Id == 212053857306542080 || arg.Id == 132720341058453504 || arg.Id == 103028520011190272)
-            {
-
-            }
-            else
-                await arg.LeaveAsync();
-        }
-
-        private async Task Client_JoinedGuild(SocketGuild arg)
-        {
-            if (arg.Id == 110373943822540800 || arg.Id == 212053857306542080 || arg.Id == 132720341058453504 || arg.Id == 103028520011190272)
-            {
-
-            }
-            else
-                await arg.LeaveAsync();
-        }
-
-        //private async Task ConfigureServicesAsync(IServiceProvider _services)
-        //{
-        //    _services.AddSingleton(client);
-        //    map.Add(config);
-        //    //map.Add(commands);
-        //    //map.Add(new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false }));
-        //    //map.Add(new LogService(map));
-        //    //map.Add(new InteractiveService(client));
-        //    //await map.UsingTagService();
-        //    //map.Add(new GitHubService(map));
-        //}
-
+        
         private Task Log(LogMessage msg)
         {
             Console.WriteLine(msg.ToString());
