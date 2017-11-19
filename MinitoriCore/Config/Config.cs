@@ -24,6 +24,9 @@ namespace MinitoriCore
         [JsonProperty("mention_trigger")]
         public bool TriggerOnMention { get; set; } = true;
 
+        [JsonProperty("uptime_db")]
+        public string UptimeDB { get; set; }
+
         public static Config Load()
         {
             if (File.Exists("config.json"))

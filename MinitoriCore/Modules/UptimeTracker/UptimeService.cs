@@ -32,10 +32,10 @@ namespace MinitoriCore.Modules.UptimeTracker
             
             client.GuildMemberUpdated += GuildMemberUpdated;
 
-            // Run storage method
+            UpdateDatabase();
         }
 
-        private async Task UpdateDatabase()
+        private void UpdateDatabase()
         {
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Task.Run(async () =>
@@ -49,7 +49,7 @@ namespace MinitoriCore.Modules.UptimeTracker
                     if (SaveStats.Count() == 0)
                         continue;
 
-                    using (MySqlConnection db = new MySqlConnection(""))
+                    using (MySqlConnection db = new MySqlConnection(config.UptimeDB))
                     {
                         await db.OpenAsync();
 
@@ -59,7 +59,20 @@ namespace MinitoriCore.Modules.UptimeTracker
                         {
                             using (var cmd = new MySqlCommand($"INSERT INTO `status_{DateTimeOffset.Now.StartOfWeek(DayOfWeek.Sunday).ToString("yyyy-MM-dd")}` (botid, stats, lastupdated) VALUES(@1, @2, @3) " +
                                 $"ON DUPLICATE KEY UPDATE stats=@2, lastupdated=@3;", db))
+                            {
+                                cmd.Parameters.AddWithValue("@1", kv.Value.BotId);
+                                cmd.Parameters.AddWithValue("@2", JsonConvert.SerializeObject(kv.Value.JsonStats));
+                                cmd.Parameters.AddWithValue("@3", kv.Value.LastUpdated);
+
+                                await cmd.ExecuteNonQueryAsync();
+
+                                cmd.Dispose();
+                            }
                         }
+
+                        transaction.Commit();
+
+                        await db.CloseAsync();
                     }
                 }
             });
@@ -68,6 +81,9 @@ namespace MinitoriCore.Modules.UptimeTracker
 
         private async Task GuildMemberUpdated(SocketGuildUser Before, SocketGuildUser After)
         {
+            if (!After.IsBot)
+                return;
+
             if (After.Guild.Id != 110373943822540800)
                 return;
 
@@ -120,7 +136,7 @@ namespace MinitoriCore.Modules.UptimeTracker
         {
             FullStatus temp = null;
 
-            using (MySqlConnection db = new MySqlConnection(""))
+            using (MySqlConnection db = new MySqlConnection(config.UptimeDB))
             {
                 await db.OpenAsync();
 
