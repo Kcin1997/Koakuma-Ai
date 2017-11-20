@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using MinitoriCore.Modules.UptimeTracker;
 
 namespace MinitoriCore
 {
@@ -20,6 +21,7 @@ namespace MinitoriCore
         private Config config;
         private CommandHandler handler;
         private RandomStrings strings;
+        private UptimeService uptime;
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
         //private readonly CommandService commands = new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false });
@@ -33,15 +35,18 @@ namespace MinitoriCore
             client.Log += Log;
 
             config = Config.Load();
+            uptime = new UptimeService();
             strings = new RandomStrings();
 
             //var map = new DependencyMap();
-            var map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(strings).BuildServiceProvider();
+            var map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(strings).AddSingleton(uptime).BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
             await client.LoginAsync(TokenType.Bot, config.Token);
             await client.StartAsync();
+
+            await uptime.Install(map);
             
             client.UserJoined += Client_UserJoined;
 

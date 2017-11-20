@@ -23,7 +23,8 @@ namespace MinitoriCore.Modules.UptimeTracker
         private DiscordSocketClient client;
 
         private Dictionary<ulong, FullStatus> StatusCache = new Dictionary<ulong, FullStatus>();
-
+        
+        private static readonly TimeSpan Offset = TimeZoneInfo.Local.BaseUtcOffset;
 
         public async Task Install(IServiceProvider _services)
         {
@@ -42,37 +43,45 @@ namespace MinitoriCore.Modules.UptimeTracker
             {
                 while (true)
                 {
-                    await Task.Delay(1000 * 60 * 10); // update every 10 minutes
+                    await Task.Delay(1000 * 60 * 1); // update every 10 minutes
 
-                    Dictionary<ulong, FullStatus> SaveStats = new Dictionary<ulong, FullStatus>(StatusCache.Where(x => x.Value.Edited));
-
-                    if (SaveStats.Count() == 0)
-                        continue;
-
-                    using (MySqlConnection db = new MySqlConnection(config.UptimeDB))
+                    try
                     {
-                        await db.OpenAsync();
 
-                        var transaction = await db.BeginTransactionAsync();
+                        Dictionary<ulong, FullStatus> SaveStats = new Dictionary<ulong, FullStatus>(StatusCache.Where(x => x.Value.Edited));
 
-                        foreach (var kv in SaveStats)
+                        if (SaveStats.Count() == 0)
+                            continue;
+
+                        using (MySqlConnection db = new MySqlConnection(config.UptimeDB))
                         {
-                            using (var cmd = new MySqlCommand($"INSERT INTO `status_{DateTimeOffset.Now.StartOfWeek(DayOfWeek.Sunday).ToString("yyyy-MM-dd")}` (botid, stats, lastupdated) VALUES(@1, @2, @3) " +
-                                $"ON DUPLICATE KEY UPDATE stats=@2, lastupdated=@3;", db))
+                            await db.OpenAsync();
+
+                            var transaction = await db.BeginTransactionAsync();
+
+                            foreach (var kv in SaveStats)
                             {
-                                cmd.Parameters.AddWithValue("@1", kv.Value.BotId);
-                                cmd.Parameters.AddWithValue("@2", JsonConvert.SerializeObject(kv.Value.JsonStats));
-                                cmd.Parameters.AddWithValue("@3", kv.Value.LastUpdated);
+                                using (var cmd = new MySqlCommand($"INSERT INTO `status_{DateTimeOffset.Now.StartOfWeek(DayOfWeek.Sunday).ToString("yyyy-MM-dd")}` (botid, stats, lastupdated) VALUES(@1, @2, @3) " +
+                                    $"ON DUPLICATE KEY UPDATE stats=@2, lastupdated=@3;", db))
+                                {
+                                    cmd.Parameters.AddWithValue("@1", kv.Value.BotId);
+                                    cmd.Parameters.AddWithValue("@2", JsonConvert.SerializeObject(kv.Value.JsonStats));
+                                    cmd.Parameters.AddWithValue("@3", kv.Value.LastUpdated.ToString("yyyy-MM-dd HH:mm:ss.fff"));
 
-                                await cmd.ExecuteNonQueryAsync();
+                                    await cmd.ExecuteNonQueryAsync();
 
-                                cmd.Dispose();
+                                    cmd.Dispose();
+                                }
                             }
+
+                            transaction.Commit();
+
+                            await db.CloseAsync();
                         }
-
-                        transaction.Commit();
-
-                        await db.CloseAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
                     }
                 }
             });
@@ -94,6 +103,10 @@ namespace MinitoriCore.Modules.UptimeTracker
                 return;
 
             bool online = CheckOnline(After.Status);
+
+            //Console.ForegroundColor = ConsoleColor.Green;
+            //Console.WriteLine($"{After.Username} | [{After.Id}] | {After.Status.ToString()}");
+            //Console.ResetColor();
             
             // Check if it's cached
             if (!StatusCache.ContainsKey(After.Id))
@@ -110,7 +123,6 @@ namespace MinitoriCore.Modules.UptimeTracker
             }
 
             // Add this event
-
             if (online)
                 StatusCache[After.Id].AddOnlineEntry();
             else
@@ -121,12 +133,6 @@ namespace MinitoriCore.Modules.UptimeTracker
         {
             var tempStats = new UptimeStats();
 
-            if (online != DateTimeOffset.MinValue)
-                tempStats.OnlineTimes.Add(online);
-
-            if (offline != DateTimeOffset.MinValue)
-                tempStats.OfflineTimes.Add(offline);
-
             var temp = new FullStatus() { BotId = Id, JsonStats = tempStats };
 
             return temp;
@@ -136,28 +142,35 @@ namespace MinitoriCore.Modules.UptimeTracker
         {
             FullStatus temp = null;
 
-            using (MySqlConnection db = new MySqlConnection(config.UptimeDB))
+            try
             {
-                await db.OpenAsync();
-
-                using (var cmd = new MySqlCommand($"SELECT * FROM `status_{DateTimeOffset.Now.StartOfWeek(DayOfWeek.Sunday).ToString("yyyy-MM-dd")}` WHERE botid = @1;", db))
+                using (MySqlConnection db = new MySqlConnection(config.UptimeDB))
                 {
-                    cmd.Parameters.AddWithValue("@1", Id);
+                    await db.OpenAsync();
 
-                    using (var reader = await cmd.ExecuteReaderAsync())
+                    using (var cmd = new MySqlCommand($"SELECT * FROM `status_{DateTimeOffset.Now.StartOfWeek(DayOfWeek.Sunday).ToString("yyyy-MM-dd")}` WHERE botid = @1;", db))
                     {
-                        while (await reader.ReadAsync())
+                        cmd.Parameters.AddWithValue("@1", Id);
+
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            temp = new FullStatus { BotId = (ulong)reader["botid"], JsonStats = new UptimeStats((string)reader["stats"]), LastUpdated = (DateTimeOffset)reader["lastupdated"]};
+                            while (await reader.ReadAsync())
+                            {
+                                temp = new FullStatus { BotId = (ulong)reader["botid"], JsonStats = new UptimeStats((string)reader["stats"]), LastUpdated = new DateTimeOffset(((DateTime)reader["lastupdated"]).Ticks, Offset) };
+                            }
+
+                            reader.Close();
                         }
 
-                        reader.Close();
+                        cmd.Dispose();
                     }
 
-                    cmd.Dispose();
+                    await db.CloseAsync();
                 }
-
-                await db.CloseAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
             }
 
             return temp;
@@ -192,8 +205,6 @@ namespace MinitoriCore.Modules.UptimeTracker
 
         public class FullStatus
         {
-            private UptimeStats _jsonStats;
-
             public ulong BotId { get; set; }
             public UptimeStats JsonStats { get; set; }
             public DateTimeOffset LastUpdated { get; set; }
@@ -201,14 +212,14 @@ namespace MinitoriCore.Modules.UptimeTracker
 
             public void AddOnlineEntry()
             {
-                JsonStats.OnlineTimes.Add(DateTimeOffset.Now);
+                JsonStats.OnlineTicks.Add(DateTimeOffset.Now.Ticks);
                 LastUpdated = DateTimeOffset.Now;
                 Edited = true;
             }
 
             public void AddOfflineEntry()
             {
-                JsonStats.OfflineTimes.Add(DateTimeOffset.Now);
+                JsonStats.OfflineTicks.Add(DateTimeOffset.Now.Ticks);
                 LastUpdated = DateTimeOffset.Now;
                 Edited = true;
             }
@@ -221,21 +232,32 @@ namespace MinitoriCore.Modules.UptimeTracker
                 if (input != null && input != "")
                 {
                     var temp = JsonConvert.DeserializeObject<UptimeStats>(input);
-                    OnlineTimes = temp.OnlineTimes;
-                    OfflineTimes = temp.OfflineTimes;
+                    OnlineTicks = temp.OnlineTicks;
+                    OfflineTicks = temp.OfflineTicks;
                     temp = null;
                 }
                 else
                 {
-                    OnlineTimes = new List<DateTimeOffset>();
-                    OfflineTimes = new List<DateTimeOffset>();
+                    OnlineTicks = new List<long>();
+                    OfflineTicks = new List<long>();
                 }
             }
 
             [JsonProperty("online")]
-            public List<DateTimeOffset> OnlineTimes { get; set; }
+            public List<long> OnlineTicks { get; set; }
             [JsonProperty("offline")]
-            public List<DateTimeOffset> OfflineTimes { get; set; }
+            public List<long> OfflineTicks { get; set; }
+
+            [JsonIgnore]
+            public List<DateTimeOffset> OnlineTimes
+            {
+                get { return OnlineTicks.Select(x => new DateTimeOffset(x, Offset)).ToList(); }
+            }
+            [JsonIgnore]
+            public List<DateTimeOffset> OfflineTimes
+            {
+                get { return OfflineTicks.Select(x => new DateTimeOffset(x, Offset)).ToList(); }
+            }
         }
     }
 
