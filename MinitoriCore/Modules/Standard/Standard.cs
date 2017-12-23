@@ -37,9 +37,17 @@ namespace MinitoriCore.Modules.Standard
         {
             IGuildUser user;
 
-            if (Context.Message.MentionedUserIds.Count() > 0)
+            if (Context.Message.MentionedUserIds.Count() == 1)
             {
-                user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds.FirstOrDefault());
+                if (Context.Message.MentionedUserIds.FirstOrDefault() == ((SocketGuild)Context.Guild).CurrentUser.Id)
+                    user = (IGuildUser)Context.Message.Author;
+                else
+                    user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds.FirstOrDefault());
+            }
+            if (Context.Message.MentionedUserIds.Count() > 1)
+            {
+                user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds
+                    .FirstOrDefault(x => x != ((SocketGuild)Context.Guild).CurrentUser.Id));
             }
             else
                 user = (IGuildUser)Context.User;
