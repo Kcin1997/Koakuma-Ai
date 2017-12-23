@@ -21,7 +21,7 @@ namespace MinitoriCore
         private Config config;
         private CommandHandler handler;
         private RandomStrings strings;
-        private UptimeService uptime;
+        //private UptimeService uptime;
         private ServiceProvider map;
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
@@ -36,11 +36,11 @@ namespace MinitoriCore
             client.Log += Log;
 
             config = Config.Load();
-            uptime = new UptimeService();
+            //uptime = new UptimeService();
             strings = new RandomStrings();
 
             //var map = new DependencyMap();
-            map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(strings).AddSingleton(uptime).BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(strings)/*.AddSingleton(uptime)*/.BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
@@ -66,10 +66,10 @@ namespace MinitoriCore
             if (guild.Id != 110373943822540800)
                 return;
 
-            if (uptime.CheckInstalled())
-                return;
+            //if (uptime.CheckInstalled())
+            //    return;
 
-            uptime.Install(map);
+            //uptime.Install(map);
         }
 
         private async Task Client_UserJoined(SocketGuildUser user)
