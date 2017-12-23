@@ -26,14 +26,39 @@ namespace MinitoriCore.Modules.UptimeTracker
         
         private static readonly TimeSpan Offset = TimeZoneInfo.Local.BaseUtcOffset;
 
+        public static bool Installed = false;
+
+        public bool CheckInstalled()
+        {
+            return Installed;
+        }
+
         public async Task Install(IServiceProvider _services)
         {
+            Installed = true;
+
             client = _services.GetService<DiscordSocketClient>();
             config = _services.GetService<Config>();
             
-            client.GuildMemberUpdated += GuildMemberUpdated;
+            client.GuildMembersDownloaded += Client_GuildMembersDownloaded;
 
+            await CheckAllMembers();
             UpdateDatabase();
+
+            client.GuildMemberUpdated += GuildMemberUpdated;
+        }
+
+        private async Task Client_GuildMembersDownloaded(SocketGuild guild)
+        {
+            if (guild.Id != 110373943822540800)
+                return;
+
+
+        }
+
+        private async Task CheckAllMembers()
+        {
+            await client.GetGuild(110373943822540800).DownloadUsersAsync();
         }
 
         private void UpdateDatabase()
