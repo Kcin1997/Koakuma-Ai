@@ -17,6 +17,7 @@ namespace MinitoriCore.Modules.Standard
     public class Standard : ModuleBase
     {
         private RandomStrings strings;
+        private Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new Dictionary<ulong, Dictionary<ulong, DateTime>>();
 
         public Standard(RandomStrings _strings)
         {
@@ -39,6 +40,7 @@ namespace MinitoriCore.Modules.Standard
                 return;
 
             IGuildUser user = null;
+            string message = ""; // store the message later to be intelligent about when to yell at them for having the role or not
 
             if (Context.Message.MentionedUserIds.Count() == 1)
             {
@@ -46,8 +48,7 @@ namespace MinitoriCore.Modules.Standard
                     user = (IGuildUser)Context.Message.Author;
                 else
                 {
-                    await ReplyAsync("Hey, you sure you want to throw snowballs at your supplier");
-                    return;
+                    message = "Hey, you sure you want to throw snowballs at your supplier";
                 }
             }
             if (Context.Message.MentionedUserIds.Count() > 1)
@@ -64,8 +65,7 @@ namespace MinitoriCore.Modules.Standard
 
                 if (user == null)
                 {
-                    await ReplyAsync("Nope, still can't throw snowballs at me");
-                    return;
+                    message = "Nope, still can't throw snowballs at me";
                 }
             }
             else
@@ -74,7 +74,40 @@ namespace MinitoriCore.Modules.Standard
                 return;
             }
 
+            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(394129853043048448))
+            {
+                if (message != "")
+                {
+                    await ReplyAsync(message);
+                    return;
+                }
 
+                if (cooldown.ContainsKey(Context.Guild.Id))
+                {
+                    cooldown[Context.Guild.Id] = new Dictionary<ulong, DateTime>();
+
+
+                }
+
+
+                if (!user.RoleIds.ToList().Contains(394129853043048448))
+                {
+                    try
+                    {
+                        await user.AddRoleAsync(Context.Guild.GetRole(394129853043048448));
+                    }
+                    catch (Exception ex)
+                    {
+                        await ReplyAsync($"{user.Mention} is too fast and dodged your snowball!\nPoke Googie2149 about this! `{ex.Message}`");
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                await ReplyAsync("You don't have any snowballs to throw!");
+                return;
+            }
         }
 
         [Command("throw")]
