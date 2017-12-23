@@ -18,10 +18,14 @@ namespace MinitoriCore.Modules.Standard
     {
         private RandomStrings strings;
         private Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new Dictionary<ulong, Dictionary<ulong, DateTime>>();
+        // <Guild ID, <User ID, Time last used>>
 
-        public Standard(RandomStrings _strings)
+        private EventStorage events;
+
+        public Standard(RandomStrings _strings, EventStorage _events)
         {
             strings = _strings;
+            events = _events;
         }
 
         [Command("blah")]
@@ -36,6 +40,12 @@ namespace MinitoriCore.Modules.Standard
         [Summary("Throw snowballs at people! Build an army!")]
         public async Task Snowball([Remainder]string remainder = "")
         {
+            if (Context.Guild == null)
+            {
+                await ReplyAsync("You can't use this in DMs!");
+                return;
+            }
+
             if (Context.Guild.Id != 132720341058453504)
                 return;
 
@@ -82,24 +92,78 @@ namespace MinitoriCore.Modules.Standard
                     return;
                 }
 
-                if (cooldown.ContainsKey(Context.Guild.Id))
-                {
+                if (!cooldown.ContainsKey(Context.Guild.Id))
                     cooldown[Context.Guild.Id] = new Dictionary<ulong, DateTime>();
 
-
+                if (cooldown[Context.Guild.Id].ContainsKey(Context.User.Id) && cooldown[Context.Guild.Id][Context.User.Id] > DateTime.UtcNow.AddMinutes(-2.5))
+                {
+                    TimeSpan t = cooldown[Context.Guild.Id][Context.User.Id] - DateTime.UtcNow.AddMinutes(-2.5);
+                    await ReplyAsync($"You're still making another snowball! You'll be ready in {t.Minutes:0}:{t.Seconds:00}");
+                    return;
                 }
 
+                cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow;
+
+                if (!events.stats.ContainsKey(Context.Guild.Id))
+                    events.stats[Context.Guild.Id] = new Dictionary<ulong, SnowballStats>();
+
+                if (events.stats[Context.Guild.Id][Context.User.Id] == null)
+                    events.stats[Context.Guild.Id][Context.User.Id] = new SnowballStats();
+
+                if (events.stats[Context.Guild.Id][user.Id] == null)
+                    events.stats[Context.Guild.Id][user.Id] = new SnowballStats();
 
                 if (!user.RoleIds.ToList().Contains(394129853043048448))
                 {
+                    // Add the role. 100% chance to hit
                     try
                     {
                         await user.AddRoleAsync(Context.Guild.GetRole(394129853043048448));
                     }
                     catch (Exception ex)
                     {
-                        await ReplyAsync($"{user.Mention} is too fast and dodged your snowball!\nPoke Googie2149 about this! `{ex.Message}`");
+                        events.stats[Context.Guild.Id][Context.User.Id].Misses++;
+                        events.stats[Context.Guild.Id][user.Id].Dodged++;
+                        await ReplyAsync($"The snowball sailed right through {user.Mention}! Wait, what?\nPoke Googie2149 about this! `{ex.Message}`");
                         return;
+                    }
+
+                    events.stats[Context.Guild.Id][Context.User.Id].Hits++;
+                    events.stats[Context.Guild.Id][user.Id].Downed++;
+                    await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}!");
+                    return;
+                }
+                else
+                {
+                    Random rand = new Random((int)(Context.User.Id + user.Id + Convert.ToUInt64(DateTime.Now.Ticks)));
+
+                    var chance = rand.Next(1, 101);
+
+                    if (chance >= 1 && chance <= 65)
+                    {
+                        // hit
+                        events.stats[Context.Guild.Id][Context.User.Id].Hits++;
+                        events.stats[Context.Guild.Id][user.Id].Downed++;
+
+                        await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}!");
+                    }
+                    else if (chance >= 66 && chance <= 90)
+                    {
+                        // miss
+                        events.stats[Context.Guild.Id][Context.User.Id].Misses++;
+                        events.stats[Context.Guild.Id][user.Id].Dodged++;
+
+                        await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}, but it missed!");
+                    }
+                    else if (chance >= 91 && chance <= 100)
+                    {
+                        // caught
+                        events.stats[Context.Guild.Id][Context.User.Id].Misses++;
+                        events.stats[Context.Guild.Id][user.Id].Caught++;
+
+                        cooldown[Context.Guild.Id][user.Id] = DateTime.UtcNow.AddMinutes(-10);
+
+                        await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}, but {user.Mention} caught it!");
                     }
                 }
             }
@@ -157,6 +221,8 @@ namespace MinitoriCore.Modules.Standard
             await ReplyAsync($"*throws {objects} at {user.Mention}*");
         }
     }
+
+    
 
 #region bot list classes
     public class BotListing

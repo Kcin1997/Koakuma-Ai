@@ -9,6 +9,7 @@ using Discord.Commands;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using MinitoriCore.Modules.UptimeTracker;
+using MinitoriCore.Modules.Standard;
 
 namespace MinitoriCore
 {
@@ -22,6 +23,7 @@ namespace MinitoriCore
         private CommandHandler handler;
         private RandomStrings strings;
         //private UptimeService uptime;
+        private EventStorage events;
         private ServiceProvider map;
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
@@ -37,10 +39,11 @@ namespace MinitoriCore
 
             config = Config.Load();
             //uptime = new UptimeService();
+            events = EventStorage.Load();
             strings = new RandomStrings();
 
             //var map = new DependencyMap();
-            map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(strings)/*.AddSingleton(uptime)*/.BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(strings).AddSingleton(events)/*.AddSingleton(uptime)*/.BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
