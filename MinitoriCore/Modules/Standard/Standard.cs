@@ -93,10 +93,10 @@ namespace MinitoriCore.Modules.Standard
                 if (!events.cooldown.ContainsKey(Context.Guild.Id))
                     events.cooldown[Context.Guild.Id] = new Dictionary<ulong, DateTime>();
 
-                if (events.cooldown[Context.Guild.Id].ContainsKey(Context.User.Id) && events.cooldown[Context.Guild.Id][Context.User.Id] > DateTime.UtcNow.AddMinutes(-2.5))
+                if (events.cooldown[Context.Guild.Id].ContainsKey(Context.User.Id) && events.cooldown[Context.Guild.Id][Context.User.Id] > DateTime.UtcNow.AddSeconds(-15))
                 {
-                    TimeSpan t = events.cooldown[Context.Guild.Id][Context.User.Id] - DateTime.UtcNow.AddMinutes(-2.5);
-                    await ReplyAsync($"You're still making another snowball! You'll be ready in {t.Minutes:0}:{t.Seconds:00}");
+                    TimeSpan t = events.cooldown[Context.Guild.Id][Context.User.Id] - DateTime.UtcNow.AddSeconds(-15);
+                    await ReplyAsync($"You're still making another snowball! You'll be ready in {t.Seconds:00} seconds.");
                     return;
                 }
 
@@ -114,7 +114,7 @@ namespace MinitoriCore.Modules.Standard
                 if (user.Id == Context.User.Id)
                 {
                     events.stats[Context.Guild.Id][Context.User.Id].Misses++;
-                    events.cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow.AddMinutes(2);
+                    events.cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow.AddSeconds(40);
                     await ReplyAsync($"{Context.User.Mention} attempted to throw a snowball at {Context.User.Mention}, but all they managed to do is fall over and lose their snowball.");
                     return;
                 }
@@ -175,7 +175,7 @@ namespace MinitoriCore.Modules.Standard
             }
             else
             {
-                await ReplyAsync("You don't have any snowballs to throw!");
+                await ReplyAsync("You don't have any snowballs to throw! You have to wait for someone to throw a snowball at you before you can join.");
                 return;
             }
         }
