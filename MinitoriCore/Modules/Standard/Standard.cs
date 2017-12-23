@@ -54,14 +54,14 @@ namespace MinitoriCore.Modules.Standard
 
             if (Context.Message.MentionedUserIds.Count() == 1)
             {
-                if (Context.Message.MentionedUserIds.FirstOrDefault() == ((SocketGuild)Context.Guild).CurrentUser.Id)
+                if (Context.Message.MentionedUserIds.FirstOrDefault() != ((SocketGuild)Context.Guild).CurrentUser.Id)
                     user = (IGuildUser)Context.Message.Author;
                 else
                 {
                     message = "Hey, you sure you want to throw snowballs at your supplier";
                 }
             }
-            if (Context.Message.MentionedUserIds.Count() > 1)
+            else if (Context.Message.MentionedUserIds.Count() > 1)
             {
                 foreach (var u in Context.Message.MentionedUserIds)
                 {
@@ -187,7 +187,7 @@ namespace MinitoriCore.Modules.Standard
                 else
                     user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds.FirstOrDefault());
             }
-            if (Context.Message.MentionedUserIds.Count() > 1)
+            else if (Context.Message.MentionedUserIds.Count() > 1)
             {
                 foreach (var u in Context.Message.MentionedUserIds)
                 {
