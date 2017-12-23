@@ -17,8 +17,6 @@ namespace MinitoriCore.Modules.Standard
     public class Standard : ModuleBase
     {
         private RandomStrings strings;
-        private Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new Dictionary<ulong, Dictionary<ulong, DateTime>>();
-        // <Guild ID, <User ID, Time last used>>
 
         private EventStorage events;
 
@@ -55,7 +53,7 @@ namespace MinitoriCore.Modules.Standard
             if (Context.Message.MentionedUserIds.Count() == 1)
             {
                 if (Context.Message.MentionedUserIds.FirstOrDefault() != ((SocketGuild)Context.Guild).CurrentUser.Id)
-                    user = (IGuildUser)Context.Message.Author;
+                    user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds.FirstOrDefault());
                 else
                 {
                     message = "Hey, you sure you want to throw snowballs at your supplier";
@@ -92,31 +90,31 @@ namespace MinitoriCore.Modules.Standard
                     return;
                 }
 
-                if (!cooldown.ContainsKey(Context.Guild.Id))
-                    cooldown[Context.Guild.Id] = new Dictionary<ulong, DateTime>();
+                if (!events.cooldown.ContainsKey(Context.Guild.Id))
+                    events.cooldown[Context.Guild.Id] = new Dictionary<ulong, DateTime>();
 
-                if (cooldown[Context.Guild.Id].ContainsKey(Context.User.Id) && cooldown[Context.Guild.Id][Context.User.Id] > DateTime.UtcNow.AddMinutes(-2.5))
+                if (events.cooldown[Context.Guild.Id].ContainsKey(Context.User.Id) && events.cooldown[Context.Guild.Id][Context.User.Id] > DateTime.UtcNow.AddMinutes(-2.5))
                 {
-                    TimeSpan t = cooldown[Context.Guild.Id][Context.User.Id] - DateTime.UtcNow.AddMinutes(-2.5);
+                    TimeSpan t = events.cooldown[Context.Guild.Id][Context.User.Id] - DateTime.UtcNow.AddMinutes(-2.5);
                     await ReplyAsync($"You're still making another snowball! You'll be ready in {t.Minutes:0}:{t.Seconds:00}");
                     return;
                 }
 
-                cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow;
+                events.cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow;
 
                 if (!events.stats.ContainsKey(Context.Guild.Id))
                     events.stats[Context.Guild.Id] = new Dictionary<ulong, SnowballStats>();
 
-                if (events.stats[Context.Guild.Id][Context.User.Id] == null)
+                if (!events.stats[Context.Guild.Id].ContainsKey(Context.User.Id))
                     events.stats[Context.Guild.Id][Context.User.Id] = new SnowballStats();
 
-                if (events.stats[Context.Guild.Id][user.Id] == null)
+                if (!events.stats[Context.Guild.Id].ContainsKey(user.Id))
                     events.stats[Context.Guild.Id][user.Id] = new SnowballStats();
 
                 if (user.Id == Context.User.Id)
                 {
                     events.stats[Context.Guild.Id][Context.User.Id].Misses++;
-                    cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow.AddMinutes(2);
+                    events.cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow.AddMinutes(2);
                     await ReplyAsync($"{Context.User.Mention} attempted to throw a snowball at {Context.User.Mention}, but all they managed to do is fall over and lose their snowball.");
                     return;
                 }
@@ -169,7 +167,7 @@ namespace MinitoriCore.Modules.Standard
                         events.stats[Context.Guild.Id][Context.User.Id].Misses++;
                         events.stats[Context.Guild.Id][user.Id].Caught++;
 
-                        cooldown[Context.Guild.Id][user.Id] = DateTime.UtcNow.AddMinutes(-10);
+                        events.cooldown[Context.Guild.Id][user.Id] = DateTime.UtcNow.AddMinutes(-10);
 
                         await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}, but {user.Mention} caught it!");
                     }

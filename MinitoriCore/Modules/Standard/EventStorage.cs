@@ -23,6 +23,10 @@ namespace MinitoriCore.Modules.Standard
         [JsonIgnore]
         public Dictionary<ulong, Dictionary<ulong, SnowballStats>> oldStats { get; set; }
 
+        [JsonIgnore]
+        public Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new Dictionary<ulong, Dictionary<ulong, DateTime>>();
+        // <Guild ID, <User ID, Time last used>>
+
         public static EventStorage Load()
         {
             if (File.Exists("events.json"))
