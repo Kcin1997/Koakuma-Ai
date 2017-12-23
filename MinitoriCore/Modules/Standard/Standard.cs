@@ -34,6 +34,27 @@ namespace MinitoriCore.Modules.Standard
             await ReplyAsync($"Blah to you too, {Context.User.Mention}.");
         }
 
+        [Command("quit")]
+        [Priority(1000)]
+        public async Task ShutDown()
+        {
+            if (Context.User.Id != 102528327251656704)
+            {
+                await ReplyAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            events.Save();
+
+            Task.Run(async () =>
+            {
+                await ReplyAsync("rip");
+                //await Task.Delay(500);
+                await ((DiscordSocketClient)Context.Client).LogoutAsync();
+                Environment.Exit(0);
+            });
+        }
+
         [Command("snowball")]
         [Summary("Throw snowballs at people! Build an army!")]
         public async Task Snowball([Remainder]string remainder = "")
@@ -43,9 +64,21 @@ namespace MinitoriCore.Modules.Standard
                 await ReplyAsync("You can't use this in DMs!");
                 return;
             }
+            
+            var snowballRoles = Context.Guild.Roles.Count(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
 
-            if (Context.Guild.Id != 132720341058453504)
+            if (snowballRoles == 0)
+            {
+                await ReplyAsync("I don't see a role named `Snowball`, make one and try again.");
                 return;
+            }
+            else if (snowballRoles > 1)
+            {
+                await ReplyAsync("There are too many roles named `Snowball`, rename some and try again.");
+                return;
+            }
+
+            var role = Context.Guild.Roles.FirstOrDefault(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
 
             IGuildUser user = null;
             string message = ""; // store the message later to be intelligent about when to yell at them for having the role or not
@@ -82,7 +115,7 @@ namespace MinitoriCore.Modules.Standard
                 return;
             }
             
-            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(394129853043048448))
+            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(role.Id))
             {
                 if (message != "")
                 {
@@ -119,18 +152,18 @@ namespace MinitoriCore.Modules.Standard
                     return;
                 }
 
-                if (!user.RoleIds.ToList().Contains(394129853043048448))
+                if (!user.RoleIds.ToList().Contains(role.Id))
                 {
                     // Add the role. 100% chance to hit
                     try
                     {
-                        await user.AddRoleAsync(Context.Guild.GetRole(394129853043048448));
+                        await user.AddRoleAsync(role);
                     }
                     catch (Exception ex)
                     {
                         events.stats[Context.Guild.Id][Context.User.Id].Misses++;
                         events.stats[Context.Guild.Id][user.Id].Dodged++;
-                        await ReplyAsync($"The snowball sailed right through {user.Mention}! Wait, what?\nPoke Googie2149 about this! `{ex.Message}`");
+                        await ReplyAsync($"The snowball sailed right through {user.Username}! Wait, what?\nPoke Googie2149#1368 about this! `{ex.Message}`");
                         return;
                     }
 
