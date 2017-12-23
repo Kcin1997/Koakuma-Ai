@@ -31,11 +31,57 @@ namespace MinitoriCore.Modules.Standard
             await ReplyAsync($"Blah to you too, {Context.User.Mention}.");
         }
 
+        [Command("snowball")]
+        [Summary("Throw snowballs at people! Build an army!")]
+        public async Task Snowball([Remainder]string remainder = "")
+        {
+            if (Context.Guild.Id != 132720341058453504)
+                return;
+
+            IGuildUser user = null;
+
+            if (Context.Message.MentionedUserIds.Count() == 1)
+            {
+                if (Context.Message.MentionedUserIds.FirstOrDefault() == ((SocketGuild)Context.Guild).CurrentUser.Id)
+                    user = (IGuildUser)Context.Message.Author;
+                else
+                {
+                    await ReplyAsync("Hey, you sure you want to throw snowballs at your supplier");
+                    return;
+                }
+            }
+            if (Context.Message.MentionedUserIds.Count() > 1)
+            {
+                foreach (var u in Context.Message.MentionedUserIds)
+                {
+                    if (u == ((SocketGuild)Context.Guild).CurrentUser.Id)
+                        continue;
+
+                    user = await Context.Guild.GetUserAsync(u);
+
+                    break;
+                }
+
+                if (user == null)
+                {
+                    await ReplyAsync("Nope, still can't throw snowballs at me");
+                    return;
+                }
+            }
+            else
+            {
+                await ReplyAsync("You need to pick someone to throw a snowball at!");
+                return;
+            }
+
+
+        }
+
         [Command("throw")]
         [Summary("Beat people with objects!")]
         public async Task Throw([Remainder]string remainder = "")
         {
-            IGuildUser user;
+            IGuildUser user = null;
 
             if (Context.Message.MentionedUserIds.Count() == 1)
             {
@@ -46,8 +92,18 @@ namespace MinitoriCore.Modules.Standard
             }
             if (Context.Message.MentionedUserIds.Count() > 1)
             {
-                user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds
-                    .FirstOrDefault(x => x != ((SocketGuild)Context.Guild).CurrentUser.Id));
+                foreach (var u in Context.Message.MentionedUserIds)
+                {
+                    if (u == ((SocketGuild)Context.Guild).CurrentUser.Id)
+                        continue;
+
+                    user = await Context.Guild.GetUserAsync(u);
+
+                    break;
+                }
+
+                if (user == null)
+                    user = (IGuildUser)Context.Message.Author;
             }
             else
                 user = (IGuildUser)Context.User;
