@@ -79,10 +79,95 @@ namespace MinitoriCore
             if (user.Guild.Id == 110373943822540800 && user.IsBot)
                 await user.AddRoleAsync(user.Guild.GetRole(318748748010487808));
         }
-        
+
         private Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            //Console.WriteLine(msg.ToString());
+
+            //Color
+            ConsoleColor color;
+            switch (msg.Severity)
+            {
+                case LogSeverity.Error: color = ConsoleColor.Red; break;
+                case LogSeverity.Warning: color = ConsoleColor.Yellow; break;
+                case LogSeverity.Info: color = ConsoleColor.White; break;
+                case LogSeverity.Verbose: color = ConsoleColor.Gray; break;
+                case LogSeverity.Debug: default: color = ConsoleColor.DarkGray; break;
+            }
+
+            //Exception
+            string exMessage;
+            Exception ex = msg.Exception;
+            if (ex != null)
+            {
+                while (ex is AggregateException && ex.InnerException != null)
+                    ex = ex.InnerException;
+                exMessage = $"{ex.Message}";
+                if (exMessage != "Reconnect failed: HTTP/1.1 503 Service Unavailable")
+                    exMessage += $"\n{ex.StackTrace}";
+            }
+            else
+                exMessage = null;
+
+            //Source
+            string sourceName = msg.Source?.ToString();
+
+            //Text
+            string text;
+            if (msg.Message == null)
+            {
+                text = exMessage ?? "";
+                exMessage = null;
+            }
+            else
+                text = msg.Message;
+
+            //if (text.Contains("GUILD_UPDATE: ") && text.Contains("UTC"))
+            //    return Task.CompletedTask;
+            //else if (text.StartsWith("CHANNEL_UPDATE: "))
+            //    return Task.CompletedTask;
+
+            if (sourceName == "Command")
+                color = ConsoleColor.Cyan;
+            else if (sourceName == "<<Message")
+                color = ConsoleColor.Green;
+            else if (sourceName == ">>Message")
+                return Task.CompletedTask;
+
+            //Build message
+            StringBuilder builder = new StringBuilder(text.Length + (sourceName?.Length ?? 0) + (exMessage?.Length ?? 0) + 5);
+            if (sourceName != null)
+            {
+                builder.Append('[');
+                builder.Append(sourceName);
+                builder.Append("] ");
+            }
+            builder.Append($"[{DateTime.Now.ToString("d")} {DateTime.Now.ToString("T")}] ");
+            for (int i = 0; i < text.Length; i++)
+            {
+                //Strip control chars
+                char c = text[i];
+                if (c == '\n' || !char.IsControl(c) || c != (char)8226)
+                    builder.Append(c);
+            }
+            if (exMessage != null)
+            {
+                builder.Append(": ");
+                builder.Append(exMessage);
+            }
+
+            text = builder.ToString();
+            //if (msg.Severity <= LogSeverity.Info)
+            //{
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            //}
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine(text);
+#endif
+
+
+
             return Task.CompletedTask;
         }
     }
