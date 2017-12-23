@@ -83,7 +83,7 @@ namespace MinitoriCore.Modules.Standard
                 await ReplyAsync("You need to pick someone to throw a snowball at!");
                 return;
             }
-
+            
             if (((IGuildUser)Context.User).RoleIds.ToList().Contains(394129853043048448))
             {
                 if (message != "")
@@ -112,6 +112,14 @@ namespace MinitoriCore.Modules.Standard
 
                 if (events.stats[Context.Guild.Id][user.Id] == null)
                     events.stats[Context.Guild.Id][user.Id] = new SnowballStats();
+
+                if (user.Id == Context.User.Id)
+                {
+                    events.stats[Context.Guild.Id][Context.User.Id].Misses++;
+                    cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow.AddMinutes(2);
+                    await ReplyAsync($"{Context.User.Mention} attempted to throw a snowball at {Context.User.Mention}, but all they managed to do is fall over and lose their snowball.");
+                    return;
+                }
 
                 if (!user.RoleIds.ToList().Contains(394129853043048448))
                 {
