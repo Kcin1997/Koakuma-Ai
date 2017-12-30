@@ -11,6 +11,7 @@ using System.Reflection;
 using System.IO;
 using RestSharp;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
 
 namespace MinitoriCore.Modules.Standard
 {
@@ -24,6 +25,26 @@ namespace MinitoriCore.Modules.Standard
         {
             strings = _strings;
             events = _events;
+        }
+
+        private RNGCryptoServiceProvider rand = new RNGCryptoServiceProvider();
+
+        private int RandomInteger(int min, int max)
+        {
+            uint scale = uint.MaxValue;
+            while (scale == uint.MaxValue)
+            {
+                // Get four random bytes.
+                byte[] four_bytes = new byte[4];
+                rand.GetBytes(four_bytes);
+
+                // Convert that into an uint.
+                scale = BitConverter.ToUInt32(four_bytes, 0);
+            }
+
+            // Add min to the scaled difference between max and min.
+            return (int)(min + (max - min) *
+                (scale / (double)uint.MaxValue));
         }
 
         [Command("blah")]
@@ -278,6 +299,19 @@ namespace MinitoriCore.Modules.Standard
                     $"and {strings.objects[strings.RandomInteger(0, strings.objects.Length)]}";
 
             await ReplyAsync($"*throws {objects} at {user.Mention}*");
+        }
+
+        [Command("choose")]
+        [Alias("choice")]
+        [Summary("Let the bot decide for you!")]
+        public async Task Choose([Remainder]string remainder = "")
+        {
+            string[] choices = remainder.Split(';').Where(x => x.Trim().Length > 0).ToArray();
+            
+            if (choices[0] != "")
+                await ReplyAsync($"I choose **{choices[RandomInteger(0, choices.Length)].Trim()}**");
+            else
+                await ReplyAsync("What do you want me to do with this?");
         }
     }
 
