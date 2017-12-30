@@ -55,6 +55,26 @@ namespace MinitoriCore.Modules.Standard
             });
         }
 
+        [Command("unsnow")]
+        [Summary("Leave the snowball fight")]
+        public async Task UnSnowball()
+        {
+            var snowballRoles = Context.Guild.Roles.Count(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
+
+            if (snowballRoles == 0)
+            {
+                await ReplyAsync("I don't see a role named `Snowball`, make one and try again.");
+                return;
+            }
+            else if (snowballRoles > 1)
+            {
+                await ReplyAsync("There are too many roles named `Snowball`, rename some and try again.");
+                return;
+            }
+
+            var role = Context.Guild.Roles.FirstOrDefault(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
+        }
+
         [Command("snowball")]
         [Summary("Throw snowballs at people! Build an army!")]
         public async Task Snowball([Remainder]string remainder = "")
@@ -163,7 +183,7 @@ namespace MinitoriCore.Modules.Standard
                     {
                         events.stats[Context.Guild.Id][Context.User.Id].Misses++;
                         events.stats[Context.Guild.Id][user.Id].Dodged++;
-                        await ReplyAsync($"The snowball sailed right through {user.Username}! Wait, what?\nPoke Googie2149#1368 about this! `{ex.Message}`");
+                        await ReplyAsync($"The snowball sailed right through {user.Username}! Wait, what?\ni probably don't have the manage roles permission! `{ex.Message}`");
                         return;
                     }
 
@@ -208,7 +228,7 @@ namespace MinitoriCore.Modules.Standard
             }
             else
             {
-                await ReplyAsync("You don't have any snowballs to throw! You have to wait for someone to throw a snowball at you before you can join.");
+                await ReplyAsync("No one has thrown any snowballs your way yet, so you don't have the Snowball role yet.");
                 return;
             }
         }
