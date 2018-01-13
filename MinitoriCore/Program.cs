@@ -65,20 +65,20 @@ namespace MinitoriCore
             await Task.Delay(-1);
         }
 
-        private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
+        private async Task Client_UserUpdated(SocketUser before, SocketUser after)
         {
-            if (before.Guild.Id != 110373943822540800)
+            if (((SocketGuildUser)before).Guild.Id != 110373943822540800)
                 return;
 
-            if (before.Id == 190544080164487168 && before.Roles.Count() != after.Roles.Count())
+            if (before.Id == 190544080164487168 && ((SocketGuildUser)before).Roles.Count() != ((SocketGuildUser)after).Roles.Count())
             {
-                var testMute = after.Guild.GetRole(132106771975110656);
-                var superMute = after.Guild.GetRole(132106637614776320);
+                var testMute = ((SocketGuildUser)after).Guild.GetRole(132106771975110656);
+                var superMute = ((SocketGuildUser)after).Guild.GetRole(132106637614776320);
 
-                if (after.Roles.Contains(superMute) || after.Roles.Contains(testMute))
+                if (((SocketGuildUser)after).Roles.Contains(superMute) || ((SocketGuildUser)after).Roles.Contains(testMute))
                 {
                     await Task.Delay(200);
-                    await after.RemoveRolesAsync(new IRole[] { testMute, superMute });
+                    await ((SocketGuildUser)after).RemoveRolesAsync(new IRole[] { testMute, superMute });
                 }
             }
         }
