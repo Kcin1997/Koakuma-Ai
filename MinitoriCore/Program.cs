@@ -51,7 +51,8 @@ namespace MinitoriCore
             await client.StartAsync();
 
             client.GuildAvailable += Client_GuildAvailable;
-            client.GuildMemberUpdated += Client_UserUpdated;
+            //client.GuildMemberUpdated += Client_UserUpdated;
+            // memes
 
             //await uptime.Install(map);
 
