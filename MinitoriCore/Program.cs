@@ -51,10 +51,10 @@ namespace MinitoriCore
             await client.StartAsync();
 
             client.GuildAvailable += Client_GuildAvailable;
-            client.UserUpdated += Client_UserUpdated;
+            client.GuildMemberUpdated += Client_UserUpdated;
 
             //await uptime.Install(map);
-            
+
             client.UserJoined += Client_UserJoined;
 
             handler = new CommandHandler();
@@ -65,7 +65,7 @@ namespace MinitoriCore
             await Task.Delay(-1);
         }
 
-        private async Task Client_UserUpdated(SocketUser before, SocketUser after)
+        private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
         {
             if (((SocketGuildUser)before).Guild.Id != 110373943822540800)
                 return;
