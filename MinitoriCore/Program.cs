@@ -51,6 +51,7 @@ namespace MinitoriCore
             await client.StartAsync();
 
             client.GuildAvailable += Client_GuildAvailable;
+            client.UserUpdated += Client_UserUpdated;
 
             //await uptime.Install(map);
             
@@ -62,6 +63,24 @@ namespace MinitoriCore
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(File.OpenRead("Minitori.png")));
 
             await Task.Delay(-1);
+        }
+
+        private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
+        {
+            if (before.Guild.Id != 110373943822540800)
+                return;
+
+            if (before.Id == 190544080164487168 && before.Roles.Count() != after.Roles.Count())
+            {
+                var testMute = after.Guild.GetRole(132106771975110656);
+                var superMute = after.Guild.GetRole(132106637614776320);
+
+                if (after.Roles.Contains(superMute) || after.Roles.Contains(testMute))
+                {
+                    await Task.Delay(200);
+                    await after.RemoveRolesAsync(new IRole[] { testMute, superMute });
+                }
+            }
         }
 
         private async Task Client_GuildAvailable(SocketGuild guild)
