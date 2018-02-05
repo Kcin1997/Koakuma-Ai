@@ -102,6 +102,11 @@ namespace MinitoriCore.Modules.DiscordBots
                         {
                             if (u.RoleIds.Contains((ulong)132106637614776320))
                                 unroledBots.Add(u);
+                            else
+                            {
+                                await u.AddRoleAsync(r, new RequestOptions() { AuditLogReason = reason });
+                                roledBots.Add(u);
+                            }
                         }
                         else
                         {
