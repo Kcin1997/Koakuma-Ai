@@ -119,6 +119,7 @@ namespace MinitoriCore.Modules.DiscordBots
                     {
                         await u.RemoveRolesAsync(new List<IRole>() { Context.Guild.GetRole(132106637614776320), Context.Guild.GetRole(132106771975110656) }, 
                             new RequestOptions() { AuditLogReason = reason });
+                        roledBots.Add(u);
                     }
                     else if (u.RoleIds.Contains(r.Id))
                     {
