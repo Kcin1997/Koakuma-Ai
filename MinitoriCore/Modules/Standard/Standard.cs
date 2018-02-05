@@ -144,6 +144,12 @@ namespace MinitoriCore.Modules.Standard
                     output.Append($"**{user.Username}#{user.Discriminator}**, ");
                 }
 
+                if (mutedUsers == 0)
+                {
+                    await ReplyAsync("None of those are bots!");
+                    return;
+                }
+
                 await ReplyAsync(output.ToString().Trim().TrimEnd(','));
             }
         }
