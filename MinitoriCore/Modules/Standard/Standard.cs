@@ -119,7 +119,7 @@ namespace MinitoriCore.Modules.Standard
                     return;
                 }
 
-                reason = $"[ Mute by {Context.User.Username}#{Context.User.Discriminator} ]{string.Join(" ", args)}";
+                reason = $"[ Mute by {Context.User.Username}#{Context.User.Discriminator} ] {string.Join(" ", args)}".Trim();
 
                 StringBuilder output = new StringBuilder();
                 output.AppendLine("Non-testing muted the following bots:");
