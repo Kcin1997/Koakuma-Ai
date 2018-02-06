@@ -155,6 +155,9 @@ namespace MinitoriCore.Modules.Standard
                 await ReplyAsync("You need to pick someone to throw a snowball at!");
                 return;
             }
+
+            if (user.Id == 396277750664527872)
+                return; // made me stay up late to break things
             
             if (((IGuildUser)Context.User).RoleIds.ToList().Contains(role.Id))
             {

@@ -213,7 +213,7 @@ namespace MinitoriCore.Modules.DiscordBots
             if (((IGuildUser)Context.User).RoleIds.ToList().Contains(407326634819977217) ||
                 ((IGuildUser)Context.User).RoleIds.ToList().Contains(113379036524212224))
             {
-                await ChangeRoles(remainder, 132106771975110656, false);
+                await ChangeRoles(remainder, 132106637614776320, false);
             }
         }
 
