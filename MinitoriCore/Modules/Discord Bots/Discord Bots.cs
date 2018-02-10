@@ -244,5 +244,19 @@ namespace MinitoriCore.Modules.DiscordBots
                 await ChangeRoles(remainder, 318748748010487808, false);
             }
         }
+
+        [Command("botneedshelp")]
+        [Summary("pollr machine broke")]
+        public async Task AddBotRole([Remainder]string remainder = "")
+        {
+            if (Context.Guild.Id != 110373943822540800)
+                return;
+
+            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(407326634819977217) ||
+                ((IGuildUser)Context.User).RoleIds.ToList().Contains(113379036524212224))
+            {
+                await ChangeRoles(remainder, 110374777914417152);
+            }
+        }
     }
 }
