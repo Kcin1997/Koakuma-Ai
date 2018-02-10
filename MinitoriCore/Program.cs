@@ -57,6 +57,7 @@ namespace MinitoriCore
             //await uptime.Install(map);
 
             client.UserJoined += Client_UserJoined;
+            client.MessageReceived += Client_MessageReceived;
 
             handler = new CommandHandler();
             await handler.Install(map);
@@ -64,6 +65,17 @@ namespace MinitoriCore
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(File.OpenRead("Minitori.png")));
 
             await Task.Delay(-1);
+        }
+
+        private async Task Client_MessageReceived(SocketMessage msg)
+        {
+            if (((IGuildChannel)msg.Channel).GuildId != 110373943822540800)
+                return;
+            
+            if (msg.Content.ToLower().StartsWith(".iam emotes"))
+            {
+                await ((IGuildChannel)msg.Channel).Guild.AddBanAsync(msg.Author, 1, "Spam prevention");
+            }
         }
 
         private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
