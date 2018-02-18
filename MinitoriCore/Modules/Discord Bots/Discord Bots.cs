@@ -245,6 +245,34 @@ namespace MinitoriCore.Modules.DiscordBots
             }
         }
 
+        [Command("noreactions")]
+        [Summary("Remove a mute from a bot")]
+        public async Task AddNoReaction([Remainder]string remainder = "")
+        {
+            if (Context.Guild.Id != 110373943822540800)
+                return;
+
+            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(407326634819977217) ||
+                ((IGuildUser)Context.User).RoleIds.ToList().Contains(113379036524212224))
+            {
+                await ChangeRoles(remainder, 241256979840892939);
+            }
+        }
+
+        [Command("yesreactions")]
+        [Summary("Remove a mute from a bot")]
+        public async Task RemoveNoReaction([Remainder]string remainder = "")
+        {
+            if (Context.Guild.Id != 110373943822540800)
+                return;
+
+            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(407326634819977217) ||
+                ((IGuildUser)Context.User).RoleIds.ToList().Contains(113379036524212224))
+            {
+                await ChangeRoles(remainder, 241256979840892939, false);
+            }
+        }
+
         [Command("botneedshelp")]
         [Summary("pollr machine broke")]
         public async Task AddBotRole([Remainder]string remainder = "")
