@@ -9,6 +9,7 @@ using Discord.Commands.Builders;
 using Discord.WebSocket;
 using Discord.Addons.EmojiTools;
 using Microsoft.Extensions.DependencyInjection;
+using MinitoriCore.Modules.ImageCommands;
 //using Minitori.Modules.HelpModule;
 
 namespace MinitoriCore
@@ -20,6 +21,7 @@ namespace MinitoriCore
         //private IDependencyMap map;
         private IServiceProvider services;
         private Config config;
+        private Kirby kirby;
 
         public async Task Install(IServiceProvider _services)
         {
@@ -31,6 +33,7 @@ namespace MinitoriCore
             config = _services.GetService<Config>();
 
             await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            kirby = new Kirby(commands);
 
             //await HelpModule.Install(commands);
 
