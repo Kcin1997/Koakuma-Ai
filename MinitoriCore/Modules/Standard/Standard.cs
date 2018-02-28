@@ -156,6 +156,9 @@ namespace MinitoriCore.Modules.Standard
                 return;
             }
 
+            if (user.Id == 102528327251656704) // Googie2149
+                user = (IGuildUser)Context.User;
+
             if (user.Id == 396277750664527872)
                 return; // made me stay up late to break things
             
@@ -286,6 +289,9 @@ namespace MinitoriCore.Modules.Standard
                     user = (IGuildUser)Context.Message.Author;
             }
             else
+                user = (IGuildUser)Context.User;
+
+            if (user.Id == 102528327251656704) // Googie2149
                 user = (IGuildUser)Context.User;
 
             int count = strings.RandomInteger(0, 100);

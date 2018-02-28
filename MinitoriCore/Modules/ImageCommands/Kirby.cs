@@ -21,11 +21,40 @@ namespace MinitoriCore.Modules.ImageCommands
             commands.CreateModuleAsync("", x =>
             {
                 x.Name = "Kirby";
-                x.AddCommand("reserved", async (context, param, serv, command) => 
+
+                foreach (string[] source in new string[][] {
+                    new string[] { "poyo", "kirby", "gorb" },
+                    new string[] { "ddd", "dedede" },
+                    new string[] { "metaborb", "metaknight", "borb" },
+                    new string[] { "bandana", "waddee", "waddle" },
+                    new string[] { "egg", "lor" },
+                    new string[] { "spiderman", "taranza" },
+                    new string[] { "squeak", "squek" },
+                    new string[] { "familyproblems", "susie", "soos" },
+                    new string[] { "artist", "adeleine" },
+                    new string[] { "randomfairy", "ribbon" },
+                    new string[] { "dreamland" },
+                    new string[] { "birb" },
+                    new string[] { "onion", "witch", "gryll" },
+                    new string[] { "queen", "secc", "sectonia" },
+                    new string[] { "helper", "helpers", "helpful", "friendship", "friendo" },
+                    new string[] { "moretsu", "manga", "mungu", "kirbymanga" },
+                    new string[] { "grenpa", "mommy" },
+                    new string[] { "eye", "eyeborb", "badsphere" },
+                    new string[] { "dad", "father", "baddad", "haltman", "daddy" },
+                    new string[] { "clown", "marx", "grape" } })
                 {
-                    await context.Channel.SendMessageAsync("It didnt work son");
-                },
-                command => { command.AddAliases("reserved1", "reserved3"); });
+                    x.AddCommand(source[0], async (context, param, serv, command) =>
+                    {
+                        await context.Channel.SendMessageAsync("It didnt work son");
+                    },
+                    command => 
+                    {
+                        command.AddAliases(source.Skip(1).ToArray());
+                        command.Summary = $"***{source[0]}***";
+                    });
+                }
+                
                 x.Build(commands);
             });
         }
