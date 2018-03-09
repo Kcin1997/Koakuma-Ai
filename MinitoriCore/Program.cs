@@ -62,6 +62,26 @@ namespace MinitoriCore
             handler = new CommandHandler();
             await handler.Install(map);
 
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000 * 60); // wait a minute before downloading to ensure we have access to the server
+                await client.DownloadUsersAsync(new IGuild[] { client.GetGuild(110373943822540800) });
+                var role = client.GetGuild(110373943822540800).GetRole(110374777914417152);
+
+                while (true)
+                {
+                    foreach (var u in client.GetGuild(110373943822540800).Users.Where(x => x?.IsBot == true))
+                    {
+                        if (!u.Roles.Contains(role))
+                        {
+                            await u.AddRoleAsync(role);
+                        }
+                    }
+
+                    await Task.Delay(1000 * 60 * 30); // Wait 30 minutes
+                }
+            });
+
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(File.OpenRead("Minitori.png")));
 
             await Task.Delay(-1);
