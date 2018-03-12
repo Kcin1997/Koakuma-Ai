@@ -28,13 +28,13 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "metaborb", "metaknight", "borb" },
                     new string[] { "bandana", "waddee", "waddle" },
                     new string[] { "egg", "lor" },
-                    new string[] { "spiderman", "taranza" },
+                    new string[] { "spiderman", "taranza", "spid" },
                     new string[] { "squeak", "squek" },
                     new string[] { "familyproblems", "susie", "soos" },
                     new string[] { "artist", "adeleine" },
                     new string[] { "randomfairy", "ribbon" },
                     new string[] { "dreamland" },
-                    new string[] { "birb" },
+                    new string[] { "birb", "gala" },
                     new string[] { "onion", "witch", "gryll" },
                     new string[] { "queen", "secc", "sectonia" },
                     new string[] { "helper", "helpers", "helpful", "friendship", "friendo" },
@@ -59,6 +59,9 @@ namespace MinitoriCore.Modules.ImageCommands
             });
         }
 
-        
+        private async Task UploadImage(string source, CommandContext Context)
+        {
+            
+        }
     }
 }

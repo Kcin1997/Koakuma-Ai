@@ -75,6 +75,20 @@ namespace MinitoriCore.Modules.Standard
                 Environment.Exit(0);
             });
         }
+
+        [Command("joined")]
+        public async Task GetJoinDates([Remainder]string blah)
+        {
+            StringBuilder output = new StringBuilder();
+
+            foreach (var u in Context.Message.MentionedUserIds)
+            {
+                var user = ((SocketGuild)Context.Guild).GetUser(u);
+                output.AppendLine($"{user.Username} - `{user.JoinedAt.Value.ToLocalTime().ToString("d")} {user.JoinedAt.Value.ToLocalTime().ToString("T")}`");
+            }
+
+            await ReplyAsync(output.ToString());
+        }
         
         [Command("unsnow")]
         [Summary("Leave the snowball fight")]
