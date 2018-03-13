@@ -89,6 +89,33 @@ namespace MinitoriCore.Modules.Standard
 
             await ReplyAsync(output.ToString());
         }
+
+        [Command("listroles")]
+        public async Task ListRoles([Remainder]string role)
+        {
+            if (role.Length > 0)
+            {
+                var r = Context.Guild.Roles.FirstOrDefault(x => x.Name == role);
+                if (r != null)
+                    await ReplyAsync($"```{r.Id} | {r.Name}```");
+                else
+                    await ReplyAsync($"I can't find a role named `{role}`!");
+
+                return;
+            }
+
+            StringBuilder output = new StringBuilder();
+            output.Append("```");
+
+            foreach (var r in Context.Guild.Roles)
+            {
+                output.AppendLine($"{r.Id} | {r.Name}");
+            }
+
+            output.Append("```");
+
+            await ReplyAsync(output.ToString());
+        }
         
         [Command("unsnow")]
         [Summary("Leave the snowball fight")]
