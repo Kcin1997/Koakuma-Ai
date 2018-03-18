@@ -98,23 +98,23 @@ namespace MinitoriCore
             }
         }
 
-        private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
-        {
-            if (((SocketGuildUser)before).Guild.Id != 110373943822540800)
-                return;
+        //private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
+        //{
+        //    if (((SocketGuildUser)before).Guild.Id != 110373943822540800)
+        //        return;
 
-            if (before.Id == 190544080164487168 && ((SocketGuildUser)before).Roles.Count() != ((SocketGuildUser)after).Roles.Count())
-            {
-                var testMute = ((SocketGuildUser)after).Guild.GetRole(132106771975110656);
-                var superMute = ((SocketGuildUser)after).Guild.GetRole(132106637614776320);
+        //    if (before.Id == 190544080164487168 && ((SocketGuildUser)before).Roles.Count() != ((SocketGuildUser)after).Roles.Count())
+        //    {
+        //        var testMute = ((SocketGuildUser)after).Guild.GetRole(132106771975110656);
+        //        var superMute = ((SocketGuildUser)after).Guild.GetRole(132106637614776320);
 
-                if (((SocketGuildUser)after).Roles.Contains(superMute) || ((SocketGuildUser)after).Roles.Contains(testMute))
-                {
-                    await Task.Delay(200);
-                    await ((SocketGuildUser)after).RemoveRolesAsync(new IRole[] { testMute, superMute });
-                }
-            }
-        }
+        //        if (((SocketGuildUser)after).Roles.Contains(superMute) || ((SocketGuildUser)after).Roles.Contains(testMute))
+        //        {
+        //            await Task.Delay(200);
+        //            await ((SocketGuildUser)after).RemoveRolesAsync(new IRole[] { testMute, superMute });
+        //        }
+        //    }
+        //}
 
         private async Task Client_GuildAvailable(SocketGuild guild)
         {
