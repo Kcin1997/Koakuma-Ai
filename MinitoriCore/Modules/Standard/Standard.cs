@@ -303,6 +303,7 @@ namespace MinitoriCore.Modules.Standard
 
         [Command("snowball stats")]
         [Summary("Get stats for the snowball fight!")]
+        [Priority(1000)]
         public async Task Stats([Remainder]string mentions = "")
         {
             StringBuilder output = new StringBuilder();
