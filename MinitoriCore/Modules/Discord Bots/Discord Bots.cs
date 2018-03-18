@@ -23,6 +23,7 @@ namespace MinitoriCore.Modules.DiscordBots
 
         // No emoji 241256979840892939
         // No embed 178823209217556480
+        // Bots 110374777914417152
 
         private async Task ChangeRoles(string remainder, ulong role, bool addRole = true)
         {

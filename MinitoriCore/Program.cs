@@ -129,10 +129,12 @@ namespace MinitoriCore
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
-            await Task.Delay(500);
-
             if (user.Guild.Id == 110373943822540800 && user.IsBot)
-                await user.AddRoleAsync(user.Guild.GetRole(318748748010487808));
+            {
+                await Task.Delay(1500);
+                var roles = new IRole[] { user.Guild.GetRole(318748748010487808), user.Guild.GetRole(110374777914417152) };
+                await user.AddRolesAsync(roles);
+            }
         }
 
         private Task Log(LogMessage msg)
