@@ -306,55 +306,56 @@ namespace MinitoriCore.Modules.Standard
         [Priority(1000)]
         public async Task Stats([Remainder]string mentions = "")
         {
-            StringBuilder output = new StringBuilder();
-            output.Append("```");
+            //Task.Run(async () =>
+            //{
+                StringBuilder output = new StringBuilder();
+                //output.Append("```");
+                
+                int spaces = 0;
 
-            await Context.Guild.DownloadUsersAsync();
-
-            int spaces = 0;
-
-            if (Context.Message.MentionedUserIds.Count() > 0)
-            {
-                spaces = Context.Message.MentionedUserIds.Select(x => ((SocketGuild)Context.Guild).GetUser(x)?.Username).OrderByDescending(x => x?.Length).FirstOrDefault().Length;
-
-                foreach (var kv in events.stats[Context.Guild.Id].OrderByDescending(x => x.Value.Hits).Where(x => Context.Message.MentionedUserIds.Contains(x.Key)))
+                if (Context.Message.MentionedUserIds.Count() > 0)
                 {
-                    var user = (await Context.Guild.GetUserAsync(kv.Key));
-                    var name = user == null ? kv.Key.ToString() : user.Username;
+                    spaces = Context.Message.MentionedUserIds.Select(x => ((SocketGuild)Context.Guild).GetUser(x)?.Username).OrderByDescending(x => x?.Length).FirstOrDefault().Length;
 
-                    output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("00")} Hits | {kv.Value.Misses.ToString("00")} Missed | " +
-                        $"{kv.Value.Dodged.ToString("00")} Dodged | {kv.Value.Caught.ToString("00")} Caught |");
+                    foreach (var kv in events.stats[Context.Guild.Id].OrderByDescending(x => x.Value.Hits).Where(x => Context.Message.MentionedUserIds.Contains(x.Key)))
+                    {
+                        var user = (await Context.Guild.GetUserAsync(kv.Key));
+                        var name = user == null ? kv.Key.ToString() : user.Username;
+
+                        output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("00")} Hits | {kv.Value.Misses.ToString("00")} Missed | " +
+                            $"{kv.Value.Dodged.ToString("00")} Dodged | {kv.Value.Caught.ToString("00")} Caught");
+                    }
                 }
-            }
-            else
-            {
-                spaces = events.stats[Context.Guild.Id].Select(x => ((SocketGuild)Context.Guild).GetUser(x.Key)?.Username).OrderByDescending(x => x?.Length).FirstOrDefault().Length;
-
-                foreach (var kv in events.stats[Context.Guild.Id].OrderByDescending(x => x.Value.Hits))
+                else
                 {
-                    var user = (await Context.Guild.GetUserAsync(kv.Key));
-                    var name = user == null ? kv.Key.ToString() : user.Username;
+                    spaces = events.stats[Context.Guild.Id].Select(x => ((SocketGuild)Context.Guild).GetUser(x.Key)?.Username).OrderByDescending(x => x?.Length).FirstOrDefault().Length;
 
-                    output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("00")} Hits | {kv.Value.Misses.ToString("00")} Missed | " +
-                        $"{kv.Value.Dodged.ToString("00")} Dodged | {kv.Value.Caught.ToString("00")} Caught |");
+                    foreach (var kv in events.stats[Context.Guild.Id].OrderByDescending(x => x.Value.Hits))
+                    {
+                        var user = (await Context.Guild.GetUserAsync(kv.Key));
+                        var name = user == null ? kv.Key.ToString() : user.Username;
+
+                        output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("000")} Hits | {kv.Value.Misses.ToString("000")} Missed | " +
+                            $"{kv.Value.Dodged.ToString("000")} Dodged | {kv.Value.Caught.ToString("000")} Caught");
+                    }
                 }
-            }
 
-            output.Append("```");
+                //output.Append("```");
 
-            if (output.Length > 2000)
-            {
-                using (var stream = new MemoryStream())
+                if (output.Length > 2000)
                 {
-                    var writer = new StreamWriter(stream);
-                    writer.Write(output.ToString());
-                    writer.Flush();
-                    stream.Position = 0;
-                    await Context.Channel.SendFileAsync(stream, "snowball_stats.txt", "Here's the leaderboard for the snowball fight in this server:");
+                    using (var stream = new MemoryStream())
+                    {
+                        var writer = new StreamWriter(stream);
+                        writer.Write(output.ToString());
+                        writer.Flush();
+                        stream.Position = 0;
+                        await Context.Channel.SendFileAsync(stream, "snowball_stats.txt", $"```{string.Join('\n', output.ToString().Split('\n').Take(10))}```");
+                    }
                 }
-            }
-            else
-                await ReplyAsync(output.ToString());
+                else
+                    await ReplyAsync(output.ToString());
+            //});
         }
 
         [Command("throw")]
