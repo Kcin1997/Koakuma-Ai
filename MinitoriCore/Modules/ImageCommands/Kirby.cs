@@ -16,7 +16,7 @@ namespace MinitoriCore.Modules.ImageCommands
 {
     class Kirby
     {
-        public Kirby(CommandService commands)
+        public Kirby(CommandService commands, IServiceProvider services)
         {
             commands.CreateModuleAsync("", x =>
             {
@@ -55,7 +55,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     });
                 }
                 
-                x.Build(commands);
+                x.Build(commands, services);
             });
         }
 

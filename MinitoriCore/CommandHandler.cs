@@ -31,9 +31,9 @@ namespace MinitoriCore
             //_map.Add(commands);
             services = _services;
             config = _services.GetService<Config>();
-
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
-            kirby = new Kirby(commands);
+            
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
+            kirby = new Kirby(commands, services);
 
             //await HelpModule.Install(commands);
 
