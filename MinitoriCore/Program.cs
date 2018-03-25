@@ -62,25 +62,25 @@ namespace MinitoriCore
             handler = new CommandHandler();
             await handler.Install(map);
 
-            Task.Run(async () =>
-            {
-                await Task.Delay(1000 * 60); // wait a minute before downloading to ensure we have access to the server
-                await client.DownloadUsersAsync(new IGuild[] { client.GetGuild(110373943822540800) });
-                var role = client.GetGuild(110373943822540800).GetRole(110374777914417152);
+            //Task.Run(async () =>
+            //{
+            //    await Task.Delay(1000 * 60); // wait a minute before downloading to ensure we have access to the server
+            //    await client.DownloadUsersAsync(new IGuild[] { client.GetGuild(110373943822540800) });
+            //    var role = client.GetGuild(110373943822540800).GetRole(110374777914417152);
 
-                while (true)
-                {
-                    foreach (var u in client.GetGuild(110373943822540800).Users.Where(x => x?.IsBot == true))
-                    {
-                        if (!u.Roles.Contains(role))
-                        {
-                            await u.AddRoleAsync(role);
-                        }
-                    }
+            //    while (true)
+            //    {
+            //        foreach (var u in client.GetGuild(110373943822540800).Users.Where(x => x?.IsBot == true))
+            //        {
+            //            if (!u.Roles.Contains(role))
+            //            {
+            //                await u.AddRoleAsync(role);
+            //            }
+            //        }
 
-                    await Task.Delay(1000 * 60 * 30); // Wait 30 minutes
-                }
-            });
+            //        await Task.Delay(1000 * 60 * 30); // Wait 30 minutes
+            //    }
+            //});
 
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(File.OpenRead("Minitori.png")));
 
@@ -131,7 +131,7 @@ namespace MinitoriCore
         {
             if (user.Guild.Id == 110373943822540800 && user.IsBot)
             {
-                await Task.Delay(1500);
+                await Task.Delay(2500);
                 var roles = new IRole[] { user.Guild.GetRole(318748748010487808), user.Guild.GetRole(110374777914417152) };
                 await user.AddRolesAsync(roles);
             }
