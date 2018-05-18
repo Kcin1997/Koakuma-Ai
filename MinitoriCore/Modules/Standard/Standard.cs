@@ -55,6 +55,15 @@ namespace MinitoriCore.Modules.Standard
             await ReplyAsync($"Blah to you too, {Context.User.Mention}.");
         }
 
+        [Command("setnick")]
+        [Summary("Change my nickname!")]
+        [RequireOwner()]
+        public async Task SetNickname(string Nick = "")
+        {
+            await (Context.Guild as SocketGuild).CurrentUser.ModifyAsync(x => x.Nickname = Nick);
+            await ReplyAsync(":thumbsup:");
+        }
+
         [Command("quit")]
         [Priority(1000)]
         public async Task ShutDown()
