@@ -11,6 +11,7 @@ using System.Reflection;
 using System.IO;
 using RestSharp;
 using Newtonsoft.Json;
+using MinitoriCore.Preconditions;
 
 namespace MinitoriCore.Modules.ImageCommands
 {
@@ -27,14 +28,15 @@ namespace MinitoriCore.Modules.ImageCommands
         public bool Amiibo = false;
     }
 
-    public class Kirby : ModuleBase
+    public class Kirby : MinitoriModule
     {
         [Command("addentry")]
+        [Hide]
         public async Task AddLeaderboard([Remainder]string remainder)
         {
             if (remainder.Length == 0)
             {
-                await ReplyAsync("You can't leave this blank!"); // Todo: put a help command here
+                await RespondAsync("You can't leave this blank!"); // Todo: put a help command here
                 return;
             }
 
@@ -42,7 +44,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
             if (split.Length % 2 == 1)
             {
-                await ReplyAsync("You gave me an uneven number of responses! Check your colons.");
+                await RespondAsync("You gave me an uneven number of responses! Check your colons.");
                 return;
             }
 
@@ -58,7 +60,7 @@ namespace MinitoriCore.Modules.ImageCommands
                             Ranking.Score = tempScore;
                         else
                         {
-                            await ReplyAsync($"`{split[i + 1]}` doesn't look like a valid score to me.");
+                            await RespondAsync($"`{split[i + 1]}` doesn't look like a valid score to me.");
                             return;
                         }
                         break;
@@ -71,7 +73,7 @@ namespace MinitoriCore.Modules.ImageCommands
                             Ranking.Time = tempTime;
                         else
                         {
-                            await ReplyAsync($"`{split[i + 1]}` doesn't look like a valid time to me.");
+                            await RespondAsync($"`{split[i + 1]}` doesn't look like a valid time to me.");
                             return;
                         }
                         break;
@@ -97,7 +99,7 @@ namespace MinitoriCore.Modules.ImageCommands
                             Ranking.Amiibo = false;
                         else
                         {
-                            await ReplyAsync("I was looking for a yes or no answer for the Amiibo section.");
+                            await RespondAsync("I was looking for a yes or no answer for the Amiibo section.");
                             return;
                         }
                         break;
@@ -108,14 +110,14 @@ namespace MinitoriCore.Modules.ImageCommands
                             Ranking.Group = false;
                         else
                         {
-                            await ReplyAsync("I was looking for a yes or no answer for the Group section.");
+                            await RespondAsync("I was looking for a yes or no answer for the Group section.");
                             return;
                         }
                         break;
                 }
             }
 
-            await ReplyAsync(
+            await RespondAsync(
                 $"Time: {Ranking.Time.ToString()}\n" +
                 $"Score: {Ranking.Score.ToString()}\n" +
                 $"Level: {Ranking.Level}\n" +
@@ -163,6 +165,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     {
                         command.AddAliases(source.Skip(1).ToArray());
                         command.Summary = $"***{source[0]}***";
+                        command.AddPrecondition(new HideAttribute());
                     });
                 }
                 

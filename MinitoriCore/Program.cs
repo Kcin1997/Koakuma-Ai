@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using Discord.Rest;
 using Discord.Commands;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +19,8 @@ namespace MinitoriCore
         static void Main(string[] args) =>
             new Program().RunAsync().GetAwaiter().GetResult();
 
-        private DiscordSocketClient client;
+        private DiscordSocketClient socketClient;
+        private DiscordRestClient restClient;
         private Config config;
         private CommandHandler handler;
         private RandomStrings strings;
@@ -28,14 +30,30 @@ namespace MinitoriCore
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
         //private readonly CommandService commands = new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false });
+        private ulong updateChannel = 0;
 
         private async Task RunAsync()
         {
-            client = new DiscordSocketClient(new DiscordSocketConfig
+            socketClient = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                LogLevel = LogSeverity.Verbose,
+                AlwaysDownloadUsers = true
+            });
+            socketClient.Log += Log;
+
+            restClient = new DiscordRestClient(new DiscordRestConfig
             {
                 LogLevel = LogSeverity.Verbose
             });
-            client.Log += Log;
+            restClient.Log += Log;
+
+            if (File.Exists("./update"))
+            {
+                var temp = File.ReadAllText("./update");
+                ulong.TryParse(temp, out updateChannel);
+                File.Delete("./update");
+                Console.WriteLine($"Found an update file! It contained [{temp}] and we got [{updateChannel}] from it!");
+            }
 
             config = Config.Load();
             //uptime = new UptimeService();
@@ -43,21 +61,29 @@ namespace MinitoriCore
             strings = new RandomStrings();
 
             //var map = new DependencyMap();
-            map = new ServiceCollection().AddSingleton(client).AddSingleton(config).AddSingleton(strings).AddSingleton(events)/*.AddSingleton(uptime)*/.BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events)/*.AddSingleton(uptime)*/.BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
-            await client.LoginAsync(TokenType.Bot, config.Token);
-            await client.StartAsync();
+            await socketClient.LoginAsync(TokenType.Bot, config.Token);
+            await socketClient.StartAsync();
 
-            client.GuildAvailable += Client_GuildAvailable;
+            await restClient.LoginAsync(TokenType.Bot, config.Token);
+
+            if (File.Exists("./deadlock"))
+            {
+                Console.WriteLine("We're recovering from a deadlock.");
+                File.Delete("./deadlock");
+                (await restClient.GetUserAsync(config.OwnerId))?.SendMessageAsync($"I recovered from a deadlock.\n`{DateTime.Now.ToShortDateString()}` `{DateTime.Now.ToLongTimeString()}`");
+            }
+
+            socketClient.GuildAvailable += Client_GuildAvailable;
             //client.GuildMemberUpdated += Client_UserUpdated;
             // memes
 
             //await uptime.Install(map);
 
-            client.UserJoined += Client_UserJoined;
-            client.MessageReceived += Client_MessageReceived;
+            socketClient.UserJoined += Client_UserJoined;
 
             handler = new CommandHandler();
             await handler.Install(map);
@@ -86,18 +112,7 @@ namespace MinitoriCore
 
             await Task.Delay(-1);
         }
-
-        private async Task Client_MessageReceived(SocketMessage msg)
-        {
-            if (((IGuildChannel)msg.Channel).GuildId != 110373943822540800)
-                return;
-            
-            if (msg.Content.ToLower().StartsWith(".iam emotes"))
-            {
-                await ((IGuildChannel)msg.Channel).Guild.AddBanAsync(msg.Author, 1, "Spam prevention");
-            }
-        }
-
+        
         //private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
         //{
         //    if (((SocketGuildUser)before).Guild.Id != 110373943822540800)
@@ -115,18 +130,7 @@ namespace MinitoriCore
         //        }
         //    }
         //}
-
-        private async Task Client_GuildAvailable(SocketGuild guild)
-        {
-            if (guild.Id != 110373943822540800)
-                return;
-
-            //if (uptime.CheckInstalled())
-            //    return;
-
-            //uptime.Install(map);
-        }
-
+        
         private async Task Client_UserJoined(SocketGuildUser user)
         {
             if (user.Guild.Id == 110373943822540800 && user.IsBot)
@@ -135,6 +139,37 @@ namespace MinitoriCore
                 var roles = new IRole[] { user.Guild.GetRole(318748748010487808), user.Guild.GetRole(110374777914417152) };
                 await user.AddRolesAsync(roles);
             }
+        }
+
+        private async Task Client_GuildAvailable(SocketGuild guild)
+        {
+            if (updateChannel != 0 && guild.GetTextChannel(updateChannel) != null)
+            {
+                await Task.Delay(3000); // wait 3 seconds just to ensure we can actually send it. this might not do anything.
+                await guild.GetTextChannel(updateChannel).SendMessageAsync("aaaaaand we're back.");
+            }
+        }
+
+        private async Task SocketClient_Disconnected(Exception ex)
+        {
+            // If we disconnect, wait 3 minutes and see if we regained the connection.
+            // If we did, great, exit out and continue. If not, check again 3 minutes later
+            // just to be safe, and restart to exit a deadlock.
+            var task = Task.Run(async () =>
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    await Task.Delay(1000 * 60 * 3);
+
+                    if (socketClient.ConnectionState == ConnectionState.Connected)
+                        break;
+                    else if (i == 1)
+                    {
+                        File.Create("./deadlock");
+                        Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);
+                    }
+                }
+            });
         }
 
         private Task Log(LogMessage msg)

@@ -12,10 +12,11 @@ using System.IO;
 using RestSharp;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
+using MinitoriCore.Preconditions;
 
 namespace MinitoriCore.Modules.Standard
 {
-    public class Standard : ModuleBase
+    public class Standard : MinitoriModule
     {
         private RandomStrings strings;
 
@@ -52,7 +53,7 @@ namespace MinitoriCore.Modules.Standard
         [Priority(1000)]
         public async Task Blah()
         {
-            await ReplyAsync($"Blah to you too, {Context.User.Mention}.");
+            await RespondAsync($"Blah to you too, {Context.User.Mention}.");
         }
 
         [Command("setnick")]
@@ -61,28 +62,87 @@ namespace MinitoriCore.Modules.Standard
         public async Task SetNickname(string Nick = "")
         {
             await (Context.Guild as SocketGuild).CurrentUser.ModifyAsync(x => x.Nickname = Nick);
-            await ReplyAsync(":thumbsup:");
+            await RespondAsync(":thumbsup:");
         }
 
-        [Command("quit")]
+        [Command("quit", RunMode = RunMode.Async)]
         [Priority(1000)]
+        [Hide]
         public async Task ShutDown()
         {
             if (Context.User.Id != 102528327251656704)
             {
-                await ReplyAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
             }
 
             events.Save();
 
-            Task.Run(async () =>
+            await RespondAsync("rip");
+            await Context.Client.LogoutAsync();
+            await Task.Delay(1000);
+            Environment.Exit((int)ExitCodes.ExitCode.Success);
+        }
+
+        [Command("restart", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Hide]
+        public async Task Restart()
+        {
+            if (Context.User.Id != 102528327251656704)
             {
-                await ReplyAsync("rip");
-                //await Task.Delay(500);
-                await ((DiscordSocketClient)Context.Client).LogoutAsync();
-                Environment.Exit(0);
-            });
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            events.Save();
+
+            await RespondAsync("Restarting...");
+            await File.WriteAllTextAsync("./update", Context.Channel.Id.ToString());
+
+            await Context.Client.LogoutAsync();
+            await Task.Delay(1000);
+            Environment.Exit((int)ExitCodes.ExitCode.Restart);
+        }
+
+        [Command("update", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Hide]
+        public async Task UpdateAndRestart()
+        {
+            if (Context.User.Id != Config.OwnerId)
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            await File.WriteAllTextAsync("./update", Context.Channel.Id.ToString());
+            events.Save();
+
+            await RespondAsync("hold on i gotta go break everything");
+            await Context.Client.LogoutAsync();
+            await Task.Delay(1000);
+            Environment.Exit((int)ExitCodes.ExitCode.RestartAndUpdate);
+        }
+
+        [Command("deadlocksim", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Hide]
+        public async Task DeadlockSimulation()
+        {
+            if (Context.User.Id != 102528327251656704)
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            File.Create("./deadlock");
+            events.Save();
+
+            await RespondAsync("Restarting...");
+            await Context.Client.LogoutAsync();
+            await Task.Delay(1000);
+            Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);
         }
 
         [Command("joined")]
@@ -96,7 +156,7 @@ namespace MinitoriCore.Modules.Standard
                 output.AppendLine($"{user.Username} - `{user.JoinedAt.Value.ToLocalTime().ToString("d")} {user.JoinedAt.Value.ToLocalTime().ToString("T")}`");
             }
 
-            await ReplyAsync(output.ToString());
+            await RespondAsync(output.ToString());
         }
 
         [Command("listroles")]
@@ -106,9 +166,9 @@ namespace MinitoriCore.Modules.Standard
             {
                 var r = Context.Guild.Roles.FirstOrDefault(x => x.Name == role);
                 if (r != null)
-                    await ReplyAsync($"```{r.Id} | {r.Name}```");
+                    await RespondAsync($"```{r.Id} | {r.Name}```");
                 else
-                    await ReplyAsync($"I can't find a role named `{role}`!");
+                    await RespondAsync($"I can't find a role named `{role}`!");
 
                 return;
             }
@@ -123,7 +183,7 @@ namespace MinitoriCore.Modules.Standard
 
             output.Append("```");
 
-            await ReplyAsync(output.ToString());
+            await RespondAsync(output.ToString());
         }
         
         [Command("unsnow")]
@@ -134,12 +194,12 @@ namespace MinitoriCore.Modules.Standard
 
             if (snowballRoles == 0)
             {
-                await ReplyAsync("I don't see a role named `Snowball`, make one and try again.");
+                await RespondAsync("I don't see a role named `Snowball`, make one and try again.");
                 return;
             }
             else if (snowballRoles > 1)
             {
-                await ReplyAsync("There are too many roles named `Snowball`, rename some and try again.");
+                await RespondAsync("There are too many roles named `Snowball`, rename some and try again.");
                 return;
             }
 
@@ -152,7 +212,7 @@ namespace MinitoriCore.Modules.Standard
         {
             if (Context.Guild == null)
             {
-                await ReplyAsync("You can't use this in DMs!");
+                await RespondAsync("You can't use this in DMs!");
                 return;
             }
             
@@ -160,12 +220,12 @@ namespace MinitoriCore.Modules.Standard
 
             if (snowballRoles == 0)
             {
-                await ReplyAsync("I don't see a role named `Snowball`, make one and try again.");
+                await RespondAsync("I don't see a role named `Snowball`, make one and try again.");
                 return;
             }
             else if (snowballRoles > 1)
             {
-                await ReplyAsync("There are too many roles named `Snowball`, rename some and try again.");
+                await RespondAsync("There are too many roles named `Snowball`, rename some and try again.");
                 return;
             }
 
@@ -177,7 +237,7 @@ namespace MinitoriCore.Modules.Standard
             if (Context.Message.MentionedUserIds.Count() == 1)
             {
                 if (Context.Message.MentionedUserIds.FirstOrDefault() != ((SocketGuild)Context.Guild).CurrentUser.Id)
-                    user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds.FirstOrDefault());
+                    user = Context.Guild.GetUser(Context.Message.MentionedUserIds.FirstOrDefault());
                 else
                 {
                     message = "Hey, you sure you want to throw snowballs at your supplier";
@@ -190,7 +250,7 @@ namespace MinitoriCore.Modules.Standard
                     if (u == ((SocketGuild)Context.Guild).CurrentUser.Id)
                         continue;
 
-                    user = await Context.Guild.GetUserAsync(u);
+                    user = Context.Guild.GetUser(u);
 
                     break;
                 }
@@ -202,7 +262,7 @@ namespace MinitoriCore.Modules.Standard
             }
             else
             {
-                await ReplyAsync("You need to pick someone to throw a snowball at!");
+                await RespondAsync("You need to pick someone to throw a snowball at!");
                 return;
             }
 
@@ -216,7 +276,7 @@ namespace MinitoriCore.Modules.Standard
             {
                 if (message != "")
                 {
-                    await ReplyAsync(message);
+                    await RespondAsync(message);
                     return;
                 }
 
@@ -226,7 +286,7 @@ namespace MinitoriCore.Modules.Standard
                 if (events.cooldown[Context.Guild.Id].ContainsKey(Context.User.Id) && events.cooldown[Context.Guild.Id][Context.User.Id] > DateTime.UtcNow.AddSeconds(-15))
                 {
                     TimeSpan t = events.cooldown[Context.Guild.Id][Context.User.Id] - DateTime.UtcNow.AddSeconds(-15);
-                    await ReplyAsync($"You're still making another snowball! You'll be ready in {t.Seconds:00} seconds.");
+                    await RespondAsync($"You're still making another snowball! You'll be ready in {t.Seconds:00} seconds.");
                     return;
                 }
 
@@ -245,7 +305,7 @@ namespace MinitoriCore.Modules.Standard
                 {
                     events.stats[Context.Guild.Id][Context.User.Id].Misses++;
                     events.cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow.AddSeconds(40);
-                    await ReplyAsync($"{Context.User.Mention} attempted to throw a snowball at {Context.User.Mention}, but all they managed to do is fall over and lose their snowball.");
+                    await RespondAsync($"{Context.User.Mention} attempted to throw a snowball at {Context.User.Mention}, but all they managed to do is fall over and lose their snowball.");
                     return;
                 }
 
@@ -260,13 +320,13 @@ namespace MinitoriCore.Modules.Standard
                     {
                         events.stats[Context.Guild.Id][Context.User.Id].Misses++;
                         events.stats[Context.Guild.Id][user.Id].Dodged++;
-                        await ReplyAsync($"The snowball sailed right through {user.Username}! Wait, what?\ni probably don't have the manage roles permission! `{ex.Message}`");
+                        await RespondAsync($"The snowball sailed right through {user.Username}! Wait, what?\ni probably don't have the manage roles permission! `{ex.Message}`");
                         return;
                     }
 
                     events.stats[Context.Guild.Id][Context.User.Id].Hits++;
                     events.stats[Context.Guild.Id][user.Id].Downed++;
-                    await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}!");
+                    await RespondAsync($"{Context.User.Mention} threw a snowball at {user.Mention}!");
                     return;
                 }
                 else
@@ -281,7 +341,7 @@ namespace MinitoriCore.Modules.Standard
                         events.stats[Context.Guild.Id][Context.User.Id].Hits++;
                         events.stats[Context.Guild.Id][user.Id].Downed++;
 
-                        await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}!");
+                        await RespondAsync($"{Context.User.Mention} threw a snowball at {user.Mention}!");
                     }
                     else if (chance >= 66 && chance <= 90)
                     {
@@ -289,7 +349,7 @@ namespace MinitoriCore.Modules.Standard
                         events.stats[Context.Guild.Id][Context.User.Id].Misses++;
                         events.stats[Context.Guild.Id][user.Id].Dodged++;
 
-                        await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}, but it missed!");
+                        await RespondAsync($"{Context.User.Mention} threw a snowball at {user.Mention}, but it missed!");
                     }
                     else if (chance >= 91 && chance <= 100)
                     {
@@ -299,13 +359,13 @@ namespace MinitoriCore.Modules.Standard
 
                         events.cooldown[Context.Guild.Id][user.Id] = DateTime.UtcNow.AddMinutes(-10);
 
-                        await ReplyAsync($"{Context.User.Mention} threw a snowball at {user.Mention}, but {user.Mention} caught it!");
+                        await RespondAsync($"{Context.User.Mention} threw a snowball at {user.Mention}, but {user.Mention} caught it!");
                     }
                 }
             }
             else
             {
-                await ReplyAsync("No one has thrown any snowballs your way yet, so you don't have the Snowball role yet.");
+                await RespondAsync("No one has thrown any snowballs your way yet, so you don't have the Snowball role yet.");
                 return;
             }
         }
@@ -328,7 +388,7 @@ namespace MinitoriCore.Modules.Standard
 
                     foreach (var kv in events.stats[Context.Guild.Id].OrderByDescending(x => x.Value.Hits).Where(x => Context.Message.MentionedUserIds.Contains(x.Key)))
                     {
-                        var user = (await Context.Guild.GetUserAsync(kv.Key));
+                        var user = Context.Guild.GetUser(kv.Key);
                         var name = user == null ? kv.Key.ToString() : user.Username;
 
                         output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("00")} Hits | {kv.Value.Misses.ToString("00")} Missed | " +
@@ -341,7 +401,7 @@ namespace MinitoriCore.Modules.Standard
 
                     foreach (var kv in events.stats[Context.Guild.Id].OrderByDescending(x => x.Value.Hits))
                     {
-                        var user = (await Context.Guild.GetUserAsync(kv.Key));
+                        var user = Context.Guild.GetUser(kv.Key);
                         var name = user == null ? kv.Key.ToString() : user.Username;
 
                         output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("000")} Hits | {kv.Value.Misses.ToString("000")} Missed | " +
@@ -363,7 +423,7 @@ namespace MinitoriCore.Modules.Standard
                     }
                 }
                 else
-                    await ReplyAsync(output.ToString());
+                    await RespondAsync(output.ToString());
             //});
         }
 
@@ -378,7 +438,7 @@ namespace MinitoriCore.Modules.Standard
                 if (Context.Message.MentionedUserIds.FirstOrDefault() == ((SocketGuild)Context.Guild).CurrentUser.Id)
                     user = (IGuildUser)Context.Message.Author;
                 else
-                    user = await Context.Guild.GetUserAsync(Context.Message.MentionedUserIds.FirstOrDefault());
+                    user = Context.Guild.GetUser(Context.Message.MentionedUserIds.FirstOrDefault());
             }
             else if (Context.Message.MentionedUserIds.Count() > 1)
             {
@@ -387,7 +447,7 @@ namespace MinitoriCore.Modules.Standard
                     if (u == ((SocketGuild)Context.Guild).CurrentUser.Id)
                         continue;
 
-                    user = await Context.Guild.GetUserAsync(u);
+                    user = Context.Guild.GetUser(u);
 
                     break;
                 }
@@ -414,7 +474,7 @@ namespace MinitoriCore.Modules.Standard
                     $"{strings.objects[strings.RandomInteger(0, strings.objects.Length)]}, " +
                     $"and {strings.objects[strings.RandomInteger(0, strings.objects.Length)]}";
 
-            await ReplyAsync($"*throws {objects} at {user.Mention}*");
+            await RespondAsync($"*throws {objects} at {user.Mention}*");
         }
 
         [Command("choose")]
@@ -425,9 +485,9 @@ namespace MinitoriCore.Modules.Standard
             string[] choices = remainder.Split(';').Where(x => x.Trim().Length > 0).ToArray();
             
             if (choices[0] != "")
-                await ReplyAsync($"I choose **{choices[RandomInteger(0, choices.Length)].Trim()}**");
+                await RespondAsync($"I choose **{choices[RandomInteger(0, choices.Length)].Trim()}**");
             else
-                await ReplyAsync("What do you want me to do with this?");
+                await RespondAsync("What do you want me to do with this?");
         }
     }
 

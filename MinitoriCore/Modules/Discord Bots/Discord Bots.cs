@@ -12,10 +12,11 @@ using System.IO;
 using RestSharp;
 using Newtonsoft.Json;
 using System.Security.Cryptography;
+using MinitoriCore.Preconditions;
 
 namespace MinitoriCore.Modules.DiscordBots
 {
-    public class DiscordBots : ModuleBase
+    public class DiscordBots : MinitoriModule
     {
         // Non-testing 132106771975110656
         // Full mute 132106637614776320
@@ -38,7 +39,7 @@ namespace MinitoriCore.Modules.DiscordBots
                 ulong temp;
                 if (ulong.TryParse(id, out temp))
                 {
-                    var user = await Context.Guild.GetUserAsync(temp);
+                    var user = Context.Guild.GetUser(temp);
 
                     if (user != null && user.IsBot)
                         users.Add(user);
@@ -52,7 +53,7 @@ namespace MinitoriCore.Modules.DiscordBots
 
             if (users.Count() == 0)
             {
-                await ReplyAsync("You need to mention some bots for this to work!");
+                await RespondAsync("You need to mention some bots for this to work!");
                 return;
             }
 
@@ -139,7 +140,7 @@ namespace MinitoriCore.Modules.DiscordBots
 
             if (roledBots.Count() == 0)
             {
-                await ReplyAsync("None of those mentioned were affected.");
+                await RespondAsync("None of those mentioned were affected.");
                 return;
             }
 
@@ -173,7 +174,7 @@ namespace MinitoriCore.Modules.DiscordBots
                 output.AppendLine(string.Join(", ", unroledBots.Select(x => $"**{x.Username}#{x.Discriminator}**")));
             }
 
-            await ReplyAsync(output.ToString().Trim());
+            await RespondAsync(output.ToString().Trim());
         }
 
         [Command("mute")]
