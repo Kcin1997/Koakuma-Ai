@@ -16,6 +16,7 @@ using MinitoriCore.Preconditions;
 
 namespace MinitoriCore.Modules.DiscordBots
 {
+    [RequireGuild(110373943822540800)]
     public class DiscordBots : MinitoriModule
     {
         // Non-testing 132106771975110656
