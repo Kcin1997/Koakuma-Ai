@@ -21,11 +21,15 @@ namespace MinitoriCore.Modules.Standard
         private RandomStrings strings;
 
         private EventStorage events;
+        private CommandService commands;
+        private IServiceProvider services;
 
-        public Standard(RandomStrings _strings, EventStorage _events)
+        public Standard(RandomStrings _strings, EventStorage _events, CommandService _commands, IServiceProvider _services)
         {
             strings = _strings;
             events = _events;
+            commands = _commands;
+            services = _services;
         }
 
         private RNGCryptoServiceProvider rand = new RNGCryptoServiceProvider();
@@ -46,6 +50,51 @@ namespace MinitoriCore.Modules.Standard
             // Add min to the scaled difference between max and min.
             return (int)(min + (max - min) *
                 (scale / (double)uint.MaxValue));
+        }
+
+        [Command("help")]
+        public async Task HelpCommand()
+        {
+            Context.IsHelp = true;
+
+            StringBuilder output = new StringBuilder();
+            StringBuilder module = new StringBuilder();
+            var SeenModules = new List<string>();
+            int i = 0;
+
+            output.Append("These are the commands you can use:");
+
+            foreach (var c in commands.Commands)
+            {
+                if (!SeenModules.Contains(c.Module.Name))
+                {
+                    if (i > 0)
+                        output.Append(module.ToString());
+
+                    module.Clear();
+
+                    module.Append($"\n**{c.Module.Name}:**");
+                    SeenModules.Add(c.Module.Name);
+                    i = 0;
+                }
+
+                if ((await c.CheckPreconditionsAsync(Context, services)).IsSuccess)
+                {
+                    if (i == 0)
+                        module.Append(" ");
+                    else
+                        module.Append(", ");
+
+                    i++;
+
+                    module.Append($"`{c.Name}`");
+                }
+            }
+
+            if (i > 0)
+                output.AppendLine(module.ToString());
+
+            await ReplyAsync(output.ToString());
         }
 
         [Command("blah")]
