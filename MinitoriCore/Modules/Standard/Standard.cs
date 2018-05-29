@@ -224,7 +224,7 @@ namespace MinitoriCore.Modules.Standard
 
             while (rotate[Context.Guild.Id])
             {
-                angle[e.Server.Id] += 5f;
+                angle[Context.Guild.Id] += 5f;
 
                 System.Drawing.Imaging.PixelFormat pf = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
 
