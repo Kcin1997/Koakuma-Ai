@@ -122,14 +122,9 @@ namespace MinitoriCore.Modules.Standard
         [Command("quit", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
+        [RequireOwner()]
         public async Task ShutDown()
         {
-            if (Context.User.Id != config.OwnerId)
-            {
-                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
-                return;
-            }
-
             events.Save();
 
             await RespondAsync("rip");
@@ -141,6 +136,7 @@ namespace MinitoriCore.Modules.Standard
         [Command("restart", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
+        [RequireOwner()]
         public async Task Restart()
         {
             if (Context.User.Id != config.OwnerId)
@@ -162,6 +158,7 @@ namespace MinitoriCore.Modules.Standard
         [Command("update", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
+        [RequireOwner()]
         public async Task UpdateAndRestart()
         {
             if (Context.User.Id != config.OwnerId)
@@ -182,6 +179,7 @@ namespace MinitoriCore.Modules.Standard
         [Command("deadlocksim", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
+        [RequireOwner()]
         public async Task DeadlockSimulation()
         {
             if (Context.User.Id != config.OwnerId)
