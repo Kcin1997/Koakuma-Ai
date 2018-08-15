@@ -133,6 +133,12 @@ namespace MinitoriCore
         
         private async Task Client_UserJoined(SocketGuildUser user)
         {
+            if (user.Username.ToLower().Contains("platinbots") || user.Username.ToLower().Contains("botsplat"))
+            {
+                await user.Guild.AddBanAsync(user.Id, reason: "Userbot");
+                return;
+            }
+
             if (user.Guild.Id == 110373943822540800 && user.IsBot)
             {
                 await Task.Delay(2500);
