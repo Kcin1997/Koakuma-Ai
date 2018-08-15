@@ -112,9 +112,14 @@ namespace MinitoriCore.Modules.Standard
 
         [Command("setnick")]
         [Summary("Change my nickname!")]
-        [RequireOwner()]
         public async Task SetNickname(string Nick = "")
         {
+            if (!config.OwnerIds.Contains(Context.User.Id))
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
             await (Context.Guild as SocketGuild).CurrentUser.ModifyAsync(x => x.Nickname = Nick);
             await RespondAsync(":thumbsup:");
         }
@@ -122,9 +127,14 @@ namespace MinitoriCore.Modules.Standard
         [Command("quit", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
-        [RequireOwner()]
         public async Task ShutDown()
         {
+            if (!config.OwnerIds.Contains(Context.User.Id))
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
             events.Save();
 
             await RespondAsync("rip");
@@ -136,10 +146,9 @@ namespace MinitoriCore.Modules.Standard
         [Command("restart", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
-        [RequireOwner()]
         public async Task Restart()
         {
-            if (Context.User.Id != config.OwnerId)
+            if (!config.OwnerIds.Contains(Context.User.Id))
             {
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
@@ -158,10 +167,9 @@ namespace MinitoriCore.Modules.Standard
         [Command("update", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
-        [RequireOwner()]
         public async Task UpdateAndRestart()
         {
-            if (Context.User.Id != config.OwnerId)
+            if (!config.OwnerIds.Contains(Context.User.Id))
             {
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
@@ -179,10 +187,9 @@ namespace MinitoriCore.Modules.Standard
         [Command("deadlocksim", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Hide]
-        [RequireOwner()]
         public async Task DeadlockSimulation()
         {
-            if (Context.User.Id != config.OwnerId)
+            if (!config.OwnerIds.Contains(Context.User.Id))
             {
                 await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
                 return;
@@ -201,7 +208,6 @@ namespace MinitoriCore.Modules.Standard
         [Priority(1000)]
         [Summary("ye")]
         [RequireGuild(124499234564210688)]
-        [RequireOwner]
         public async Task Rotate()
         {
             if (!Context.Guild.CurrentUser.GuildPermissions.ManageGuild)
@@ -254,6 +260,7 @@ namespace MinitoriCore.Modules.Standard
         }
 
         [Command("joined")]
+        [Hide]
         public async Task GetJoinDates([Remainder]string blah)
         {
             StringBuilder output = new StringBuilder();

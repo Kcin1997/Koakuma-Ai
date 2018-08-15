@@ -74,7 +74,11 @@ namespace MinitoriCore
             {
                 Console.WriteLine("We're recovering from a deadlock.");
                 File.Delete("./deadlock");
-                (await restClient.GetUserAsync(config.OwnerId))?.SendMessageAsync($"I recovered from a deadlock.\n`{DateTime.Now.ToShortDateString()}` `{DateTime.Now.ToLongTimeString()}`");
+                foreach (var u in config.OwnerIds)
+                {
+                    (await restClient.GetUserAsync(u))?
+                        .SendMessageAsync($"I recovered from a deadlock.\n`{DateTime.Now.ToShortDateString()}` `{DateTime.Now.ToLongTimeString()}`");
+                }
             }
 
             socketClient.GuildAvailable += Client_GuildAvailable;
