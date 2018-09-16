@@ -143,12 +143,12 @@ namespace MinitoriCore
                 return;
             }
 
-            if (user.Guild.Id == 110373943822540800 && user.IsBot)
-            {
-                await Task.Delay(2500);
-                var roles = new IRole[] { user.Guild.GetRole(318748748010487808), user.Guild.GetRole(110374777914417152) };
-                await user.AddRolesAsync(roles);
-            }
+            //if (user.Guild.Id == 110373943822540800 && user.IsBot)
+            //{
+            //    await Task.Delay(2500);
+            //    var roles = new IRole[] { user.Guild.GetRole(318748748010487808), user.Guild.GetRole(110374777914417152) };
+            //    await user.AddRolesAsync(roles);
+            //}
         }
 
         private async Task Client_GuildAvailable(SocketGuild guild)
