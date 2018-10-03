@@ -39,6 +39,8 @@ namespace MinitoriCore.Modules.DiscordBots
                 int i = 0;
                 foreach (var s in new List<string>(args))
                 {
+                    Console.WriteLine($"[{i}] {s}");
+
                     var id = s.TrimStart('<').TrimStart('@').TrimStart('!').TrimEnd('>');
                     ulong temp;
                     if (ulong.TryParse(id, out temp))
