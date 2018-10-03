@@ -35,12 +35,9 @@ namespace MinitoriCore.Modules.DiscordBots
                 var args = remainder.Split(' ').Where(x => x.Length > 0).ToList();
                 string reason = "";
                 var users = new List<IGuildUser>();
-
-                int i = 0;
+                
                 foreach (var s in new List<string>(args))
                 {
-                    Console.WriteLine($"[{i}] {s}");
-
                     var id = s.TrimStart('<').TrimStart('@').TrimStart('!').TrimEnd('>');
                     ulong temp;
                     if (ulong.TryParse(id, out temp))
@@ -50,8 +47,7 @@ namespace MinitoriCore.Modules.DiscordBots
                         if (user != null && user.IsBot)
                             users.Add(user);
 
-                        args.RemoveAt(i);
-                        i++;
+                        args.RemoveAt(0);
                     }
                     else
                         break;
@@ -184,54 +180,54 @@ namespace MinitoriCore.Modules.DiscordBots
             }
             catch (Exception ex)
             {
-                string exMessage;
+                //string exMessage;
                 
-                if (ex != null)
-                {
-                    while (ex is AggregateException && ex.InnerException != null)
-                        ex = ex.InnerException;
-                    exMessage = $"{ex.Message}";
-                    if (exMessage != "Reconnect failed: HTTP/1.1 503 Service Unavailable")
-                        exMessage += $"\n{ex.StackTrace}";
-                }
-                else
-                    exMessage = null;
+                //if (ex != null)
+                //{
+                //    while (ex is AggregateException && ex.InnerException != null)
+                //        ex = ex.InnerException;
+                //    exMessage = $"{ex.Message}";
+                //    if (exMessage != "Reconnect failed: HTTP/1.1 503 Service Unavailable")
+                //        exMessage += $"\n{ex.StackTrace}";
+                //}
+                //else
+                //    exMessage = null;
 
-                string sourceName = ex.Source?.ToString();
+                //string sourceName = ex.Source?.ToString();
 
-                string text;
-                if (ex.Message == null)
-                {
-                    text = exMessage ?? "";
-                    exMessage = null;
-                }
-                else
-                    text = ex.Message;
+                //string text;
+                //if (ex.Message == null)
+                //{
+                //    text = exMessage ?? "";
+                //    exMessage = null;
+                //}
+                //else
+                //    text = ex.Message;
 
-                StringBuilder builder = new StringBuilder(text.Length + (sourceName?.Length ?? 0) + (exMessage?.Length ?? 0) + 5);
-                if (sourceName != null)
-                {
-                    builder.Append('[');
-                    builder.Append(sourceName);
-                    builder.Append("] ");
-                }
-                builder.Append($"[{DateTime.Now.ToString("d")} {DateTime.Now.ToString("T")}] ");
-                for (int i = 0; i < text.Length; i++)
-                {
-                    //Strip control chars
-                    char c = text[i];
-                    if (c == '\n' || !char.IsControl(c) || c != (char)8226)
-                        builder.Append(c);
-                }
-                if (exMessage != null)
-                {
-                    builder.Append(": ");
-                    builder.Append(exMessage);
-                }
+                //StringBuilder builder = new StringBuilder(text.Length + (sourceName?.Length ?? 0) + (exMessage?.Length ?? 0) + 5);
+                //if (sourceName != null)
+                //{
+                //    builder.Append('[');
+                //    builder.Append(sourceName);
+                //    builder.Append("] ");
+                //}
+                //builder.Append($"[{DateTime.Now.ToString("d")} {DateTime.Now.ToString("T")}] ");
+                //for (int i = 0; i < text.Length; i++)
+                //{
+                //    //Strip control chars
+                //    char c = text[i];
+                //    if (c == '\n' || !char.IsControl(c) || c != (char)8226)
+                //        builder.Append(c);
+                //}
+                //if (exMessage != null)
+                //{
+                //    builder.Append(": ");
+                //    builder.Append(exMessage);
+                //}
 
-                text = builder.ToString();
+                //text = builder.ToString();
 
-                await RespondAsync(text);
+                //await RespondAsync(text);
             }
         }
 
