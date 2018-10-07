@@ -164,7 +164,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "eye", "eyeborb", "badsphere" },
                     new string[] { "dad", "father", "baddad", "haltman", "daddy" },
                     new string[] { "clown", "marx", "grape" },
-                    new string[] { "nose", "ebi" } })
+                    new string[] { "nose", "ebi", "juh" } })
                 {
                     // Upload image
                     x.AddCommand(source[0], async (context, param, serv, command) =>
