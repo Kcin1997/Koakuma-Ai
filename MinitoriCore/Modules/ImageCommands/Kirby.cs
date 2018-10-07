@@ -161,21 +161,21 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "clown", "marx", "grape" } })
                 {
                     
-                    x.AddCommand(source[0], async (context, param, serv, command) =>
+                    x.AddCommand(source[0], async (e, param, serv, command) =>
                     {
-                        var Context = context as CommandContext;
+                        //var e = context as CommandContext;
 
-                        if (!Context.IsPrivate && 
-                        (cooldown.ContainsKey(Context.Guild.Id) && cooldown[Context.Guild.Id].ContainsKey(Context.User.Id) &&
-                        cooldown[Context.Guild.Id][Context.User.Id] >  DateTime.Now.AddMinutes(-2)))
+                        if (e.Guild != null && 
+                        (cooldown.ContainsKey(e.Guild.Id) && cooldown[e.Guild.Id].ContainsKey(e.User.Id) &&
+                        cooldown[e.Guild.Id][e.User.Id] >  DateTime.Now.AddMinutes(-2)))
                         {
-                            TimeSpan t = cooldown[Context.Guild.Id][Context.User.Id] - DateTime.Now.AddMilliseconds(-2);
-                            await Context.Channel.SendMessageAsync($"You are in a cooldown period, you must wait {t.Minutes:0}:{t.Minutes:00} until you can use these commands again.");
+                            TimeSpan t = cooldown[e.Guild.Id][e.User.Id] - DateTime.Now.AddMilliseconds(-2);
+                            await e.Channel.SendMessageAsync($"You are in a cooldown period, you must wait {t.Minutes:0}:{t.Minutes:00} until you can use these commands again.");
 
                             return;
                         }
 
-                        await UploadImage(source[0], Context);
+                        await UploadImage(source[0], e);
                         //await context.Channel.SendMessageAsync("It didnt work son");
                     },
                     command => 
@@ -191,7 +191,7 @@ namespace MinitoriCore.Modules.ImageCommands
             });
         }
 
-        private async Task UploadImage(string source, CommandContext Context)
+        private async Task UploadImage(string source, ICommandContext e)
         {
             Random asdf = new Random();
             string[] valid = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
@@ -201,9 +201,9 @@ namespace MinitoriCore.Modules.ImageCommands
             {
                 lastImage[source] = new Dictionary<ulong, string>();
             }
-            if (!lastImage[source].ContainsKey(Context.Channel.Id))
+            if (!lastImage[source].ContainsKey(e.Channel.Id))
             {
-                lastImage[source][Context.Channel.Id] = "";
+                lastImage[source][e.Channel.Id] = "";
             }
 
             if (!Directory.Exists($"./Images/{source}/"))
@@ -215,36 +215,36 @@ namespace MinitoriCore.Modules.ImageCommands
 
             if (fileCount == 0)
             {
-                await Context.Channel.SendMessageAsync($"There are no files in the {source} folder yet! Use the `{source} add` command to add some!");
+                await e.Channel.SendMessageAsync($"There are no files in the {source} folder yet! Use the `{source} add` command to add some!");
                 return;
             }
             else if (fileCount == 1)
                 file = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.')))).OrderBy(x => asdf.Next()).FirstOrDefault();
             else if (fileCount > 1)
-                file = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.'))) && lastImage[source][Context.Channel.Id] != x).OrderBy(x => asdf.Next()).FirstOrDefault();
+                file = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.'))) && lastImage[source][e.Channel.Id] != x).OrderBy(x => asdf.Next()).FirstOrDefault();
 
-            await Context.Channel.SendFileAsync(file);
+            await e.Channel.SendFileAsync(file);
 
-            lastImage[source][Context.Channel.Id] = file;
+            lastImage[source][e.Channel.Id] = file;
 
-            if (Context.User.Id == 83390631937839104)
+            if (e.User.Id == 83390631937839104)
             {
                 var r = new Random();
                 if (r.Next(0, 100) > 60)
                 {
                     if (r.Next(0, 100) > 60)
-                        await Context.Channel.SendMessageAsync("Compa was here :^)");
+                        await e.Channel.SendMessageAsync("Compa was here :^)");
                     else
-                        await Context.Channel.SendMessageAsync("hi itsuka kotori (miku)");
+                        await e.Channel.SendMessageAsync("hi itsuka kotori (miku)");
                 }
             }
 
-            if (!Context.IsPrivate)
+            if (e.Guild != null)
             {
-                if (!cooldown.ContainsKey(Context.Guild.Id))
-                    cooldown[Context.Guild.Id] = new Dictionary<ulong, DateTime>();
+                if (!cooldown.ContainsKey(e.Guild.Id))
+                    cooldown[e.Guild.Id] = new Dictionary<ulong, DateTime>();
 
-                cooldown[Context.Guild.Id][Context.User.Id] = DateTime.Now;
+                cooldown[e.Guild.Id][e.User.Id] = DateTime.Now;
             }
         }
     }
