@@ -131,7 +131,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
         public Kirby(CommandService commands, IServiceProvider services)
         {
-            commands.CreateModuleAsync("Image Commands", x =>
+            commands.CreateModuleAsync("Images", x =>
             {
                 x.Name = "Kirby";
 
