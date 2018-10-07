@@ -59,9 +59,9 @@ namespace MinitoriCore
 
 
 
-            // If the command failed, notify the user
-            //if (!result.IsSuccess)
-            //    await message.Channel.SendMessageAsync($"**Error:** {result.ErrorReason}");
+            //If the command failed, notify the user
+            if (!result.IsSuccess)
+                await message.Channel.SendMessageAsync($"**Error:** {result.ErrorReason}");
         }
 
         //private readonly IDependencyMap _map;
