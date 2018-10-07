@@ -33,7 +33,7 @@ namespace MinitoriCore
             config = _services.GetService<Config>();
             
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            kirby = new Kirby(commands, services);
+            kirby = new Kirby(commands, services, config);
 
             //await HelpModule.Install(commands);
 
@@ -70,7 +70,7 @@ namespace MinitoriCore
                             await message.Channel.SendMessageAsync($"**Something went wrong:** That isn't an actual number!");
                             break;
                         case CommandError.BadArgCount:
-                            await message.Channel.SendMessageAsync($"**Something went wrong:** You're missing some parts of that command!");
+                            //await message.Channel.SendMessageAsync($"**Something went wrong:** You're missing some parts of that command!");
                             break;
                         case CommandError.UnknownCommand:
                             break;
@@ -78,8 +78,8 @@ namespace MinitoriCore
                             break;
                         default:
                             await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
-                                $"Poke Googie2149#1368 about it if the reason doesn't make sense.");
-                            Console.WriteLine($"{result.ErrorReason}\n{result.Error.Value.ToString()}");
+                                $"Poke Gardevoir#2149 about it if the reason doesn't make sense.");
+                            Console.WriteLine($"{result.ErrorReason}");
                             break;
                     }
                 }

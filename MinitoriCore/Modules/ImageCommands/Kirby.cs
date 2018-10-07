@@ -12,6 +12,7 @@ using System.IO;
 using RestSharp;
 using Newtonsoft.Json;
 using MinitoriCore.Preconditions;
+using System.Net;
 
 namespace MinitoriCore.Modules.ImageCommands
 {
@@ -131,9 +132,13 @@ namespace MinitoriCore.Modules.ImageCommands
 
         private Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new Dictionary<ulong, Dictionary<ulong, DateTime>>();
         private Dictionary<string, Dictionary<ulong, string>> lastImage = new Dictionary<string, Dictionary<ulong, string>>();
+        private Config config;
 
-        public Kirby(CommandService commands, IServiceProvider services)
+        public Kirby(CommandService commands, IServiceProvider services, Config _config)
         {
+            config = _config;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
             commands.CreateModuleAsync("", x =>
             {
                 x.Name = "Kirby";
@@ -160,22 +165,12 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "dad", "father", "baddad", "haltman", "daddy" },
                     new string[] { "clown", "marx", "grape" } })
                 {
+                    // Upload image
                     x.AddCommand(source[0], async (context, param, serv, command) =>
                     {
                         try
                         {
-                            //await context.Channel.SendMessageAsync("It didnt work son");
-                            if (context.Guild != null &&
-                            (cooldown.ContainsKey(context.Guild.Id) && cooldown[context.Guild.Id].ContainsKey(context.User.Id) &&
-                            cooldown[context.Guild.Id][context.User.Id] > DateTime.Now.AddMinutes(-2)))
-                            {
-                                TimeSpan t = cooldown[context.Guild.Id][context.User.Id] - DateTime.Now.AddMinutes(-2);
-                                await context.Channel.SendMessageAsync($"You are in a cooldown period, you must wait {t.Minutes:0}:{t.Minutes:00} until you can use these commands again.");
-
-                                return;
-                            }
-
-                            await UploadImage(command.Name, context);
+                            await UploadImage(source[0], context);
                         }
                         catch (Exception ex)
                         {
@@ -188,14 +183,148 @@ namespace MinitoriCore.Modules.ImageCommands
                         command.Summary = $"***{source[0]}***";
                         command.AddPrecondition(new HideAttribute());
                     });
+
+                    // Download image
+                    x.AddCommand($"{source[0]} add", async (context, param, serv, command) =>
+                    {
+                        if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
+                            return;
+
+                        await DownloadImage(source[0], context, param[0]?.ToString());
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).Select(y => $"{y} add").ToArray());
+                        command.Summary = $"Never enough {source[0]}, we need more.";
+                        command.AddPrecondition(new HideAttribute());
+                        command.AddParameter("url", typeof(string), y =>
+                        {
+                            y.IsRemainder = true;
+                            y.IsOptional = true;
+                        });
+                    });
+
+                    // Delete image
+                    x.AddCommand($"{source[0]} remove", async (context, param, serv, command) =>
+                    {
+                        if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
+                            return;
+
+                        if (
+                            !(config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
+
+                                ((IGuildUser)Context.User)
+                                    .RoleIds.ToList()
+                                        .Contains(451057945044582400) // Check for /r/kirby mod role
+                            )
+                        )
+                            return;
+
+                        await DeleteImage(source[0], context, param[0]?.ToString());
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).Select(y => $"{y} remove").ToArray());
+                        command.Summary = $"A bit too much {source[0]}. Somehow.";
+                        command.AddPrecondition(new HideAttribute());
+                        command.AddParameter("file", typeof(string), y =>
+                        {
+                            y.IsRemainder = true;
+                            y.IsOptional = false;
+                        });
+                    });
+
+                    // reserved
+                    x.AddCommand("resered", async (context, param, serv, command) =>
+                    {
+                        try
+                        {
+                            await UploadImage("reserverd", context);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.StackTrace);
+                        }
+                    },
+                    command =>
+                    {
+                        command.Summary = $"*this is great*";
+                        command.AddPrecondition(new HideAttribute());
+                    });
                 }
                 
                 x.Build(commands, services);
             });
         }
 
+        private bool ImageDownloadWhitelist(ulong server, ulong user)
+        {
+            if (config.OwnerIds.Contains(user))
+                return true;
+
+            switch (server)
+            {
+                case 103028520011190272: // RoboNitori
+                case 132720341058453504: // /r/Kirby
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private async Task DeleteImage(string source, ICommandContext context, string file)
+        {
+            if (!Directory.Exists($"./Images/removed {source}/"))
+            {
+                Directory.CreateDirectory($"./Images/removed {source}/");
+            }
+
+            if (!File.Exists($@"./Images/{source}/{file}"))
+            {
+                await context.Channel.SendMessageAsync($"I can't find an image named `{file}` in `  Images/{source}`");
+                return;
+            }
+
+            if (!File.Exists($@"./Images/removed {source}/{file}"))
+            {
+                File.Move($"./Images/{source}/{file}", $"./Images/removed {source}/{file}");
+                await context.Channel.SendMessageAsync("Image removed.");
+                return;
+            }
+            else
+            {
+                int i = 0;
+
+                while (File.Exists($@"./Images/removed {source}/{file}{i}"))
+                    i++;
+
+                File.Move($"./Images/{source}/file", $"./Images/removed {source}/{file}{i}");
+
+                await context.Channel.SendMessageAsync($"Image removed. It has also been removed {i + 1} time(s) before.");
+                return;
+            }
+        }
+
         private async Task UploadImage(string source, ICommandContext context)
         {
+            if (context.Guild != null &&
+                            (cooldown.ContainsKey(context.Guild.Id) && cooldown[context.Guild.Id].ContainsKey(context.User.Id) &&
+                            cooldown[context.Guild.Id][context.User.Id] > DateTime.Now.AddMinutes(-2)))
+            {
+                TimeSpan t = cooldown[context.Guild.Id][context.User.Id] - DateTime.Now.AddMinutes(-2);
+
+                Task.Run(async () =>
+                {
+                    var msg = await context.Channel.SendMessageAsync($"You are in a cooldown period, you must wait {t.Minutes:0}:{t.Seconds:00} until you can use these commands again.");
+
+                    await Task.Delay(1000 * 3);
+
+                    await msg.DeleteAsync();
+                });
+                
+                return;
+            }
+
             Random asdf = new Random();
             string[] valid = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
             string file = "";
@@ -249,6 +378,58 @@ namespace MinitoriCore.Modules.ImageCommands
 
                 cooldown[context.Guild.Id][context.User.Id] = DateTime.Now;
             }
+        }
+
+        private async Task DownloadImage(string source, ICommandContext context, string url)
+        {
+            string image = "";
+
+            if (url != null)
+                image = url;
+            else
+            {
+                if (context.Message.Attachments.Count() > 0)
+                    image = context.Message.Attachments.First().Url;
+                else
+                {
+                    await context.Channel.SendMessageAsync("You have to actually link a file!");
+                    return;
+                }
+            }
+
+            string ext = image.Substring(image.LastIndexOf('.'));
+            string file = image.Substring(image.LastIndexOf('/') + 1);
+
+            string[] valid = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
+
+            if (valid.Contains(ext.ToLower()))
+            {
+                if (file == "unknown.png")
+                {
+                    do
+                        file = $".{context.User.Id} - {Path.GetRandomFileName().Substring(0, 8)}{ext}";
+                    while (File.Exists($@"./Images/{source}/{file}"));
+                }
+
+                if (!Directory.Exists($"./Images/{source}/"))
+                {
+                    Directory.CreateDirectory(source);
+                }
+
+                if (!File.Exists($@"./Images/{source}/{file}"))
+                {
+                    using (WebClient client = new WebClient())
+                    {
+
+                        client.DownloadFile(new Uri(image), $@"./Images/{source}/{file}");
+                        await context.Channel.SendMessageAsync("Downloaded!");
+                    };
+                }
+                else
+                    await context.Channel.SendMessageAsync("I already have that one!");
+            }
+            else
+                await context.Channel.SendMessageAsync("That doesn't look like a valid image to me, sorry!");
         }
     }
 }
