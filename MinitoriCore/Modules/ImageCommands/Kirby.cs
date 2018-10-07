@@ -129,9 +129,12 @@ namespace MinitoriCore.Modules.ImageCommands
                 $"Group: {Ranking.Group.ToString()}");
         }
 
+        private Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new Dictionary<ulong, Dictionary<ulong, DateTime>>();
+        private Dictionary<string, Dictionary<ulong, string>> lastImage = new Dictionary<string, Dictionary<ulong, string>>();
+
         public Kirby(CommandService commands, IServiceProvider services)
         {
-            commands.CreateModuleAsync("Image Commands", x =>
+            commands.CreateModuleAsync("", x =>
             {
                 x.Name = "Kirby";
 
@@ -160,14 +163,32 @@ namespace MinitoriCore.Modules.ImageCommands
                     
                     x.AddCommand(source[0], async (context, param, serv, command) =>
                     {
-                        await context.Channel.SendMessageAsync("It didnt work son");
+                        try
+                        {
+                            //await context.Channel.SendMessageAsync("It didnt work son");
+                            if (context.Guild != null &&
+                            (cooldown.ContainsKey(context.Guild.Id) && cooldown[context.Guild.Id].ContainsKey(context.User.Id) &&
+                            cooldown[context.Guild.Id][context.User.Id] > DateTime.Now.AddMinutes(-2)))
+                            {
+                                TimeSpan t = cooldown[context.Guild.Id][context.User.Id] - DateTime.Now.AddMinutes(-2);
+                                await context.Channel.SendMessageAsync($"You are in a cooldown period, you must wait {t.Minutes:0}:{t.Minutes:00} until you can use these commands again.");
+
+                                return;
+                            }
+
+                            await UploadImage(command.Name, context);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.StackTrace);
+                        }
                     },
                     command => 
                     {
                         command.AddAliases(source.Skip(1).ToArray());
                         command.Summary = $"***{source[0]}***";
                         command.AddPrecondition(new HideAttribute());
-                        
+
                     });
                 }
                 
@@ -175,9 +196,61 @@ namespace MinitoriCore.Modules.ImageCommands
             });
         }
 
-        private async Task UploadImage(string source, CommandContext Context)
+        private async Task UploadImage(string source, ICommandContext context)
         {
-            
+            Random asdf = new Random();
+            string[] valid = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
+            string file = "";
+
+            if (!lastImage.ContainsKey(source))
+            {
+                lastImage[source] = new Dictionary<ulong, string>();
+            }
+            if (!lastImage[source].ContainsKey(context.Channel.Id))
+            {
+                lastImage[source][context.Channel.Id] = "";
+            }
+
+            if (!Directory.Exists($"./Images/{source}/"))
+            {
+                Directory.CreateDirectory($"./Images/{source}/");
+            }
+
+            int fileCount = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.')))).Count();
+
+            if (fileCount == 0)
+            {
+                await context.Channel.SendMessageAsync($"There are no files in the {source} folder yet! Use the `{source} add` command to add some!");
+                return;
+            }
+            else if (fileCount == 1)
+                file = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.')))).OrderBy(x => asdf.Next()).FirstOrDefault();
+            else if (fileCount > 1)
+                file = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.'))) && lastImage[source][context.Channel.Id] != x).OrderBy(x => asdf.Next()).FirstOrDefault();
+
+            await context.Channel.SendFileAsync(file);
+
+            lastImage[source][context.Channel.Id] = file;
+
+            if (context.User.Id == 83390631937839104)
+            {
+                var r = new Random();
+                if (r.Next(0, 100) > 60)
+                {
+                    if (r.Next(0, 100) > 60)
+                        await context.Channel.SendMessageAsync("Compa was here :^)");
+                    else
+                        await context.Channel.SendMessageAsync("hi itsuka kotori (miku)");
+                }
+            }
+
+            if (context.Guild != null)
+            {
+                if (!cooldown.ContainsKey(context.Guild.Id))
+                    cooldown[context.Guild.Id] = new Dictionary<ulong, DateTime>();
+
+                cooldown[context.Guild.Id][context.User.Id] = DateTime.Now;
+            }
         }
     }
 }
