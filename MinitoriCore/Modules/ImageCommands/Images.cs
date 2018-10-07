@@ -340,6 +340,79 @@ namespace MinitoriCore.Modules.ImageCommands
 
                 x.Build(commands, services);
             });
+
+            commands.CreateModuleAsync("", x =>
+            {
+                x.Name = "Rozen Maiden";
+
+                foreach (string[] source in new string[][] {
+                    new string[] { "desu" } })
+                {
+                    // Upload image
+                    x.AddCommand(source[0], async (context, param, serv, command) =>
+                    {
+                        try
+                        {
+                            await UploadImage(source[0], context);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.StackTrace);
+                        }
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).ToArray());
+                        command.Summary = $"***{source[0]}***";
+                        command.AddPrecondition(new HideAttribute());
+                    });
+
+                    // Download image
+                    x.AddCommand($"{source[0]} add", async (context, param, serv, command) =>
+                    {
+                        if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
+                            return;
+
+                        await DownloadImage(source[0], context, param[0]?.ToString());
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).Select(y => $"{y} add").ToArray());
+                        command.Summary = $"Never enough {source[0]}, we need more.";
+                        command.AddPrecondition(new HideAttribute());
+                        command.AddParameter("url", typeof(string), y =>
+                        {
+                            y.IsRemainder = true;
+                            y.IsOptional = true;
+                        });
+                    });
+
+                    // Delete image
+                    x.AddCommand($"{source[0]} remove", async (context, param, serv, command) =>
+                    {
+                        if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
+                            return;
+
+                        if (!config.OwnerIds.Contains(context.User.Id)) // check for bot owners 
+                            return;
+
+                        await DeleteImage(source[0], context, param[0]?.ToString());
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).Select(y => $"{y} remove").ToArray());
+                        command.Summary = $"A bit too much {source[0]}. Somehow.";
+                        command.AddPrecondition(new HideAttribute());
+                        command.AddParameter("file", typeof(string), y =>
+                        {
+                            y.IsRemainder = true;
+                            y.IsOptional = false;
+                        });
+                    });
+                }
+
+                x.Build(commands, services);
+            });
         }
 
         private bool ImageDownloadWhitelist(ulong server, ulong user)
