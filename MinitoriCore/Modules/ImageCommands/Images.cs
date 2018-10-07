@@ -479,6 +479,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     await Task.Delay(1000 * 3);
 
                     await msg.DeleteAsync();
+                    await context.Message.DeleteAsync();
                 });
                 
                 return;
