@@ -30,7 +30,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
     public class Kirby : MinitoriModule
     {
-        [Command("addentry")]
+        //[Command("addentry")]
         [Hide]
         public async Task AddLeaderboard([Remainder]string remainder)
         {
@@ -131,7 +131,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
         public Kirby(CommandService commands, IServiceProvider services)
         {
-            commands.CreateModuleAsync("", x =>
+            commands.CreateModuleAsync("Image Commands", x =>
             {
                 x.Name = "Kirby";
 
@@ -157,6 +157,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "dad", "father", "baddad", "haltman", "daddy" },
                     new string[] { "clown", "marx", "grape" } })
                 {
+                    
                     x.AddCommand(source[0], async (context, param, serv, command) =>
                     {
                         await context.Channel.SendMessageAsync("It didnt work son");
@@ -166,6 +167,7 @@ namespace MinitoriCore.Modules.ImageCommands
                         command.AddAliases(source.Skip(1).ToArray());
                         command.Summary = $"***{source[0]}***";
                         command.AddPrecondition(new HideAttribute());
+                        
                     });
                 }
                 
