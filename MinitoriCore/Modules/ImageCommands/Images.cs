@@ -233,26 +233,26 @@ namespace MinitoriCore.Modules.ImageCommands
                             y.IsOptional = false;
                         });
                     });
-
-                    // reserved
-                    x.AddCommand("resered", async (context, param, serv, command) =>
-                    {
-                        try
-                        {
-                            await UploadImage("reserverd", context);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.StackTrace);
-                        }
-                    },
-                    command =>
-                    {
-                        command.Summary = $"*this is great*";
-                        command.AddPrecondition(new HideAttribute());
-                    });
                 }
-                
+
+                // reserved
+                x.AddCommand("reserved", async (context, param, serv, command) =>
+                {
+                    try
+                    {
+                        await UploadImage("reserved", context);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.StackTrace);
+                    }
+                },
+                command =>
+                {
+                    command.Summary = $"*this is great*";
+                    command.AddPrecondition(new HideAttribute());
+                });
+
                 x.Build(commands, services);
             });
 
