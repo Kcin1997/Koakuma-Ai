@@ -59,9 +59,31 @@ namespace MinitoriCore
 
 
 
-            // If the command failed, notify the user
-            //if (!result.IsSuccess)
-            //    await message.Channel.SendMessageAsync($"**Error:** {result.ErrorReason}");
+            //If the command failed, notify the user
+            if (!result.IsSuccess)
+            {
+                if (result.Error.HasValue)
+                {
+                    switch (result.Error.Value)
+                    {
+                        case CommandError.ParseFailed:
+                            await message.Channel.SendMessageAsync($"**Something went wrong:** That isn't an actual number!");
+                            break;
+                        case CommandError.BadArgCount:
+                            await message.Channel.SendMessageAsync($"**Something went wrong:** You're missing some parts of that command!");
+                            break;
+                        case CommandError.UnknownCommand:
+                            break;
+                        case CommandError.UnmetPrecondition:
+                            break;
+                        default:
+                            await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
+                                $"Poke Googie2149#1368 about it if the reason doesn't make sense.");
+                            Console.WriteLine($"{result.ErrorReason}\n{result.Error.Value.ToString()}");
+                            break;
+                    }
+                }
+            }
         }
 
         //private readonly IDependencyMap _map;
