@@ -21,7 +21,7 @@ namespace MinitoriCore
         //private IDependencyMap map;
         private IServiceProvider services;
         private Config config;
-        private Kirby kirby;
+        private ImageCommands images;
 
         public async Task Install(IServiceProvider _services)
         {
@@ -33,7 +33,7 @@ namespace MinitoriCore
             config = _services.GetService<Config>();
             
             await commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
-            kirby = new Kirby(commands, services, config);
+            images = new ImageCommands(commands, services, config);
 
             //await HelpModule.Install(commands);
 

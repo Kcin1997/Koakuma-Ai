@@ -29,7 +29,7 @@ namespace MinitoriCore.Modules.ImageCommands
         public bool Amiibo = false;
     }
 
-    public class Kirby : MinitoriModule
+    public class ImageCommands : MinitoriModule
     {
         //[Command("addentry")]
         [Hide]
@@ -134,7 +134,7 @@ namespace MinitoriCore.Modules.ImageCommands
         private Dictionary<string, Dictionary<ulong, string>> lastImage = new Dictionary<string, Dictionary<ulong, string>>();
         private Config config;
 
-        public Kirby(CommandService commands, IServiceProvider services, Config _config)
+        public ImageCommands(CommandService commands, IServiceProvider services, Config _config)
         {
             config = _config;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -253,6 +253,90 @@ namespace MinitoriCore.Modules.ImageCommands
                     });
                 }
                 
+                x.Build(commands, services);
+            });
+
+            commands.CreateModuleAsync("", x =>
+            {
+                x.Name = "Touhou";
+
+                foreach (string[] source in new string[][] {
+                    new string[] { "honk", "chen" },
+                    new string[] { "mukyu" },
+                    new string[] { "unyu" },
+                    new string[] { "ayaya" },
+                    new string[] { "mokou"},
+                    new string[] { "awoo" },
+                    new string[] { "9ball" },
+                    new string[] { "zun" },
+                    new string[] { "yuyuko" },
+                    new string[] { "kappa" },
+                    new string[] { "uuu", "remilia" },
+                    new string[] { "alice" } })
+                {
+                    // Upload image
+                    x.AddCommand(source[0], async (context, param, serv, command) =>
+                    {
+                        try
+                        {
+                            await UploadImage(source[0], context);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.StackTrace);
+                        }
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).ToArray());
+                        command.Summary = $"***{source[0]}***";
+                        command.AddPrecondition(new HideAttribute());
+                    });
+
+                    // Download image
+                    x.AddCommand($"{source[0]} add", async (context, param, serv, command) =>
+                    {
+                        if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
+                            return;
+
+                        await DownloadImage(source[0], context, param[0]?.ToString());
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).Select(y => $"{y} add").ToArray());
+                        command.Summary = $"Never enough {source[0]}, we need more.";
+                        command.AddPrecondition(new HideAttribute());
+                        command.AddParameter("url", typeof(string), y =>
+                        {
+                            y.IsRemainder = true;
+                            y.IsOptional = true;
+                        });
+                    });
+
+                    // Delete image
+                    x.AddCommand($"{source[0]} remove", async (context, param, serv, command) =>
+                    {
+                        if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
+                            return;
+
+                        if (!config.OwnerIds.Contains(context.User.Id)) // check for bot owners 
+                            return;
+
+                        await DeleteImage(source[0], context, param[0]?.ToString());
+                    },
+                    command =>
+                    {
+                        command.AddAliases(source.Skip(1).Select(y => $"{y} remove").ToArray());
+                        command.Summary = $"A bit too much {source[0]}. Somehow.";
+                        command.AddPrecondition(new HideAttribute());
+                        command.AddParameter("file", typeof(string), y =>
+                        {
+                            y.IsRemainder = true;
+                            y.IsOptional = false;
+                        });
+                    });
+                }
+
                 x.Build(commands, services);
             });
         }
