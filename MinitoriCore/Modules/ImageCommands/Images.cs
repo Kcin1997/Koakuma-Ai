@@ -570,7 +570,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
             if (valid.Contains(ext.ToLower()))
             {
-                if (file == "unknown.png")
+                if (file == "unknown.png" || file == "image0.jpg")
                 {
                     do
                         file = $".{context.User.Id} - {Path.GetRandomFileName().Substring(0, 8)}{ext}";
