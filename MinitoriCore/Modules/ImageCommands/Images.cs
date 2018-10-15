@@ -151,8 +151,8 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "egg", "lor" },
                     new string[] { "spiderman", "taranza", "spid" },
                     new string[] { "squeak", "squek" },
-                    new string[] { "familyproblems", "susie", "soos" },
-                    new string[] { "artist", "adeleine" },
+                    new string[] { "soos", "susie", "familyproblems" },
+                    new string[] { "adeleine", "artist", "ado" },
                     new string[] { "randomfairy", "ribbon" },
                     new string[] { "dreamland" },
                     new string[] { "birb", "gala" },
@@ -197,7 +197,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     {
                         command.AddAliases(source.Skip(1).Select(y => $"{y} add").ToArray());
                         command.Summary = $"Never enough {source[0]}, we need more.";
-                        command.AddPrecondition(new HideAttribute());
+                        //command.AddPrecondition(new HideAttribute());
                         command.AddParameter("url", typeof(string), y =>
                         {
                             y.IsRemainder = true;
@@ -307,7 +307,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     {
                         command.AddAliases(source.Skip(1).Select(y => $"{y} add").ToArray());
                         command.Summary = $"Never enough {source[0]}, we need more.";
-                        command.AddPrecondition(new HideAttribute());
+                        //command.AddPrecondition(new HideAttribute());
                         command.AddParameter("url", typeof(string), y =>
                         {
                             y.IsRemainder = true;
