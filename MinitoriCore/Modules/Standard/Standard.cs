@@ -63,41 +63,60 @@ namespace MinitoriCore.Modules.Standard
             Context.IsHelp = true;
 
             StringBuilder output = new StringBuilder();
-            StringBuilder module = new StringBuilder();
-            var SeenModules = new List<string>();
-            int i = 0;
+            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
+            //StringBuilder module = new StringBuilder();
+            //var SeenModules = new List<string>();
+            //int i = 0;
 
             output.Append("These are the commands you can use:");
 
             foreach (var c in commands.Commands)
             {
-                if (!SeenModules.Contains(c.Module.Name))
-                {
-                    if (i > 0)
-                        output.Append(module.ToString());
+                //if (!SeenModules.Contains(c.Module.Name))
+                //{
+                //    if (i > 0)
+                //        output.Append(module.ToString());
 
-                    module.Clear();
+                //    module.Clear();
 
-                    module.Append($"\n**{c.Module.Name}:**");
-                    SeenModules.Add(c.Module.Name);
-                    i = 0;
-                }
+                //    foreach (var h in c.Module.Commands)
+                //    {
+                //        if ((await c.CheckPreconditionsAsync(Context, services)).IsSuccess)
+                //        {
+                //            module.Append($"\n**{c.Module.Name}:**");
+                //            break;
+                //        }
+                //    }
+                //    SeenModules.Add(c.Module.Name);
+                //    i = 0;
+                //}
 
                 if ((await c.CheckPreconditionsAsync(Context, services)).IsSuccess)
                 {
-                    if (i == 0)
-                        module.Append(" ");
-                    else
-                        module.Append(", ");
+                    //if (i == 0)
+                    //    module.Append(" ");
+                    //else
+                    //    module.Append(", ");
 
-                    i++;
+                    //i++;
 
-                    module.Append($"`{c.Name}`");
+                    if (!modules.ContainsKey(c.Module.Name))
+                        modules.Add(c.Module.Name, new List<string>());
+
+                    if (!modules[c.Module.Name].Contains(c.Name))
+                        modules[c.Module.Name].Add(c.Name);
+
+                    //module.Append($"`{c.Name}`");
                 }
             }
 
-            if (i > 0)
-                output.AppendLine(module.ToString());
+            //if (i > 0)
+            //    output.AppendLine(module.ToString());
+
+            foreach (var kv in modules)
+            {
+                output.Append($"\n**{kv.Key}:** {kv.Value.Select(x => $"`{x}`").Join(", ")}");
+            }
 
             await ReplyAsync(output.ToString());
         }
