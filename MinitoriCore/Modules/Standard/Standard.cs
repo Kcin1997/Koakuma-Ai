@@ -121,6 +121,8 @@ namespace MinitoriCore.Modules.Standard
             await ReplyAsync(output.ToString());
         }
 
+
+
         [Command("blah")]
         [Summary("Blah!")]
         [Priority(1000)]
