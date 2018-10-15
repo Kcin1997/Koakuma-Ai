@@ -182,7 +182,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     {
                         command.AddAliases(source.Skip(1).ToArray());
                         command.Summary = $"***{source[0]}***";
-                        command.AddPrecondition(new HideAttribute());
+                        //command.AddPrecondition(new HideAttribute());
                     });
 
                     // Download image
@@ -197,7 +197,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     {
                         command.AddAliases(source.Skip(1).Select(y => $"{y} add").ToArray());
                         command.Summary = $"Never enough {source[0]}, we need more.";
-                        //command.AddPrecondition(new HideAttribute());
+                        command.AddPrecondition(new HideAttribute());
                         command.AddParameter("url", typeof(string), y =>
                         {
                             y.IsRemainder = true;
@@ -292,7 +292,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     {
                         command.AddAliases(source.Skip(1).ToArray());
                         command.Summary = $"***{source[0]}***";
-                        command.AddPrecondition(new HideAttribute());
+                        //command.AddPrecondition(new HideAttribute());
                     });
 
                     // Download image
@@ -307,7 +307,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     {
                         command.AddAliases(source.Skip(1).Select(y => $"{y} add").ToArray());
                         command.Summary = $"Never enough {source[0]}, we need more.";
-                        //command.AddPrecondition(new HideAttribute());
+                        command.AddPrecondition(new HideAttribute());
                         command.AddParameter("url", typeof(string), y =>
                         {
                             y.IsRemainder = true;
