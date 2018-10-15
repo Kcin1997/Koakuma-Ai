@@ -558,6 +558,11 @@ namespace MinitoriCore.Modules.ImageCommands
                 }
             }
 
+            if (!Directory.Exists($"./Images/{source}/"))
+            {
+                Directory.CreateDirectory($"./Images/{source}/");
+            }
+
             string ext = image.Substring(image.LastIndexOf('.'));
             string file = image.Substring(image.LastIndexOf('/') + 1);
 
