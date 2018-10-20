@@ -137,7 +137,11 @@ namespace MinitoriCore
         
         private async Task Client_UserJoined(SocketGuildUser user)
         {
-            if (user.Username.ToLower().Contains("platinbots") || user.Username.ToLower().Contains("botsplat") || user.Username.ToLower().Contains("discord.gg/"))
+            if (user.Username.ToLower().Contains("platinbots") || user.Username.ToLower().Contains("botsplat") || 
+                user.Username.ToLower().Contains("discord.gg/") ||
+                (user.Username.ToLower().Contains("twitch") && user.Username.ToLower().Contains("tv") && user.Username.ToLower().Contains("binzy")) ||
+                (user.Username.ToLower().Contains("twitter") && user.Username.ToLower().Contains(".com") && user.Username.ToLower().Contains("senseibin"))
+                )
             {
                 await user.Guild.AddBanAsync(user.Id, reason: "Userbot/Adbot");
                 return;
