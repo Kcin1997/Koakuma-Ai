@@ -333,7 +333,7 @@ namespace MinitoriCore.Modules.Standard
                 using (WebClient client = new WebClient())
                 {
                     client.DownloadFile(new Uri($"https://cdn.discordapp.com/icons/212053857306542080/{Context.Guild.IconId}.png"), $"./Images/Servers/{Context.Guild.Id}.png");
-                    await Context.Channel.SendMessageAsync("Downloaded!");
+                    await Context.Channel.SendMessageAsync("Started!");
                 };
             }
             else
@@ -354,7 +354,7 @@ namespace MinitoriCore.Modules.Standard
                     rotate[Context.Guild.Id] = false;
                 }
                 else
-                    angle[Context.Guild.Id] += 10f;
+                    angle[Context.Guild.Id] += 0.01f;
 
                 System.Drawing.Imaging.PixelFormat pf = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
 
@@ -381,6 +381,9 @@ namespace MinitoriCore.Modules.Standard
                         await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(stream));
                     }
                 }
+
+                if (zoomLevel == 0f)
+                    break;
 
                 await Task.Delay(1000 * 60 * 60);
             }
