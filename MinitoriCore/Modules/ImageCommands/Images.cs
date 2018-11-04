@@ -586,7 +586,6 @@ namespace MinitoriCore.Modules.ImageCommands
                 {
                     using (WebClient client = new WebClient())
                     {
-
                         client.DownloadFile(new Uri(image), $@"./Images/{source}/{file}");
                         await context.Channel.SendMessageAsync("Downloaded!");
                     };

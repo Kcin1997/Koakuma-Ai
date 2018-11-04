@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Drawing;
 using MinitoriCore.Preconditions;
+using System.Net;
 
 namespace MinitoriCore.Modules.Standard
 {
@@ -277,6 +278,103 @@ namespace MinitoriCore.Modules.Standard
                 }
 
                 await Task.Delay(1000 * 60 * 10);
+            }
+        }
+
+        [Command("zoom reset", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Summary("ya")]
+        [RequireOwner]
+        public async Task ZoomClearCache()
+        {
+            if (File.Exists($"./Images/Servers/{Context.Guild.Id}.png"))
+            {
+                await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(File.OpenRead($"./Images/Servers/{Context.Guild.Id}.png")));
+                File.Delete($"./Images/Servers/{Context.Guild.Id}.png");
+                rotate[Context.Guild.Id] = false;
+                angle[Context.Guild.Id] = 0f;
+                await RespondAsync("Cache cleared, old icon restored.");
+            }
+        }
+
+        [Command("zoom", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Summary("ya")]
+        [RequireOwner]
+        public async Task Zoom(float zoomLevel = 0f)
+        {
+            if (!Context.Guild.CurrentUser.GuildPermissions.ManageGuild)
+            {
+                await RespondAsync("Nope, don't have permission to do that.");
+                return;
+            }
+
+            if (!rotate.ContainsKey(Context.Guild.Id))
+            {
+                rotate[Context.Guild.Id] = false;
+                angle[Context.Guild.Id] = 0f;
+            }
+
+            if (zoomLevel != 0f)
+                angle[Context.Guild.Id] = zoomLevel;
+
+            rotate[Context.Guild.Id] = !rotate[Context.Guild.Id];
+
+            if (!File.Exists($"./Images/Servers/{Context.Guild.Id}.png"))
+            {
+                using (WebClient client = new WebClient())
+                {
+                    client.DownloadFile(new Uri(Context.Guild.IconUrl), $"./Images/Servers/{Context.Guild.Id}.png");
+                    await Context.Channel.SendMessageAsync("Downloaded!");
+                };
+            }
+            else
+            {
+                if (zoomLevel == 0f)
+                {
+                    await Context.Channel.SendMessageAsync("I already have that one!");
+                    return;
+                }
+            }
+
+            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile($"./Images/Servers/{Context.Guild.Id}.png");
+
+            while (rotate[Context.Guild.Id])
+            {
+                if (zoomLevel != 0f)
+                {
+                    rotate[Context.Guild.Id] = false;
+                }
+                else
+                    angle[Context.Guild.Id] += 10f;
+
+                System.Drawing.Imaging.PixelFormat pf = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+
+                //angle[Context.Guild.Id] = angle[Context.Guild.Id] % 360;
+                //if (angle[Context.Guild.Id] > 180)
+                //    angle[Context.Guild.Id] -= 360;
+
+                using (Bitmap newImg = new Bitmap(bmp.Width, bmp.Height, pf))
+                {
+                    using (Graphics gfx = Graphics.FromImage(newImg))
+                    {
+                        gfx.TranslateTransform((float)bmp.Width / 2, (float)bmp.Height / 2);
+                        //gfx.RotateTransform(angle[Context.Guild.Id]);
+                        gfx.ScaleTransform(angle[Context.Guild.Id], angle[Context.Guild.Id]);
+                        gfx.TranslateTransform(-(float)bmp.Width / 2, -(float)bmp.Height / 2);
+                        gfx.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        gfx.DrawImage(bmp, new Point(0, 0));
+                    }
+
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        newImg.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        stream.Position = 0;
+                        await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(stream));
+                    }
+                }
+
+                await Task.Delay(1000 * 60 * 60);
             }
         }
 
