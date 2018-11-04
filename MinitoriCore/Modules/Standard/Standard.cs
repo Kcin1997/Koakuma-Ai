@@ -286,7 +286,7 @@ namespace MinitoriCore.Modules.Standard
         [RequireOwner]
         public async Task ServerIcon()
         {
-            await RespondAsync(Context.Guild.IconUrl);
+            await RespondAsync(Context.Guild.IconId);
         }
 
         [Command("zoom reset", RunMode = RunMode.Async)]
