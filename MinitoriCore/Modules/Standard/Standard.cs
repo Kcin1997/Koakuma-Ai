@@ -320,7 +320,7 @@ namespace MinitoriCore.Modules.Standard
             if (!rotate.ContainsKey(Context.Guild.Id))
             {
                 rotate[Context.Guild.Id] = false;
-                angle[Context.Guild.Id] = 0f;
+                angle[Context.Guild.Id] = 1f;
             }
 
             if (zoomLevel != 0f)
