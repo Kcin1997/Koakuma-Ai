@@ -286,7 +286,7 @@ namespace MinitoriCore.Modules.Standard
         [RequireOwner]
         public async Task ServerIcon()
         {
-            await RespondAsync($"https://cdn.discordapp.com/icons/212053857306542080/{Context.Guild.IconId}.png");
+            await RespondAsync($"https://cdn.discordapp.com/icons/{Context.Guild.Id}/{Context.Guild.IconId}.png");
         }
 
         [Command("zoom reset", RunMode = RunMode.Async)]
@@ -332,7 +332,7 @@ namespace MinitoriCore.Modules.Standard
             {
                 using (WebClient client = new WebClient())
                 {
-                    client.DownloadFile(new Uri($"https://cdn.discordapp.com/icons/212053857306542080/{Context.Guild.IconId}.png"), $"./Images/Servers/{Context.Guild.Id}.png");
+                    client.DownloadFile(new Uri($"https://cdn.discordapp.com/icons/{Context.Guild.Id}/{Context.Guild.IconId}.png"), $"./Images/Servers/{Context.Guild.Id}.png");
                     await Context.Channel.SendMessageAsync("Started!");
                 };
             }
