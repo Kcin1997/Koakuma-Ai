@@ -281,6 +281,14 @@ namespace MinitoriCore.Modules.Standard
             }
         }
 
+        [Command("icon")]
+        [Summary("na")]
+        [RequireOwner]
+        public async Task ServerIcon()
+        {
+            await RespondAsync(Context.Guild.IconUrl);
+        }
+
         [Command("zoom reset", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Summary("ya")]
