@@ -289,6 +289,13 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync($"https://cdn.discordapp.com/icons/{Context.Guild.Id}/{Context.Guild.IconId}.png?size=2048");
         }
 
+        [Command("servercount")]
+        [Summary("Take a guess")]
+        public async Task ServerCount()
+        {
+            await RespondAsync($"I am currently in {Context.Client.Guilds.Count()} servers.");
+        }
+
         [Command("zoom reset", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Summary("ya")]
