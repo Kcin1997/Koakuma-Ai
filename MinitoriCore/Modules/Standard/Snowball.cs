@@ -106,8 +106,8 @@ namespace MinitoriCore.Modules.Standard
                 return;
             }
 
-            if (user.Id == 102528327251656704) // Googie2149
-                user = (IGuildUser)Context.User;
+            //if (user.Id == 102528327251656704) // Googie2149
+            //    user = (IGuildUser)Context.User;
 
             if (user.Id == 396277750664527872)
                 return; // made me stay up late to break things
@@ -146,6 +146,13 @@ namespace MinitoriCore.Modules.Standard
                     events.stats[Context.Guild.Id][Context.User.Id].Misses++;
                     events.cooldown[Context.Guild.Id][Context.User.Id] = DateTime.UtcNow.AddSeconds(40);
                     await RespondAsync($"{Context.User.Mention} attempted to throw a snowball at {Context.User.Mention}, but all they managed to do is fall over and lose their snowball.");
+                    return;
+                }
+
+                if (Context.Guild.Id == 132720341058453504 && 
+                    user.RoleIds.Where(x => x != 132720341058453504).Count() == 0) // In /r/Kirby, don't involve people that don't have the friends role
+                {
+                    await RespondAsync("Sorry, that person hasn't gained access to the server yet. Why were you trying to hit them 🤔");
                     return;
                 }
 
