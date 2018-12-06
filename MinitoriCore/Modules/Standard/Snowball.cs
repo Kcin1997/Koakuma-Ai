@@ -16,7 +16,7 @@ using MinitoriCore.Preconditions;
 
 namespace MinitoriCore.Modules.Standard
 {
-    class Snowball : MinitoriModule
+    public class Snowball : MinitoriModule
     {
         private EventStorage events;
         private Dictionary<ulong, bool> rotate = new Dictionary<ulong, bool>();
@@ -213,6 +213,7 @@ namespace MinitoriCore.Modules.Standard
         [Command("snowball stats")]
         [Summary("Get stats for the snowball fight!")]
         [Priority(1000)]
+        [Hide]
         public async Task Stats([Remainder]string mentions = "")
         {
             //Task.Run(async () =>
