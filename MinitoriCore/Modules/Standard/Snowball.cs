@@ -76,7 +76,7 @@ namespace MinitoriCore.Modules.Standard
 
             if (Context.Message.MentionedUserIds.Count() == 1)
             {
-                if (Context.Message.MentionedUserIds.FirstOrDefault() != ((SocketGuild)Context.Guild).CurrentUser.Id)
+                if (Context.Message.MentionedUserIds.FirstOrDefault() != Context.Client.CurrentUser.Id)
                     user = Context.Guild.GetUser(Context.Message.MentionedUserIds.FirstOrDefault());
                 else
                 {
@@ -87,7 +87,7 @@ namespace MinitoriCore.Modules.Standard
             {
                 foreach (var u in Context.Message.MentionedUserIds)
                 {
-                    if (u == ((SocketGuild)Context.Guild).CurrentUser.Id)
+                    if (u == (Context.Client.CurrentUser.Id))
                         continue;
 
                     user = Context.Guild.GetUser(u);
@@ -109,7 +109,7 @@ namespace MinitoriCore.Modules.Standard
             //if (user.Id == 102528327251656704) // Googie2149
             //    user = (IGuildUser)Context.User;
 
-            if (user.Id == 396277750664527872)
+            if (user?.Id == 396277750664527872)
                 return; // made me stay up late to break things
 
             if (((IGuildUser)Context.User).RoleIds.ToList().Contains(role.Id))
