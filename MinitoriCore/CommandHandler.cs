@@ -45,6 +45,7 @@ namespace MinitoriCore
             // Don't handle the command if it is a system message
             var message = parameterMessage as SocketUserMessage;
             if (message == null) return;
+            if (message.Author.IsBot) return;
 
             // Mark where the prefix ends and the command begins
             int argPos = 0;
