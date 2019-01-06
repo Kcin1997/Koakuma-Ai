@@ -412,7 +412,7 @@ namespace MinitoriCore.Modules.Standard
         }
 
         [Command("listbots", RunMode = RunMode.Async)]
-        public async Task Task()
+        public async Task ListBots()
         {
             if (!config.OwnerIds.Contains(Context.User.Id))
             {
