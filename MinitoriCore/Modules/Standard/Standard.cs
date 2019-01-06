@@ -411,6 +411,37 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync(output.ToString());
         }
 
+        [Command("listbots", RunMode = RunMode.Async)]
+        [RequireOwner]
+        public async Task Task()
+        {
+            var botAccounts = new List<IGuildUser>();
+            var msg = await ReplyAsync("Downloading the full member list, this might take a little bit...");
+            await Context.Guild.DownloadUsersAsync();
+
+            foreach (var u in Context.Guild.Users)
+            {
+                if (u.IsBot)
+                    botAccounts.Add(u);
+            }
+
+            StringBuilder output = new StringBuilder();
+
+            output.AppendLine($"**I found {botAccounts.Count()} bot accounts in the server.**");
+            output.AppendLine("Note: This is *only* bot accounts, this would not include a user account with a bot attached.");
+            output.AppendLine("```");
+
+            foreach (var b in botAccounts)
+            {
+                output.AppendLine($"{b.Username}#{b.Discriminator} [{b.Id}] | " +
+                    $"Joined at {b.JoinedAt.Value.ToLocalTime().ToString("d")} {b.JoinedAt.Value.ToLocalTime().ToString("T")}");
+            }
+
+            output.AppendLine("```");
+
+            await msg.ModifyAsync(x => x.Content = output.ToString());
+        }
+        
         [Command("listroles")]
         public async Task ListRoles([Remainder]string role)
         {
