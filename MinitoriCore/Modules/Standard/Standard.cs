@@ -132,6 +132,51 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync($"Blah to you too, {Context.User.Mention}.");
         }
 
+        [Command("getbots", RunMode = RunMode.Async)]
+        [Priority(1000)]
+        [Summary("na")]
+        public async Task ListBots()
+        {
+            if (!config.OwnerIds.Contains(Context.User.Id))
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            try
+            {
+                var botAccounts = new List<IGuildUser>();
+                //var msg = await ReplyAsync("Downloading the full member list, this might take a little bit...");
+                //await Context.Guild.DownloadUsersAsync();
+
+                foreach (var u in Context.Guild.Users)
+                {
+                    if (u.IsBot)
+                        botAccounts.Add(u);
+                }
+
+                StringBuilder output = new StringBuilder();
+
+                output.AppendLine($"**I found {botAccounts.Count()} bot accounts in the server.**");
+                output.AppendLine("Note: This is *only* bot accounts, this would not include a user account with a bot attached.");
+                output.AppendLine("```");
+
+                foreach (var b in botAccounts)
+                {
+                    output.AppendLine($"{b.Username}#{b.Discriminator} [{b.Id}] | " +
+                        $"Joined at {b.JoinedAt.Value.ToLocalTime().ToString("d")} {b.JoinedAt.Value.ToLocalTime().ToString("T")}");
+                }
+
+                output.AppendLine("```");
+
+                await RespondAsync(output.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
         [Command("setnick")]
         [Summary("Change my nickname!")]
         public async Task SetNickname(string Nick = "")
@@ -409,49 +454,6 @@ namespace MinitoriCore.Modules.Standard
             }
 
             await RespondAsync(output.ToString());
-        }
-
-        [Command("listbots", RunMode = RunMode.Async)]
-        public async Task ListBots()
-        {
-            if (!config.OwnerIds.Contains(Context.User.Id))
-            {
-                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
-                return;
-            }
-
-            try
-            {
-                var botAccounts = new List<IGuildUser>();
-                //var msg = await ReplyAsync("Downloading the full member list, this might take a little bit...");
-                //await Context.Guild.DownloadUsersAsync();
-
-                foreach (var u in Context.Guild.Users)
-                {
-                    if (u.IsBot)
-                        botAccounts.Add(u);
-                }
-
-                StringBuilder output = new StringBuilder();
-
-                output.AppendLine($"**I found {botAccounts.Count()} bot accounts in the server.**");
-                output.AppendLine("Note: This is *only* bot accounts, this would not include a user account with a bot attached.");
-                output.AppendLine("```");
-
-                foreach (var b in botAccounts)
-                {
-                    output.AppendLine($"{b.Username}#{b.Discriminator} [{b.Id}] | " +
-                        $"Joined at {b.JoinedAt.Value.ToLocalTime().ToString("d")} {b.JoinedAt.Value.ToLocalTime().ToString("T")}");
-                }
-
-                output.AppendLine("```");
-
-                await RespondAsync(output.ToString());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}\n{ex.StackTrace}");
-            }
         }
         
         [Command("listroles")]
