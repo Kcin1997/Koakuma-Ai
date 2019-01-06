@@ -424,7 +424,7 @@ namespace MinitoriCore.Modules.Standard
             {
                 var botAccounts = new List<IGuildUser>();
                 //var msg = await ReplyAsync("Downloading the full member list, this might take a little bit...");
-                await Context.Guild.DownloadUsersAsync();
+                //await Context.Guild.DownloadUsersAsync();
 
                 foreach (var u in Context.Guild.Users)
                 {
