@@ -412,9 +412,14 @@ namespace MinitoriCore.Modules.Standard
         }
 
         [Command("listbots", RunMode = RunMode.Async)]
-        [RequireOwner]
         public async Task Task()
         {
+            if (!config.OwnerIds.Contains(Context.User.Id))
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
             try
             {
                 var botAccounts = new List<IGuildUser>();
