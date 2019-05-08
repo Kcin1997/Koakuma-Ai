@@ -40,6 +40,8 @@ namespace MinitoriCore.Modules.Splatoon
         [Priority(1000)]
         public async Task SelectMap()
         {
+            try
+            { 
             if (rankedService.Cooldown.ContainsKey(Context.User.Id) && rankedService.Cooldown[Context.User.Id] > DateTimeOffset.Now.AddMinutes(-1))
             {
                 TimeSpan t = rankedService.Cooldown[Context.User.Id] - DateTimeOffset.Now.AddMinutes(-1);
@@ -110,6 +112,26 @@ namespace MinitoriCore.Modules.Splatoon
             await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
 
             rankedService.Cooldown[Context.User.Id] = DateTimeOffset.Now;
+            }
+            catch (Exception ex)
+            {
+                await RespondAsync($"There was an error downloading that file:\n{ex.Message}");
+                string exMessage;
+                if (ex != null)
+                {
+                    while (ex is AggregateException && ex.InnerException != null)
+                        ex = ex.InnerException;
+                    exMessage = $"{ex.Message}";
+                    if (exMessage != "Reconnect failed: HTTP/1.1 503 Service Unavailable")
+                        exMessage += $"\n{ex.StackTrace}";
+                }
+                else
+                    exMessage = null;
+
+                Console.WriteLine(exMessage);
+
+                return;
+            }
         }
     }
 }
