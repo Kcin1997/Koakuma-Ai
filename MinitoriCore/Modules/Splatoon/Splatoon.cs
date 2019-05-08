@@ -62,27 +62,20 @@ namespace MinitoriCore.Modules.Splatoon
                     stage = Directory.GetFiles("./Images/Splatoon/", "*.png").ToList().OrderBy(x => asdf.Next()).FirstOrDefault();
 
                 stage = stage.Replace("./Images/Splatoon/", "");
+                string stageName = stage.Replace('_', ' ').Substring(0, stage.IndexOf('.'));
+                
+                EmbedBuilder builder = new EmbedBuilder();
 
-                using (FileStream file = new FileStream($"./Images/Splatoon/{stage}", FileMode.Open, FileAccess.Read))
-                {
-                    EmbedBuilder builder = new EmbedBuilder();
+                builder.ImageUrl = $"attachment://{stage}";
+                builder.Title = stageName;
 
-                    builder.ImageUrl = $"attachment://{stage}";
-                    builder.Title = "ImageUrl Option Formatting Test";
+                await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: "ImageUrl Option Formatting Test", embed: builder.Build());
+                builder = new EmbedBuilder();
 
-                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: stage, embed: builder.Build());
-                    //await Context.Channel.SendFileAsync(file, stage, text: "ImageUrl Option Formatting Test", embed: builder.Build());
+                builder.ThumbnailUrl = $"attachment://{stage}";
+                builder.Title = stageName;
 
-                    file.Position = 0;
-
-                    builder = new EmbedBuilder();
-
-                    builder.ThumbnailUrl = $"attachment://{stage}";
-                    builder.Title = "ThumbnailUrl Option Formatting Test";
-
-                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: stage, embed: builder.Build());
-                    //await Context.Channel.SendFileAsync(file, stage, text: "ThumbnailUrl Option Formatting Test", embed: builder.Build());
-                }
+                await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: "ThumbnailUrl Option Formatting Test", embed: builder.Build());
             }
             catch (Exception ex)
             {
