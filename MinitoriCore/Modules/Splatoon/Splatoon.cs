@@ -67,11 +67,16 @@ namespace MinitoriCore.Modules.Splatoon
 
                 var role = (Context.User as IGuildUser).GetRoles().Where(x => x.Color != Color.Default).OrderBy(x => x.Position).Last();
 
+                string multiplier = "";
+
+                if (asdf.Next(0, 100) < 10)
+                    multiplier = $" __**2x Battle**__";
+
                 EmbedBuilder builder = new EmbedBuilder();
 
                 builder.ThumbnailUrl = $"attachment://{stage}";
                 //builder.Title = stageName;
-                builder.AddField(stageName, "Mode: Turfwar", true);
+                builder.AddField(stageName, $"**Mode:** Turfwar{multiplier}", true);
                 builder.Timestamp = DateTimeOffset.Now;
 
                 builder.WithFooter($"Requested by {(Context.User as IGuildUser).Nickname ?? Context.User.Username}#{Context.User.Discriminator}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
