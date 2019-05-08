@@ -105,10 +105,9 @@ namespace MinitoriCore.Modules.Splatoon
                 builder.WithFooter($"Requested by {(Context.User as IGuildUser).Nickname ?? Context.User.Username}#{Context.User.Discriminator}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
                 builder.Color = role.Color;
                 
+                rankedService.Cooldown[Context.User.Id] = DateTimeOffset.Now;
 
                 await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
-
-                rankedService.Cooldown[Context.User.Id] = DateTimeOffset.Now;
             }
             catch (Exception ex)
             {
