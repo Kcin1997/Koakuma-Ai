@@ -18,7 +18,6 @@ using System.Net;
 
 namespace MinitoriCore.Modules.Splatoon
 {
-    [RequireGuild(568302640371335168)]
     public class MapRotation : MinitoriModule
     {
         private RankedService rankedService;
