@@ -23,6 +23,9 @@ namespace MinitoriCore.Modules.Splatoon
             // Todo: actually make it rotate
         }
 
+        public Dictionary<ulong, string> LastMap = new Dictionary<ulong, string>();
+        public Dictionary<ulong, DateTimeOffset> Cooldown = new Dictionary<ulong, DateTimeOffset>();
+
         public RankedService()
         {
 

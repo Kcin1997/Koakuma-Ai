@@ -22,14 +22,14 @@ namespace MinitoriCore.Modules.Splatoon
     //[RequireGuild(568302640371335168)]
     public class Splatoon : MinitoriModule
     {
-        // private RankedService rankedService;
+        private RankedService rankedService;
         private Config config;
         private CommandService commands;
         private IServiceProvider services;
 
-        public Splatoon(CommandService _commands, IServiceProvider _services, Config _config)
+        public Splatoon(RankedService _rankedService, CommandService _commands, IServiceProvider _services, Config _config)
         {
-            // rankedService = _rankedService;
+            rankedService = _rankedService;
             commands = _commands;
             services = _services;
             config = _config;
@@ -40,70 +40,76 @@ namespace MinitoriCore.Modules.Splatoon
         [Priority(1000)]
         public async Task SelectMap()
         {
-            try
+            if (rankedService.Cooldown.ContainsKey(Context.User.Id) && rankedService.Cooldown[Context.User.Id] > DateTimeOffset.Now.AddMinutes(-1))
             {
-                string stage = "";
+                TimeSpan t = rankedService.Cooldown[Context.User.Id] - DateTimeOffset.Now.AddMinutes(-1);
 
-                if (!Directory.Exists("./Images/Splatoon/"))
+                Task.Run(async () =>
                 {
-                    Directory.CreateDirectory("./Images/Splatoon/");
-                }
+                    var msg = await ReplyAsync($"You're doing that too fast! Try again in {t.Seconds:00} seconds.");
 
-                Random asdf = new Random(); // Todo: Implement better rng
-                int fileCount = Directory.GetFiles("./Images/Splatoon/", "*.png").Count();
+                    await Task.Delay(1000 * 3);
 
-                if (fileCount == 0)
-                {
-                    await RespondAsync("Something went wrong and I have no maps in my list!");
-                    return;
-                }
-                else if (fileCount == 1)
-                    stage = Directory.GetFiles("./Images/Splatoon/", "*.png").FirstOrDefault();
-                else if (fileCount > 1)
-                    stage = Directory.GetFiles("./Images/Splatoon/", "*.png").ToList().OrderBy(x => asdf.Next()).FirstOrDefault();
-
-                stage = stage.Replace("./Images/Splatoon/", "");
-                string stageName = stage.Replace('_', ' ').Substring(0, stage.IndexOf('.'));
-
-                var role = (Context.User as IGuildUser).GetRoles().Where(x => x.Color != Color.Default).OrderBy(x => x.Position).Last();
-
-                string multiplier = "";
-
-                if (asdf.Next(0, 100) < 10)
-                    multiplier = $" __**2x Battle**__";
-
-                EmbedBuilder builder = new EmbedBuilder();
-
-                builder.ThumbnailUrl = $"attachment://{stage}";
-                //builder.Title = stageName;
-                builder.AddField(stageName, $"**Mode:** Turfwar{multiplier}", true);
-                builder.Timestamp = DateTimeOffset.Now;
-
-                builder.WithFooter($"Requested by {(Context.User as IGuildUser).Nickname ?? Context.User.Username}#{Context.User.Discriminator}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
-                builder.Color = role.Color;
-                
-
-                await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
-            }
-            catch (Exception ex)
-            {
-                await RespondAsync($"There was an error uploading that file:\n{ex.Message}");
-                string exMessage;
-                if (ex != null)
-                {
-                    while (ex is AggregateException && ex.InnerException != null)
-                        ex = ex.InnerException;
-                    exMessage = $"{ex.Message}";
-                    if (exMessage != "Reconnect failed: HTTP/1.1 503 Service Unavailable")
-                        exMessage += $"\n{ex.StackTrace}";
-                }
-                else
-                    exMessage = null;
-
-                Console.WriteLine(exMessage);
+                    await msg.DeleteAsync();
+                    await Context.Message.DeleteAsync();
+                });
 
                 return;
             }
+
+            string stage = "";
+
+            if (!Directory.Exists("./Images/Splatoon/"))
+            {
+                Directory.CreateDirectory("./Images/Splatoon/");
+            }
+
+            Random asdf = new Random(); // Todo: Implement better rng
+            int fileCount = Directory.GetFiles("./Images/Splatoon/", "*.png").Count();
+
+            if (fileCount == 0)
+            {
+                await RespondAsync("Something went wrong and I have no maps in my list!");
+                return;
+            }
+            else if (fileCount == 1)
+                stage = Directory.GetFiles("./Images/Splatoon/", "*.png").FirstOrDefault();
+            else if (fileCount > 1)
+            {
+                if (!rankedService.LastMap.ContainsKey(Context.User.Id))
+                    rankedService.LastMap[Context.User.Id] = "None";
+
+                do
+                {
+                    stage = Directory.GetFiles("./Images/Splatoon/", "*.png").ToList().OrderBy(x => asdf.Next()).FirstOrDefault();
+                } while (stage.Replace("./Images/Splatoon/", "") != rankedService.LastMap[Context.User.Id]);
+            }
+
+            stage = stage.Replace("./Images/Splatoon/", "");
+            rankedService.LastMap[Context.User.Id] = stage;
+            string stageName = stage.Replace('_', ' ').Substring(0, stage.IndexOf('.'));
+
+            var role = (Context.User as IGuildUser).GetRoles().Where(x => x.Color != Color.Default).OrderBy(x => x.Position).Last();
+
+            string multiplier = "";
+
+            if (asdf.Next(0, 100) < 10)
+                multiplier = $" __**2x Battle**__";
+
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder.ThumbnailUrl = $"attachment://{stage}";
+            //builder.Title = stageName;
+            builder.AddField(stageName, $"**Mode:** Turfwar{multiplier}", true);
+            builder.Timestamp = DateTimeOffset.Now;
+
+            builder.WithFooter($"Requested by {(Context.User as IGuildUser).Nickname ?? Context.User.Username}#{Context.User.Discriminator}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+            builder.Color = role.Color;
+                
+
+            await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
+
+            rankedService.Cooldown[Context.User.Id] = DateTimeOffset.Now;
         }
     }
 }
