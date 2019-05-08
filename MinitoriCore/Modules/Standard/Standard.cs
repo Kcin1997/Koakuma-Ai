@@ -167,6 +167,8 @@ namespace MinitoriCore.Modules.Standard
                         $"Joined at {b.JoinedAt.Value.ToLocalTime().ToString("d")} {b.JoinedAt.Value.ToLocalTime().ToString("T")}");
                 }
 
+                
+
                 output.AppendLine("```");
 
                 await RespondAsync(output.ToString());
