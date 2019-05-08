@@ -61,7 +61,7 @@ namespace MinitoriCore.Modules.Splatoon
                 else if (fileCount > 1)
                     stage = Directory.GetFiles("./Images/Splatoon/", "*.png").ToList().OrderBy(x => asdf.Next()).FirstOrDefault();
 
-                stage = stage.Replace("Images/Splatoon/", "");
+                stage = stage.Replace("./Images/Splatoon/", "");
 
                 using (FileStream file = new FileStream($"./Images/Splatoon/{stage}", FileMode.Open, FileAccess.Read))
                 {
