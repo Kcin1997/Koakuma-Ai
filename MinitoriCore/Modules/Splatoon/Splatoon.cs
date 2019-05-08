@@ -70,7 +70,7 @@ namespace MinitoriCore.Modules.Splatoon
                     builder.ImageUrl = $"attachment://{stage}";
                     builder.Title = "ImageUrl Option Formatting Test";
 
-                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
+                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: stage, embed: builder.Build());
                     //await Context.Channel.SendFileAsync(file, stage, text: "ImageUrl Option Formatting Test", embed: builder.Build());
 
                     file.Position = 0;
@@ -80,7 +80,7 @@ namespace MinitoriCore.Modules.Splatoon
                     builder.ThumbnailUrl = $"attachment://{stage}";
                     builder.Title = "ThumbnailUrl Option Formatting Test";
 
-                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
+                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: stage, embed: builder.Build());
                     //await Context.Channel.SendFileAsync(file, stage, text: "ThumbnailUrl Option Formatting Test", embed: builder.Build());
                 }
             }
