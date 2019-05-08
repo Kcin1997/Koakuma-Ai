@@ -11,6 +11,7 @@ using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using MinitoriCore.Modules.UptimeTracker;
 using MinitoriCore.Modules.Standard;
+using MinitoriCore.Modules.Splatoon;
 
 namespace MinitoriCore
 {
@@ -26,6 +27,7 @@ namespace MinitoriCore
         private RandomStrings strings;
         //private UptimeService uptime;
         private EventStorage events;
+        private RankedService rankedService;
         private ServiceProvider map;
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
@@ -58,10 +60,11 @@ namespace MinitoriCore
             config = Config.Load();
             //uptime = new UptimeService();
             events = EventStorage.Load();
+            rankedService = new RankedService();
             strings = new RandomStrings();
 
             //var map = new DependencyMap();
-            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events)/*.AddSingleton(uptime)*/.BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events).AddSingleton(rankedService)/*.AddSingleton(uptime)*/.BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
