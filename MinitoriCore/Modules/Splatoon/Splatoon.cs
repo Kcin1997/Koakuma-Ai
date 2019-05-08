@@ -59,6 +59,7 @@ namespace MinitoriCore.Modules.Splatoon
                     return;
                 }
 
+                Console.WriteLine("Picking map");
                 string stage = "";
 
                 if (!Directory.Exists("./Images/Splatoon/"))
@@ -86,7 +87,7 @@ namespace MinitoriCore.Modules.Splatoon
                         stage = Directory.GetFiles("./Images/Splatoon/", "*.png").ToList().OrderBy(x => asdf.Next()).FirstOrDefault();
                     } while (stage.Replace("./Images/Splatoon/", "") != rankedService.LastMap[Context.User.Id]);
                 }
-
+                Console.WriteLine("Picked map");
                 stage = stage.Replace("./Images/Splatoon/", "");
                 rankedService.LastMap[Context.User.Id] = stage;
                 string stageName = stage.Replace('_', ' ').Substring(0, stage.IndexOf('.'));
