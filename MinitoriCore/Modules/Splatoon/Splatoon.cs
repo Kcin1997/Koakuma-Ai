@@ -61,14 +61,16 @@ namespace MinitoriCore.Modules.Splatoon
                 else if (fileCount > 1)
                     stage = Directory.GetFiles("./Images/Splatoon/", "*.png").ToList().OrderBy(x => asdf.Next()).FirstOrDefault();
 
-                using (FileStream file = new FileStream($"{stage}", FileMode.Open, FileAccess.Read))
+                stage = stage.Replace("Images/Splatoon/", "");
+
+                using (FileStream file = new FileStream($"./Images/Splatoon/{stage}", FileMode.Open, FileAccess.Read))
                 {
                     EmbedBuilder builder = new EmbedBuilder();
 
                     builder.ImageUrl = $"attachment://{stage}";
                     builder.Title = "ImageUrl Option Formatting Test";
 
-                    await Context.Channel.SendFileAsync(stage, embed: builder.Build());
+                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
                     //await Context.Channel.SendFileAsync(file, stage, text: "ImageUrl Option Formatting Test", embed: builder.Build());
 
                     file.Position = 0;
@@ -78,7 +80,7 @@ namespace MinitoriCore.Modules.Splatoon
                     builder.ThumbnailUrl = $"attachment://{stage}";
                     builder.Title = "ThumbnailUrl Option Formatting Test";
 
-                    await Context.Channel.SendFileAsync(stage, embed: builder.Build());
+                    await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
                     //await Context.Channel.SendFileAsync(file, stage, text: "ThumbnailUrl Option Formatting Test", embed: builder.Build());
                 }
             }
