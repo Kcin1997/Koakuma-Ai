@@ -20,14 +20,14 @@ namespace MinitoriCore.Modules.Splatoon
 {
     public class MapRotation : MinitoriModule
     {
-        private RankedService rankedService;
+        // private RankedService rankedService;
         private Config config;
         private CommandService commands;
         private IServiceProvider services;
 
-        public MapRotation(RankedService _rankedService, CommandService _commands, IServiceProvider _services, Config _config)
+        public MapRotation(CommandService _commands, IServiceProvider _services, Config _config)
         {
-            rankedService = _rankedService;
+            // rankedService = _rankedService;
             commands = _commands;
             services = _services;
             config = _config;
