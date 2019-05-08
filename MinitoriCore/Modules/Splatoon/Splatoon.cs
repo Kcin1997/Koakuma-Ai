@@ -18,14 +18,15 @@ using System.Net;
 
 namespace MinitoriCore.Modules.Splatoon
 {
-    public class MapRotation : MinitoriModule
+    [RequireGuild(568302640371335168)]
+    public class Splatoon : MinitoriModule
     {
         // private RankedService rankedService;
         private Config config;
         private CommandService commands;
         private IServiceProvider services;
 
-        public MapRotation(CommandService _commands, IServiceProvider _services, Config _config)
+        public Splatoon(CommandService _commands, IServiceProvider _services, Config _config)
         {
             // rankedService = _rankedService;
             commands = _commands;
@@ -34,6 +35,8 @@ namespace MinitoriCore.Modules.Splatoon
         }
         
         [Command("map", RunMode = RunMode.Async)]
+        [Summary("Pick a map!")]
+        [Priority(1000)]
         public async Task SelectMap()
         {
             string stage = "";
