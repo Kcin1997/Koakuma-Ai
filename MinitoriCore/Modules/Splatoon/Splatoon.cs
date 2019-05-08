@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using System.Drawing;
 using MinitoriCore.Preconditions;
 using System.Net;
+using Color = Discord.Color;
 
 namespace MinitoriCore.Modules.Splatoon
 {
@@ -63,7 +64,9 @@ namespace MinitoriCore.Modules.Splatoon
 
                 stage = stage.Replace("./Images/Splatoon/", "");
                 string stageName = stage.Replace('_', ' ').Substring(0, stage.IndexOf('.'));
-                
+
+                var role = (Context.User as IGuildUser).GetRoles().Where(x => x.Color != Color.Default).OrderBy(x => x.Position).Last();
+
                 EmbedBuilder builder = new EmbedBuilder();
 
                 builder.ThumbnailUrl = $"attachment://{stage}";
@@ -72,6 +75,8 @@ namespace MinitoriCore.Modules.Splatoon
                 builder.Timestamp = DateTimeOffset.Now;
 
                 builder.WithFooter($"Requested by {(Context.User as IGuildUser).Nickname ?? Context.User.Username}#{Context.User.Discriminator}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+                builder.Color = role.Color;
+                
 
                 await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
             }
