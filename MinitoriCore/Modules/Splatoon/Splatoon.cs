@@ -66,16 +66,14 @@ namespace MinitoriCore.Modules.Splatoon
                 
                 EmbedBuilder builder = new EmbedBuilder();
 
-                builder.ImageUrl = $"attachment://{stage}";
-                builder.Title = stageName;
-
-                await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: "ImageUrl Option Formatting Test", embed: builder.Build());
-                builder = new EmbedBuilder();
-
                 builder.ThumbnailUrl = $"attachment://{stage}";
-                builder.Title = stageName;
+                //builder.Title = stageName;
+                builder.AddField(stageName, "Mode: Turfwar", true);
+                builder.Timestamp = DateTimeOffset.Now;
 
-                await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", text: "ThumbnailUrl Option Formatting Test", embed: builder.Build());
+                builder.WithFooter($"Requested by {(Context.User as IGuildUser).Nickname ?? Context.User.Username}#{Context.User.Discriminator}", Context.User.GetAvatarUrl() ?? Context.User.GetDefaultAvatarUrl());
+
+                await Context.Channel.SendFileAsync($"./Images/Splatoon/{stage}", embed: builder.Build());
             }
             catch (Exception ex)
             {
