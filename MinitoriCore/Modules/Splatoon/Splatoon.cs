@@ -61,7 +61,7 @@ namespace MinitoriCore.Modules.Splatoon
                 else if (fileCount > 1)
                     stage = Directory.GetFiles("./Images/Splatoon/", "*.png").ToList().OrderBy(x => asdf.Next()).FirstOrDefault();
 
-                using (FileStream file = new FileStream($"./Images/Splatoon/{stage}", FileMode.Open, FileAccess.Read))
+                using (FileStream file = new FileStream($"{stage}", FileMode.Open, FileAccess.Read))
                 {
                     EmbedBuilder builder = new EmbedBuilder();
 
