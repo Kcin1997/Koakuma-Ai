@@ -9,7 +9,7 @@ using Discord.Rest;
 using Discord.Commands;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
-using MinitoriCore.Modules.UptimeTracker;
+//using MinitoriCore.Modules.UptimeTracker;
 using MinitoriCore.Modules.Standard;
 using MinitoriCore.Modules.Splatoon;
 
