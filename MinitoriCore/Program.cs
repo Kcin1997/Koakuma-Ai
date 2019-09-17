@@ -39,7 +39,7 @@ namespace MinitoriCore
             socketClient = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                AlwaysDownloadUsers = true
+                AlwaysDownloadUsers = false
             });
             socketClient.Log += Log;
 
