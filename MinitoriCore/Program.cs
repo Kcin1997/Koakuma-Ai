@@ -170,19 +170,27 @@ namespace MinitoriCore
 
         private async Task SocketClient_Disconnected(Exception ex)
         {
+            Console.WriteLine("!!!Disconnected Event Fired!!!");
             // If we disconnect, wait 3 minutes and see if we regained the connection.
             // If we did, great, exit out and continue. If not, check again 3 minutes later
             // just to be safe, and restart to exit a deadlock.
             var task = Task.Run(async () =>
             {
+                Console.WriteLine("!!!Disconnected Task Started!!!");
                 for (int i = 0; i < 2; i++)
                 {
+                    Console.WriteLine("!!!Disconnected Timer Started!!!");
                     await Task.Delay(1000 * 60 * 3);
-
+                    Console.WriteLine("!!!Disconnected Timer Finished!!!");
+                    
                     if (socketClient.ConnectionState == ConnectionState.Connected)
+                    {
+                        Console.WriteLine("!!!Connection Regained!!!");
                         break;
+                    }
                     else if (i == 1)
                     {
+                        Console.WriteLine("!!!Still Disconnected!!!");
                         File.Create("./deadlock");
                         Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);
                     }
