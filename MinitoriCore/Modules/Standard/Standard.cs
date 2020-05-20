@@ -58,6 +58,15 @@ namespace MinitoriCore.Modules.Standard
                 (scale / (double)uint.MaxValue));
         }
 
+[Command("emergencyban")]
+        public async Task EmergencyBan()
+        {
+            if (Context.User.Id != 102528327251656704)
+                return;
+
+            await Context.Guild.AddBanAsync(597305560416911360, 7, "Shock gifs, slurs, DM harassment.");
+        }
+
         [Command("help")]
         public async Task HelpCommand()
         {
