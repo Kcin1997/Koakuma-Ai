@@ -69,7 +69,7 @@ namespace MinitoriCore.Modules.Standard
             if (UserId == 0)
                 return;
 
-            await Context.Guild.AddBanAsync(UserId, 7, "Emergency ban, will need an actual reason later.");
+            await Context.Guild.AddBanAsync(UserId, 0, "Emergency ban, will need an actual reason later.");
         }
 
         [Command("help")]
