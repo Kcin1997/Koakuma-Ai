@@ -58,6 +58,20 @@ namespace MinitoriCore.Modules.Standard
                 (scale / (double)uint.MaxValue));
         }
 
+        [Command("emergencyban")]
+        public async Task EmergencyBan(ulong UserId = 0)
+        {
+            if (Context.User.Id != 102528327251656704)
+            {
+                return;
+            }
+
+            if (UserId == 0)
+                return;
+
+            await Context.Guild.AddBanAsync(UserId, 0, "Emergency ban, will need an actual reason later.");
+        }
+
         [Command("help")]
         public async Task HelpCommand()
         {
