@@ -86,6 +86,7 @@ namespace MinitoriCore
 
             socketClient.GuildAvailable += Client_GuildAvailable;
             socketClient.Disconnected += SocketClient_Disconnected;
+            socketClient.MessageReceived += SocketClient_MessageReceived;
             //client.GuildMemberUpdated += Client_UserUpdated;
             // memes
 
@@ -120,7 +121,24 @@ namespace MinitoriCore
 
             await Task.Delay(-1);
         }
-        
+
+        private async Task SocketClient_MessageReceived(SocketMessage msg)
+        {
+            if (msg.Author.Id == socketClient.CurrentUser.Id)
+                return;
+
+            if (!msg.Author.IsBot)
+                return;
+
+            if ((msg.Channel as IGuildChannel)?.Id != 110373943822540800)
+                return;
+
+            if ((msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
+            {
+                await msg.DeleteAsync();
+            }
+        }
+
         //private async Task Client_UserUpdated(SocketGuildUser before, SocketGuildUser after)
         //{
         //    if (((SocketGuildUser)before).Guild.Id != 110373943822540800)
@@ -138,7 +156,7 @@ namespace MinitoriCore
         //        }
         //    }
         //}
-        
+
         private async Task Client_UserJoined(SocketGuildUser user)
         {
             if (user.Username.ToLower().Contains("platinbots") || user.Username.ToLower().Contains("botsplat") || 
