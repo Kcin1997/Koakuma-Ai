@@ -85,6 +85,7 @@ namespace MinitoriCore
             }
 
             socketClient.GuildAvailable += Client_GuildAvailable;
+            socketClient.Disconnected += SocketClient_Disconnected;
             //client.GuildMemberUpdated += Client_UserUpdated;
             // memes
 
