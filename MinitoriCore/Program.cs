@@ -142,6 +142,8 @@ namespace MinitoriCore
 
                 if (msg.Content.Contains("pos "))
                 {
+                    await msg.DeleteAsync();
+
                     if (!posCommandUsage.ContainsKey(author.Id))
                         posCommandUsage[author.Id] = 0;
 
@@ -151,9 +153,12 @@ namespace MinitoriCore
                     {
                         case 1:
                         case 2:
-                            var response = await msg.Channel.SendMessageAsync($"{author.Mention} please use a testing channel to check on the status of your bot.");
-                            await Task.Delay(10 * 1000);
-                            await response.DeleteAsync();
+                            Task.Run(async () =>
+                            {
+                                var response = await msg.Channel.SendMessageAsync($"{author.Mention} please use a testing channel to check on the status of your bot.");
+                                await Task.Delay(10 * 1000);
+                                await response.DeleteAsync();
+                            });
                             break;
                         case 3:
                             var nonTestingMute = channel.Guild.GetRole(132106771975110656);
