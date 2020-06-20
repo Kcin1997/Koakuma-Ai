@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 //using MinitoriCore.Modules.UptimeTracker;
 using MinitoriCore.Modules.Standard;
 using MinitoriCore.Modules.Splatoon;
+using System.Threading;
 
 namespace MinitoriCore
 {
@@ -33,6 +34,8 @@ namespace MinitoriCore
         //private readonly IDependencyMap map = new DependencyMap();
         //private readonly CommandService commands = new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false });
         private ulong updateChannel = 0;
+
+        private Dictionary<ulong, int> posCommandUsage = new Dictionary<ulong, int>();
 
         private async Task RunAsync()
         {
@@ -127,15 +130,49 @@ namespace MinitoriCore
             if (msg.Author.Id == socketClient.CurrentUser.Id)
                 return;
 
-            if (!msg.Author.IsBot)
+            var channel = msg.Channel as IGuildChannel;
+
+            if (channel == null)
                 return;
 
-            if ((msg.Channel as IGuildChannel)?.Id != 110373943822540800)
-                return;
+            // basically every channel that isn't #general or a testing channel in dbots
+            if (channel.Id == 468690756899438603 || channel.Id == 110374153562886144 || channel.Id == 631313666851078145 || channel.Id == 520832612739186688 || channel.Id == 715318925281460235)
+            {
+                var author = msg.Author as SocketGuildUser;
 
-            if ((msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
+                if (msg.Content.Contains("pos "))
+                {
+                    if (!posCommandUsage.ContainsKey(author.Id))
+                        posCommandUsage[author.Id] = 0;
+
+                    posCommandUsage[author.Id]++;
+
+                    switch (posCommandUsage[author.Id])
+                    {
+                        case 1:
+                        case 2:
+                            var response = await msg.Channel.SendMessageAsync($"{author.Mention} please use a testing channel to check on the status of your bot.");
+                            await Task.Delay(10 * 1000);
+                            await response.DeleteAsync();
+                            break;
+                        case 3:
+                            var nonTestingMute = channel.Guild.GetRole(132106771975110656);
+                            await author.AddRoleAsync(nonTestingMute, new RequestOptions { AuditLogReason = "Did not use testing channels to check on the status of their bot." });
+                            break;
+                    }
+                }
+                else if (author.Id == 241930933962407936)
+                {
+                    if (msg.Content == "That bot isn't in this guild." || msg.Content == "That bot isn't part of the queue." 
+                        || msg.Content == "That bot isn't in this guild." || msg.Content.Contains("in the verification queue."))
+                        await msg.DeleteAsync();
+                }
+            }
+
+            if (msg.Author.IsBot && channel?.Id != 110373943822540800 && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
             {
                 await msg.DeleteAsync();
+                return;
             }
         }
 
