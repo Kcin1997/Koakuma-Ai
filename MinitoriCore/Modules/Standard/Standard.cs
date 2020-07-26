@@ -382,6 +382,7 @@ namespace MinitoriCore.Modules.Standard
 
         [Command("botcollections")]
         [RequireOwner]
+        [Hide]
         public async Task ListCollectionServers()
         {
             Task.Run(async () =>
@@ -389,8 +390,16 @@ namespace MinitoriCore.Modules.Standard
                 StringBuilder output = new StringBuilder();
                 foreach (var guild in socketClient.Guilds)
                 {
+                    var percentage = (Convert.ToDouble(guild.Users.Count(x => x.IsBot)) / (guild.Users.Count())) * 100;
+
+                    if (percentage < 30)
+                        continue;
+
+                    if (guild.Users.Count(x => x.IsBot) < 15)
+                        continue;
+
                     output.AppendLine($"{guild.Name} [{guild.Id}] | Users: {guild.Users.Count(x => !x.IsBot)}, Bots {guild.Users.Count(x => x.IsBot)} | " +
-                        $"{(Convert.ToDouble(guild.Users.Count(x => x.IsBot)) / (guild.Users.Count())) * 100}% Bots");
+                        $"{percentage}% Bots");
                 }
                 await RespondAsync(output.ToString());
             });
