@@ -135,6 +135,9 @@ namespace MinitoriCore
             if (channel == null)
                 return;
 
+            if (channel.Guild.Id != 110373943822540800)
+                return;
+
             // basically every channel that isn't #general or a testing channel in dbots
             if (channel.Id == 468690756899438603 || channel.Id == 110374153562886144 || channel.Id == 631313666851078145 || channel.Id == 520832612739186688 || channel.Id == 715318925281460235)
             {
@@ -174,21 +177,10 @@ namespace MinitoriCore
                 }
             }
 
-            try
+            if (msg.Author != null && msg.Author.IsBot && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
             {
-                if (msg?.Author != null
-                    && msg.Author?.IsBot == true
-                    && channel?.Id != 110373943822540800
-                    && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
-                {
-                    await msg.DeleteAsync();
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"msgnull {msg == null} | authornull {msg?.Author == null} | bot {msg?.Author?.IsBot == true}");
-                Console.WriteLine($"{channel.Guild.Name}>{channel.Name} | {msg.Content}");
+                await msg.DeleteAsync();
+                return;
             }
         }
 
