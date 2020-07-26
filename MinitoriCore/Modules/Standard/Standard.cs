@@ -212,20 +212,20 @@ namespace MinitoriCore.Modules.Standard
         [Alias("prefix list", "prefixes", "prefixes list")]
         public async Task PrefixList()
         {
-
+            return;
         }
 
         [Command("prefix help")]
         [Alias("help prefix", "prefixes help", "help prefixes", "prefix list help", "help prefix list", "prefixes list help", "help prefixes list", "help prefix set")]
         public async Task PrefixHelp()
         {
-
+            return;
         }
 
         [Command("prefix set")]
         public async Task SetPrefix(string[] prefixes)
         {
-
+            return;
         }
 
         [Command("quit", RunMode = RunMode.Async)]
