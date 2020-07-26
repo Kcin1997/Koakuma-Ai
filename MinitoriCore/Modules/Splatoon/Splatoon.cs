@@ -37,6 +37,7 @@ namespace MinitoriCore.Modules.Splatoon
         
         [Command("map", RunMode = RunMode.Async)]
         [Summary("Pick a map!")]
+        [Hide]
         [Priority(1000)]
         public async Task SelectMap()
         {
