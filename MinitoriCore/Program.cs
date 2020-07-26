@@ -174,7 +174,7 @@ namespace MinitoriCore
                 }
             }
 
-            if (msg.Author.IsBot && channel?.Id != 110373943822540800 && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
+            if (msg.Author?.IsBot == true && channel?.Id != 110373943822540800 && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
             {
                 await msg.DeleteAsync();
                 return;
