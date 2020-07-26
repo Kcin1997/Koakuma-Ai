@@ -174,19 +174,24 @@ namespace MinitoriCore
                 }
             }
 
-            Console.WriteLine($"msg {msg == null} | author {msg?.Author == null} | bot {msg?.Author?.IsBot == true}");
-            if (msg.Author == null)
+            try
             {
-                Console.WriteLine($"{channel.Guild.Name}>{channel.Name} | {msg.Content}");
+                if (msg?.Author != null
+                    && msg.Author?.IsBot == true
+                    && channel?.Id != 110373943822540800
+                    && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
+                {
+                    await msg.DeleteAsync();
+                    return;
+                }
             }
-
-            if (msg?.Author != null 
-                && msg.Author?.IsBot == true 
-                && channel?.Id != 110373943822540800 
-                && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
+            catch (Exception ex)
             {
-                await msg.DeleteAsync();
-                return;
+                Console.WriteLine($"msgnull {msg == null} | authornull {msg?.Author == null} | bot {msg?.Author?.IsBot == true}");
+                if (msg.Author == null)
+                {
+                    Console.WriteLine($"{channel.Guild.Name}>{channel.Name} | {msg.Content}");
+                }
             }
         }
 
