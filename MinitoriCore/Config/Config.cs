@@ -21,6 +21,10 @@ namespace MinitoriCore
             "!",
             "pls "
         };
+
+        [JsonProperty("custom_prefixes")]
+        public Dictionary<ulong, List<string>> CustomPrefixes { get; set; } = new Dictionary<ulong, List<string>>();
+
         [JsonProperty("mention_trigger")]
         public bool TriggerOnMention { get; set; } = true;
 

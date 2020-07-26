@@ -58,19 +58,19 @@ namespace MinitoriCore.Modules.Standard
                 (scale / (double)uint.MaxValue));
         }
 
-        [Command("emergencyban")]
-        public async Task EmergencyBan(ulong UserId = 0)
-        {
-            if (Context.User.Id != 102528327251656704)
-            {
-                return;
-            }
+        //[Command("emergencyban")]
+        //public async Task EmergencyBan(ulong UserId = 0)
+        //{
+        //    if (Context.User.Id != 102528327251656704)
+        //    {
+        //        return;
+        //    }
 
-            if (UserId == 0)
-                return;
+        //    if (UserId == 0)
+        //        return;
 
-            await Context.Guild.AddBanAsync(UserId, 0, "Emergency ban, will need an actual reason later.");
-        }
+        //    await Context.Guild.AddBanAsync(UserId, 0, "Emergency ban, will need an actual reason later.");
+        //}
 
         [Command("help")]
         public async Task HelpCommand()
@@ -195,6 +195,7 @@ namespace MinitoriCore.Modules.Standard
 
         [Command("setnick")]
         [Summary("Change my nickname!")]
+        [Hide]
         public async Task SetNickname(string Nick = "")
         {
             if (!config.OwnerIds.Contains(Context.User.Id))
@@ -205,6 +206,26 @@ namespace MinitoriCore.Modules.Standard
 
             await (Context.Guild as SocketGuild).CurrentUser.ModifyAsync(x => x.Nickname = Nick);
             await RespondAsync(":thumbsup:");
+        }
+
+        [Command("prefix")]
+        [Alias("prefix list", "prefixes", "prefixes list")]
+        public async Task PrefixList()
+        {
+
+        }
+
+        [Command("prefix help")]
+        [Alias("help prefix", "prefixes help", "help prefixes", "prefix list help", "help prefix list", "prefixes list help", "help prefixes list", "help prefix set")]
+        public async Task PrefixHelp()
+        {
+
+        }
+
+        [Command("prefix set")]
+        public async Task SetPrefix(string[] prefixes)
+        {
+
         }
 
         [Command("quit", RunMode = RunMode.Async)]
@@ -287,60 +308,60 @@ namespace MinitoriCore.Modules.Standard
             Environment.Exit((int)ExitCodes.ExitCode.DeadlockEscape);
         }
 
-        [Command("rotate", RunMode = RunMode.Async)]
-        [Priority(1000)]
-        [Summary("ye")]
-        [RequireGuild(124499234564210688)]
-        public async Task Rotate()
-        {
-            if (!Context.Guild.CurrentUser.GuildPermissions.ManageGuild)
-            {
-                await RespondAsync("Nope, don't have permission to do that.");
-                return;
-            }
+        //[Command("rotate", RunMode = RunMode.Async)]
+        //[Priority(1000)]
+        //[Summary("ye")]
+        //[RequireGuild(124499234564210688)]
+        //public async Task Rotate()
+        //{
+        //    if (!Context.Guild.CurrentUser.GuildPermissions.ManageGuild)
+        //    {
+        //        await RespondAsync("Nope, don't have permission to do that.");
+        //        return;
+        //    }
 
-            if (!rotate.ContainsKey(Context.Guild.Id))
-            {
-                rotate[Context.Guild.Id] = false;
-                angle[Context.Guild.Id] = 0f;
-            }
+        //    if (!rotate.ContainsKey(Context.Guild.Id))
+        //    {
+        //        rotate[Context.Guild.Id] = false;
+        //        angle[Context.Guild.Id] = 0f;
+        //    }
 
-            rotate[Context.Guild.Id] = !rotate[Context.Guild.Id];
+        //    rotate[Context.Guild.Id] = !rotate[Context.Guild.Id];
 
-            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(@"Images/2.png");
+        //    Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile(@"Images/2.png");
 
-            while (rotate[Context.Guild.Id])
-            {
-                angle[Context.Guild.Id] += 5f;
+        //    while (rotate[Context.Guild.Id])
+        //    {
+        //        angle[Context.Guild.Id] += 5f;
 
-                System.Drawing.Imaging.PixelFormat pf = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+        //        System.Drawing.Imaging.PixelFormat pf = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
 
-                angle[Context.Guild.Id] = angle[Context.Guild.Id] % 360;
-                if (angle[Context.Guild.Id] > 180)
-                    angle[Context.Guild.Id] -= 360;
+        //        angle[Context.Guild.Id] = angle[Context.Guild.Id] % 360;
+        //        if (angle[Context.Guild.Id] > 180)
+        //            angle[Context.Guild.Id] -= 360;
 
-                using (Bitmap newImg = new Bitmap(bmp.Width, bmp.Height, pf))
-                {
-                    using (Graphics gfx = Graphics.FromImage(newImg))
-                    {
-                        gfx.TranslateTransform((float)bmp.Width / 2, (float)bmp.Height / 2);
-                        gfx.RotateTransform(angle[Context.Guild.Id]);
-                        gfx.TranslateTransform(-(float)bmp.Width / 2, -(float)bmp.Height / 2);
-                        gfx.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                        gfx.DrawImage(bmp, new Point(0, 0));
-                    }
+        //        using (Bitmap newImg = new Bitmap(bmp.Width, bmp.Height, pf))
+        //        {
+        //            using (Graphics gfx = Graphics.FromImage(newImg))
+        //            {
+        //                gfx.TranslateTransform((float)bmp.Width / 2, (float)bmp.Height / 2);
+        //                gfx.RotateTransform(angle[Context.Guild.Id]);
+        //                gfx.TranslateTransform(-(float)bmp.Width / 2, -(float)bmp.Height / 2);
+        //                gfx.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        //                gfx.DrawImage(bmp, new Point(0, 0));
+        //            }
 
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        newImg.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                        stream.Position = 0;
-                        await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(stream));
-                    }
-                }
+        //            using (MemoryStream stream = new MemoryStream())
+        //            {
+        //                newImg.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+        //                stream.Position = 0;
+        //                await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(stream));
+        //            }
+        //        }
 
-                await Task.Delay(1000 * 60 * 10);
-            }
-        }
+        //        await Task.Delay(1000 * 60 * 10);
+        //    }
+        //}
 
         [Command("icon")]
         [Summary("na")]
@@ -357,105 +378,105 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync($"I am currently in {Context.Client.Guilds.Count()} servers.");
         }
 
-        [Command("zoom reset", RunMode = RunMode.Async)]
-        [Priority(1000)]
-        [Summary("ya")]
-        [RequireOwner]
-        public async Task ZoomClearCache()
-        {
-            if (File.Exists($"./Images/Servers/{Context.Guild.Id}.png"))
-            {
-                await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(File.OpenRead($"./Images/Servers/{Context.Guild.Id}.png")));
-                File.Delete($"./Images/Servers/{Context.Guild.Id}.png");
-                rotate[Context.Guild.Id] = false;
-                angle[Context.Guild.Id] = 0f;
-                await RespondAsync("Cache cleared, old icon restored.");
-            }
-        }
+        //[Command("zoom reset", RunMode = RunMode.Async)]
+        //[Priority(1000)]
+        //[Summary("ya")]
+        //[RequireOwner]
+        //public async Task ZoomClearCache()
+        //{
+        //    if (File.Exists($"./Images/Servers/{Context.Guild.Id}.png"))
+        //    {
+        //        await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(File.OpenRead($"./Images/Servers/{Context.Guild.Id}.png")));
+        //        File.Delete($"./Images/Servers/{Context.Guild.Id}.png");
+        //        rotate[Context.Guild.Id] = false;
+        //        angle[Context.Guild.Id] = 0f;
+        //        await RespondAsync("Cache cleared, old icon restored.");
+        //    }
+        //}
 
-        [Command("zoom", RunMode = RunMode.Async)]
-        [Priority(1000)]
-        [Summary("ya")]
-        [RequireOwner]
-        public async Task Zoom(float zoomLevel = 0f)
-        {
-            if (!Context.Guild.CurrentUser.GuildPermissions.ManageGuild)
-            {
-                await RespondAsync("Nope, don't have permission to do that.");
-                return;
-            }
+        //[Command("zoom", RunMode = RunMode.Async)]
+        //[Priority(1000)]
+        //[Summary("ya")]
+        //[RequireOwner]
+        //public async Task Zoom(float zoomLevel = 0f)
+        //{
+        //    if (!Context.Guild.CurrentUser.GuildPermissions.ManageGuild)
+        //    {
+        //        await RespondAsync("Nope, don't have permission to do that.");
+        //        return;
+        //    }
 
-            if (!rotate.ContainsKey(Context.Guild.Id))
-            {
-                rotate[Context.Guild.Id] = false;
-                angle[Context.Guild.Id] = 1f;
-            }
+        //    if (!rotate.ContainsKey(Context.Guild.Id))
+        //    {
+        //        rotate[Context.Guild.Id] = false;
+        //        angle[Context.Guild.Id] = 1f;
+        //    }
 
-            if (zoomLevel != 0f)
-                angle[Context.Guild.Id] = zoomLevel;
+        //    if (zoomLevel != 0f)
+        //        angle[Context.Guild.Id] = zoomLevel;
 
-            rotate[Context.Guild.Id] = !rotate[Context.Guild.Id];
+        //    rotate[Context.Guild.Id] = !rotate[Context.Guild.Id];
 
-            if (!File.Exists($"./Images/Servers/{Context.Guild.Id}.png"))
-            {
-                using (WebClient client = new WebClient())
-                {
-                    client.DownloadFile(new Uri($"https://cdn.discordapp.com/icons/{Context.Guild.Id}/{Context.Guild.IconId}.png?size=2048"), $"./Images/Servers/{Context.Guild.Id}.png");
-                    await Context.Channel.SendMessageAsync("Started!");
-                };
-            }
-            else
-            {
-                if (zoomLevel == 0f)
-                {
-                    await Context.Channel.SendMessageAsync("I already have that one!");
-                    return;
-                }
-            }
+        //    if (!File.Exists($"./Images/Servers/{Context.Guild.Id}.png"))
+        //    {
+        //        using (WebClient client = new WebClient())
+        //        {
+        //            client.DownloadFile(new Uri($"https://cdn.discordapp.com/icons/{Context.Guild.Id}/{Context.Guild.IconId}.png?size=2048"), $"./Images/Servers/{Context.Guild.Id}.png");
+        //            await Context.Channel.SendMessageAsync("Started!");
+        //        };
+        //    }
+        //    else
+        //    {
+        //        if (zoomLevel == 0f)
+        //        {
+        //            await Context.Channel.SendMessageAsync("I already have that one!");
+        //            return;
+        //        }
+        //    }
 
-            Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile($"./Images/Servers/{Context.Guild.Id}.png");
+        //    Bitmap bmp = (Bitmap)System.Drawing.Image.FromFile($"./Images/Servers/{Context.Guild.Id}.png");
 
-            while (rotate[Context.Guild.Id])
-            {
-                if (zoomLevel != 0f)
-                {
-                    rotate[Context.Guild.Id] = false;
-                }
-                else
-                    angle[Context.Guild.Id] += 0.01f;
+        //    while (rotate[Context.Guild.Id])
+        //    {
+        //        if (zoomLevel != 0f)
+        //        {
+        //            rotate[Context.Guild.Id] = false;
+        //        }
+        //        else
+        //            angle[Context.Guild.Id] += 0.01f;
 
-                System.Drawing.Imaging.PixelFormat pf = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+        //        System.Drawing.Imaging.PixelFormat pf = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
 
-                //angle[Context.Guild.Id] = angle[Context.Guild.Id] % 360;
-                //if (angle[Context.Guild.Id] > 180)
-                //    angle[Context.Guild.Id] -= 360;
+        //        //angle[Context.Guild.Id] = angle[Context.Guild.Id] % 360;
+        //        //if (angle[Context.Guild.Id] > 180)
+        //        //    angle[Context.Guild.Id] -= 360;
 
-                using (Bitmap newImg = new Bitmap(bmp.Width, bmp.Height, pf))
-                {
-                    using (Graphics gfx = Graphics.FromImage(newImg))
-                    {
-                        gfx.TranslateTransform((float)bmp.Width / 2, (float)bmp.Height / 2);
-                        //gfx.RotateTransform(angle[Context.Guild.Id]);
-                        gfx.ScaleTransform(angle[Context.Guild.Id], angle[Context.Guild.Id]);
-                        gfx.TranslateTransform(-(float)bmp.Width / 2, -(float)bmp.Height / 2);
-                        gfx.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                        gfx.DrawImage(bmp, new Point(0, 0));
-                    }
+        //        using (Bitmap newImg = new Bitmap(bmp.Width, bmp.Height, pf))
+        //        {
+        //            using (Graphics gfx = Graphics.FromImage(newImg))
+        //            {
+        //                gfx.TranslateTransform((float)bmp.Width / 2, (float)bmp.Height / 2);
+        //                //gfx.RotateTransform(angle[Context.Guild.Id]);
+        //                gfx.ScaleTransform(angle[Context.Guild.Id], angle[Context.Guild.Id]);
+        //                gfx.TranslateTransform(-(float)bmp.Width / 2, -(float)bmp.Height / 2);
+        //                gfx.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+        //                gfx.DrawImage(bmp, new Point(0, 0));
+        //            }
 
-                    using (MemoryStream stream = new MemoryStream())
-                    {
-                        newImg.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                        stream.Position = 0;
-                        await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(stream));
-                    }
-                }
+        //            using (MemoryStream stream = new MemoryStream())
+        //            {
+        //                newImg.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+        //                stream.Position = 0;
+        //                await Context.Guild.ModifyAsync(x => x.Icon = new Discord.Image(stream));
+        //            }
+        //        }
 
-                if (zoomLevel == 0f)
-                    break;
+        //        if (zoomLevel == 0f)
+        //            break;
 
-                await Task.Delay(1000 * 60 * 60);
-            }
-        }
+        //        await Task.Delay(1000 * 60 * 60);
+        //    }
+        //}
 
         [Command("joined")]
         [Hide]
@@ -499,8 +520,6 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync(output.ToString());
         }
         
-        
-
         [Command("throw")]
         [Summary("Beat people with objects!")]
         public async Task Throw([Remainder]string remainder = "")
@@ -564,29 +583,29 @@ namespace MinitoriCore.Modules.Standard
                 await RespondAsync("What do you want me to do with this?");
         }
 
-        [Command("gardedede")]
-        [Summary("why did i do this")]
-        public async Task Gardeposting([Remainder]string Big = "")
-        {
-            if (Big.ToLower() == "big")
-            {
-                await RespondAsync("<a:_Gardedede90:665027960851398657><a:_Gardedede89:665027953398120478><a:_Gardedede88:665027943461945364><a:_Gardedede87:665027934251253761><a:_Gardedede86:665027926248390677><a:_Gardedede85:665027918010777613><a:_Gardedede84:665027908859068416><a:_Gardedede83:665027896892719114><a:_Gardedede82:665027887337832458><a:_Gardedede81:665027872380944414>\n<a:_Gardedede80:665027862562209802><a:_Gardedede79:665027853150060545><a:_Gardedede78:665027843184394253><a:_Gardedede77:665027830320594945><a:_Gardedede76:665027820589809673><a:_Gardedede75:665027782505529346><a:_Gardedede74:665027772833595413><a:_Gardedede73:665027761374625836><a:_Gardedede72:665027751576600608><a:_Gardedede71:665027740449112064>");
+        //[Command("gardedede")]
+        //[Summary("why did i do this")]
+        //public async Task Gardeposting([Remainder]string Big = "")
+        //{
+        //    if (Big.ToLower() == "big")
+        //    {
+        //        await RespondAsync("<a:_Gardedede90:665027960851398657><a:_Gardedede89:665027953398120478><a:_Gardedede88:665027943461945364><a:_Gardedede87:665027934251253761><a:_Gardedede86:665027926248390677><a:_Gardedede85:665027918010777613><a:_Gardedede84:665027908859068416><a:_Gardedede83:665027896892719114><a:_Gardedede82:665027887337832458><a:_Gardedede81:665027872380944414>\n<a:_Gardedede80:665027862562209802><a:_Gardedede79:665027853150060545><a:_Gardedede78:665027843184394253><a:_Gardedede77:665027830320594945><a:_Gardedede76:665027820589809673><a:_Gardedede75:665027782505529346><a:_Gardedede74:665027772833595413><a:_Gardedede73:665027761374625836><a:_Gardedede72:665027751576600608><a:_Gardedede71:665027740449112064>");
 
-                await RespondAsync("<a:_Gardedede70:665027732027211787><a:_Gardedede69:665027724204703775><a:_Gardedede68:665027716235526163><a:_Gardedede67:665027706420985879><a:_Gardedede66:665027696740270090><a:_Gardedede65:665027687030456343><a:_Gardedede64:665027677136093214><a:_Gardedede63:665027668965589012><a:_Gardedede62:665027659444650004><a:_Gardedede61:665027651429203972>\n<a:_Gardedede60:665027642512375828><a:_Gardedede59:665027633171660830><a:_Gardedede58:665027623281491978><a:_Gardedede57:665027612568977409><a:_Gardedede56:665027597452836864><a:_Gardedede55:665027587101425684><a:_Gardedede54:665027578310164530><a:_Gardedede53:665027536694018048><a:_Gardedede52:665027528175517699><a:_Gardedede51:665027519535251496>");
+        //        await RespondAsync("<a:_Gardedede70:665027732027211787><a:_Gardedede69:665027724204703775><a:_Gardedede68:665027716235526163><a:_Gardedede67:665027706420985879><a:_Gardedede66:665027696740270090><a:_Gardedede65:665027687030456343><a:_Gardedede64:665027677136093214><a:_Gardedede63:665027668965589012><a:_Gardedede62:665027659444650004><a:_Gardedede61:665027651429203972>\n<a:_Gardedede60:665027642512375828><a:_Gardedede59:665027633171660830><a:_Gardedede58:665027623281491978><a:_Gardedede57:665027612568977409><a:_Gardedede56:665027597452836864><a:_Gardedede55:665027587101425684><a:_Gardedede54:665027578310164530><a:_Gardedede53:665027536694018048><a:_Gardedede52:665027528175517699><a:_Gardedede51:665027519535251496>");
 
-                await RespondAsync("<a:_Gardedede50:665027512438489105><a:_Gardedede49:665027503819325441><a:_Gardedede48:665027494532874250><a:_Gardedede47:665027485393616897><a:_Gardedede46:665027475394396179><a:_Gardedede45:665027463100891158><a:_Gardedede44:665027427788914689><a:_Gardedede43:665027416569282560><a:_Gardedede42:665027408457629706><a:_Gardedede41:665027395337846796>\n<a:_Gardedede40:665027386219167774><a:_Gardedede39:665027374567522353><a:_Gardedede38:665027365721866260><a:_Gardedede37:665027357396041759><a:_Gardedede36:665027347208077322><a:_Gardedede35:665027338286792744><a:_Gardedede34:665027329969618962><a:_Gardedede33:665027322163757103><a:_Gardedede32:665027314098372608><a:_Gardedede31:665027306749689905>");
+        //        await RespondAsync("<a:_Gardedede50:665027512438489105><a:_Gardedede49:665027503819325441><a:_Gardedede48:665027494532874250><a:_Gardedede47:665027485393616897><a:_Gardedede46:665027475394396179><a:_Gardedede45:665027463100891158><a:_Gardedede44:665027427788914689><a:_Gardedede43:665027416569282560><a:_Gardedede42:665027408457629706><a:_Gardedede41:665027395337846796>\n<a:_Gardedede40:665027386219167774><a:_Gardedede39:665027374567522353><a:_Gardedede38:665027365721866260><a:_Gardedede37:665027357396041759><a:_Gardedede36:665027347208077322><a:_Gardedede35:665027338286792744><a:_Gardedede34:665027329969618962><a:_Gardedede33:665027322163757103><a:_Gardedede32:665027314098372608><a:_Gardedede31:665027306749689905>");
 
-                await RespondAsync("<a:_Gardedede30:665027298910535681><a:_Gardedede29:665027292627599370><a:_Gardedede28:665027284302037012><a:_Gardedede27:665027275837669383><a:_Gardedede26:665027266442690591><a:_Gardedede25:665027257756024862><a:_Gardedede24:665027246590787589><a:_Gardedede23:665027237581422623><a:_Gardedede22:665027226458259495><a:_Gardedede21:665027215557394483>\n<a:_Gardedede20:665027207118454786><a:_Gardedede19:665027197853237261><a:_Gardedede18:665027188181041180><a:_Gardedede17:665027175937867777><a:_Gardedede16:665027164281896972><a:_Gardedede15:665027154131681323><a:_Gardedede14:665027120862461991><a:_Gardedede13:665027106224209920><a:_Gardedede12:665027097810567178><a:_Gardedede11:665027088683761705>");
+        //        await RespondAsync("<a:_Gardedede30:665027298910535681><a:_Gardedede29:665027292627599370><a:_Gardedede28:665027284302037012><a:_Gardedede27:665027275837669383><a:_Gardedede26:665027266442690591><a:_Gardedede25:665027257756024862><a:_Gardedede24:665027246590787589><a:_Gardedede23:665027237581422623><a:_Gardedede22:665027226458259495><a:_Gardedede21:665027215557394483>\n<a:_Gardedede20:665027207118454786><a:_Gardedede19:665027197853237261><a:_Gardedede18:665027188181041180><a:_Gardedede17:665027175937867777><a:_Gardedede16:665027164281896972><a:_Gardedede15:665027154131681323><a:_Gardedede14:665027120862461991><a:_Gardedede13:665027106224209920><a:_Gardedede12:665027097810567178><a:_Gardedede11:665027088683761705>");
 
-                await RespondAsync("<a:_Gardedede10:665027079519338497><a:_Gardedede09:665027071222874122><a:_Gardedede08:665027061966176266><a:_Gardedede07:665027050133782572><a:_Gardedede06:665027041053114409><a:_Gardedede05:665027030278078465><a:_Gardedede04:665027020589367318><a:_Gardedede03:665027009792966657><a:_Gardedede02:665027001093980180><a:_Gardedede01:665026990268481566>");
-            }
-            else
-            {
-                await RespondAsync("<a:_Gardedede90:665027960851398657><a:_Gardedede89:665027953398120478><a:_Gardedede88:665027943461945364><a:_Gardedede87:665027934251253761><a:_Gardedede86:665027926248390677><a:_Gardedede85:665027918010777613><a:_Gardedede84:665027908859068416><a:_Gardedede83:665027896892719114><a:_Gardedede82:665027887337832458><a:_Gardedede81:665027872380944414>\n<a:_Gardedede80:665027862562209802><a:_Gardedede79:665027853150060545><a:_Gardedede78:665027843184394253><a:_Gardedede77:665027830320594945><a:_Gardedede76:665027820589809673><a:_Gardedede75:665027782505529346><a:_Gardedede74:665027772833595413><a:_Gardedede73:665027761374625836><a:_Gardedede72:665027751576600608><a:_Gardedede71:665027740449112064>\n<a:_Gardedede70:665027732027211787><a:_Gardedede69:665027724204703775><a:_Gardedede68:665027716235526163><a:_Gardedede67:665027706420985879><a:_Gardedede66:665027696740270090><a:_Gardedede65:665027687030456343><a:_Gardedede64:665027677136093214><a:_Gardedede63:665027668965589012><a:_Gardedede62:665027659444650004><a:_Gardedede61:665027651429203972>\n<a:_Gardedede60:665027642512375828><a:_Gardedede59:665027633171660830><a:_Gardedede58:665027623281491978><a:_Gardedede57:665027612568977409><a:_Gardedede56:665027597452836864><a:_Gardedede55:665027587101425684><a:_Gardedede54:665027578310164530><a:_Gardedede53:665027536694018048><a:_Gardedede52:665027528175517699><a:_Gardedede51:665027519535251496>\n<a:_Gardedede50:665027512438489105><a:_Gardedede49:665027503819325441><a:_Gardedede48:665027494532874250><a:_Gardedede47:665027485393616897><a:_Gardedede46:665027475394396179><a:_Gardedede45:665027463100891158><a:_Gardedede44:665027427788914689><a:_Gardedede43:665027416569282560><a:_Gardedede42:665027408457629706><a:_Gardedede41:665027395337846796>");
+        //        await RespondAsync("<a:_Gardedede10:665027079519338497><a:_Gardedede09:665027071222874122><a:_Gardedede08:665027061966176266><a:_Gardedede07:665027050133782572><a:_Gardedede06:665027041053114409><a:_Gardedede05:665027030278078465><a:_Gardedede04:665027020589367318><a:_Gardedede03:665027009792966657><a:_Gardedede02:665027001093980180><a:_Gardedede01:665026990268481566>");
+        //    }
+        //    else
+        //    {
+        //        await RespondAsync("<a:_Gardedede90:665027960851398657><a:_Gardedede89:665027953398120478><a:_Gardedede88:665027943461945364><a:_Gardedede87:665027934251253761><a:_Gardedede86:665027926248390677><a:_Gardedede85:665027918010777613><a:_Gardedede84:665027908859068416><a:_Gardedede83:665027896892719114><a:_Gardedede82:665027887337832458><a:_Gardedede81:665027872380944414>\n<a:_Gardedede80:665027862562209802><a:_Gardedede79:665027853150060545><a:_Gardedede78:665027843184394253><a:_Gardedede77:665027830320594945><a:_Gardedede76:665027820589809673><a:_Gardedede75:665027782505529346><a:_Gardedede74:665027772833595413><a:_Gardedede73:665027761374625836><a:_Gardedede72:665027751576600608><a:_Gardedede71:665027740449112064>\n<a:_Gardedede70:665027732027211787><a:_Gardedede69:665027724204703775><a:_Gardedede68:665027716235526163><a:_Gardedede67:665027706420985879><a:_Gardedede66:665027696740270090><a:_Gardedede65:665027687030456343><a:_Gardedede64:665027677136093214><a:_Gardedede63:665027668965589012><a:_Gardedede62:665027659444650004><a:_Gardedede61:665027651429203972>\n<a:_Gardedede60:665027642512375828><a:_Gardedede59:665027633171660830><a:_Gardedede58:665027623281491978><a:_Gardedede57:665027612568977409><a:_Gardedede56:665027597452836864><a:_Gardedede55:665027587101425684><a:_Gardedede54:665027578310164530><a:_Gardedede53:665027536694018048><a:_Gardedede52:665027528175517699><a:_Gardedede51:665027519535251496>\n<a:_Gardedede50:665027512438489105><a:_Gardedede49:665027503819325441><a:_Gardedede48:665027494532874250><a:_Gardedede47:665027485393616897><a:_Gardedede46:665027475394396179><a:_Gardedede45:665027463100891158><a:_Gardedede44:665027427788914689><a:_Gardedede43:665027416569282560><a:_Gardedede42:665027408457629706><a:_Gardedede41:665027395337846796>");
 
-                await RespondAsync("<a:_Gardedede40:665027386219167774><a:_Gardedede39:665027374567522353><a:_Gardedede38:665027365721866260><a:_Gardedede37:665027357396041759><a:_Gardedede36:665027347208077322><a:_Gardedede35:665027338286792744><a:_Gardedede34:665027329969618962><a:_Gardedede33:665027322163757103><a:_Gardedede32:665027314098372608><a:_Gardedede31:665027306749689905>\n<a:_Gardedede30:665027298910535681><a:_Gardedede29:665027292627599370><a:_Gardedede28:665027284302037012><a:_Gardedede27:665027275837669383><a:_Gardedede26:665027266442690591><a:_Gardedede25:665027257756024862><a:_Gardedede24:665027246590787589><a:_Gardedede23:665027237581422623><a:_Gardedede22:665027226458259495><a:_Gardedede21:665027215557394483>\n<a:_Gardedede20:665027207118454786><a:_Gardedede19:665027197853237261><a:_Gardedede18:665027188181041180><a:_Gardedede17:665027175937867777><a:_Gardedede16:665027164281896972><a:_Gardedede15:665027154131681323><a:_Gardedede14:665027120862461991><a:_Gardedede13:665027106224209920><a:_Gardedede12:665027097810567178><a:_Gardedede11:665027088683761705>\n<a:_Gardedede10:665027079519338497><a:_Gardedede09:665027071222874122><a:_Gardedede08:665027061966176266><a:_Gardedede07:665027050133782572><a:_Gardedede06:665027041053114409><a:_Gardedede05:665027030278078465><a:_Gardedede04:665027020589367318><a:_Gardedede03:665027009792966657><a:_Gardedede02:665027001093980180><a:_Gardedede01:665026990268481566>");
-            }
-        }
+        //        await RespondAsync("<a:_Gardedede40:665027386219167774><a:_Gardedede39:665027374567522353><a:_Gardedede38:665027365721866260><a:_Gardedede37:665027357396041759><a:_Gardedede36:665027347208077322><a:_Gardedede35:665027338286792744><a:_Gardedede34:665027329969618962><a:_Gardedede33:665027322163757103><a:_Gardedede32:665027314098372608><a:_Gardedede31:665027306749689905>\n<a:_Gardedede30:665027298910535681><a:_Gardedede29:665027292627599370><a:_Gardedede28:665027284302037012><a:_Gardedede27:665027275837669383><a:_Gardedede26:665027266442690591><a:_Gardedede25:665027257756024862><a:_Gardedede24:665027246590787589><a:_Gardedede23:665027237581422623><a:_Gardedede22:665027226458259495><a:_Gardedede21:665027215557394483>\n<a:_Gardedede20:665027207118454786><a:_Gardedede19:665027197853237261><a:_Gardedede18:665027188181041180><a:_Gardedede17:665027175937867777><a:_Gardedede16:665027164281896972><a:_Gardedede15:665027154131681323><a:_Gardedede14:665027120862461991><a:_Gardedede13:665027106224209920><a:_Gardedede12:665027097810567178><a:_Gardedede11:665027088683761705>\n<a:_Gardedede10:665027079519338497><a:_Gardedede09:665027071222874122><a:_Gardedede08:665027061966176266><a:_Gardedede07:665027050133782572><a:_Gardedede06:665027041053114409><a:_Gardedede05:665027030278078465><a:_Gardedede04:665027020589367318><a:_Gardedede03:665027009792966657><a:_Gardedede02:665027001093980180><a:_Gardedede01:665026990268481566>");
+        //    }
+        //}
     }
 
     
