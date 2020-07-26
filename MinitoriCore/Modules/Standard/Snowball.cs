@@ -26,25 +26,25 @@ namespace MinitoriCore.Modules.Standard
             events = _events;
         }
 
-        [Command("unsnow")]
-        [Summary("Leave the snowball fight")]
-        public async Task UnSnowball()
-        {
-            var snowballRoles = Context.Guild.Roles.Count(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
+        //[Command("unsnow")]
+        //[Summary("Leave the snowball fight")]
+        //public async Task UnSnowball()
+        //{
+        //    var snowballRoles = Context.Guild.Roles.Count(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
 
-            if (snowballRoles == 0)
-            {
-                await RespondAsync("I don't see a role named `Snowball`, make one and try again.");
-                return;
-            }
-            else if (snowballRoles > 1)
-            {
-                await RespondAsync("There are too many roles named `Snowball`, rename some and try again.");
-                return;
-            }
+        //    if (snowballRoles == 0)
+        //    {
+        //        await RespondAsync("I don't see a role named `Snowball`, make one and try again.");
+        //        return;
+        //    }
+        //    else if (snowballRoles > 1)
+        //    {
+        //        await RespondAsync("There are too many roles named `Snowball`, rename some and try again.");
+        //        return;
+        //    }
 
-            var role = Context.Guild.Roles.FirstOrDefault(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
-        }
+        //    var role = Context.Guild.Roles.FirstOrDefault(x => string.Equals(x.Name, "SNOWBALL", StringComparison.OrdinalIgnoreCase));
+        //}
 
         [Command("snowball")]
         [Summary("Throw snowballs at people! Build an army!")]
