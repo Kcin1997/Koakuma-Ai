@@ -28,14 +28,16 @@ namespace MinitoriCore.Modules.Standard
         private IServiceProvider services;
         private Dictionary<ulong, bool> rotate = new Dictionary<ulong, bool>();
         private Dictionary<ulong, float> angle = new Dictionary<ulong, float>();
+        private DiscordSocketClient socketClient;
 
-        public Standard(RandomStrings _strings, EventStorage _events, CommandService _commands, IServiceProvider _services, Config _config)
+        public Standard(RandomStrings _strings, EventStorage _events, CommandService _commands, IServiceProvider _services, Config _config, DiscordSocketClient _socketClient)
         {
             strings = _strings;
             events = _events;
             commands = _commands;
             services = _services;
             config = _config;
+            socketClient = _socketClient;
         }
 
         private RNGCryptoServiceProvider rand = new RNGCryptoServiceProvider();
@@ -376,6 +378,22 @@ namespace MinitoriCore.Modules.Standard
         public async Task ServerCount()
         {
             await RespondAsync($"I am currently in {Context.Client.Guilds.Count()} servers.");
+        }
+
+        [Command("botcollections")]
+        [RequireOwner]
+        public async Task ListCollectionServers()
+        {
+            Task.Run(async () =>
+            {
+                StringBuilder output = new StringBuilder();
+                foreach (var guild in socketClient.Guilds)
+                {
+                    output.AppendLine($"{guild.Name} [{guild.Id}] | Users: {guild.Users.Count(x => !x.IsBot)}, Bots {guild.Users.Count(x => x.IsBot)} | " +
+                        $"{(Convert.ToDouble(guild.Users.Count(x => x.IsBot)) / (guild.Users.Count())) * 100}% Bots");
+                }
+                await RespondAsync(output.ToString());
+            });
         }
 
         //[Command("zoom reset", RunMode = RunMode.Async)]
