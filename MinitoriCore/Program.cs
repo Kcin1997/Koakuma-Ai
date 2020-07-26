@@ -188,10 +188,7 @@ namespace MinitoriCore
             catch (Exception ex)
             {
                 Console.WriteLine($"msgnull {msg == null} | authornull {msg?.Author == null} | bot {msg?.Author?.IsBot == true}");
-                if (msg.Author == null)
-                {
-                    Console.WriteLine($"{channel.Guild.Name}>{channel.Name} | {msg.Content}");
-                }
+                Console.WriteLine($"{channel.Guild.Name}>{channel.Name} | {msg.Content}");
             }
         }
 
