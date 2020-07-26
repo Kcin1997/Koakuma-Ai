@@ -223,7 +223,7 @@ namespace MinitoriCore.Modules.Standard
         }
 
         [Command("prefix set")]
-        public async Task SetPrefix(string[] prefixes)
+        public async Task SetPrefix(List<string> prefixes)
         {
             return;
         }
