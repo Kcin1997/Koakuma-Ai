@@ -401,8 +401,21 @@ namespace MinitoriCore.Modules.Standard
                     output.AppendLine($"{guild.Name} [{guild.Id}] | Users: {guild.Users.Count(x => !x.IsBot)}, Bots {guild.Users.Count(x => x.IsBot)} | " +
                         $"{percentage}% Bots");
                 }
-                await RespondAsync(output.ToString());
+                await RespondAsync($"```{output}```");
             });
+        }
+
+        [Command("forceleave")]
+        [RequireOwner]
+        [Hide]
+        public async Task ForceLeave(ulong[] guilds)
+        {
+            foreach (var g in guilds)
+            {
+                var guild = socketClient.GetGuild(g);
+                if (guild != null)
+                    await guild.LeaveAsync();
+            }
         }
 
         //[Command("zoom reset", RunMode = RunMode.Async)]
