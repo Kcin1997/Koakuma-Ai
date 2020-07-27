@@ -408,14 +408,11 @@ namespace MinitoriCore.Modules.Standard
         [Command("forceleave")]
         [RequireOwner]
         [Hide]
-        public async Task ForceLeave(ulong[] guilds)
+        public async Task ForceLeave(ulong g)
         {
-            foreach (var g in guilds)
-            {
-                var guild = socketClient.GetGuild(g);
-                if (guild != null)
-                    await guild.LeaveAsync();
-            }
+            var guild = socketClient.GetGuild(g);
+            if (guild != null)
+                await guild.LeaveAsync();
         }
 
         //[Command("zoom reset", RunMode = RunMode.Async)]
