@@ -179,7 +179,12 @@ namespace MinitoriCore
 
             if (msg.Author != null && msg.Author.IsBot && (msg.Author as SocketGuildUser).JoinedAt > DateTimeOffset.Now.AddSeconds(-15))
             {
+                await Task.Delay(250);
                 await msg.DeleteAsync();
+                var logChannel = await channel.Guild.GetChannelAsync(467192652463341578) as SocketTextChannel;
+                EmbedBuilder builder = new EmbedBuilder();
+                await logChannel.SendMessageAsync($"`[{DateTimeOffset.Now.ToString("HH:mm:ss")}]` Deleted a join message from the bot **{msg.Author.Username}**{msg.Author.Discriminator} (ID:{msg.Author.Id}):", 
+                    embed: builder.WithAuthor(msg.Author).WithCurrentTimestamp().WithTitle("Deleted Message").WithDescription(msg.Content).Build());
                 return;
             }
         }
