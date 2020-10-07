@@ -210,25 +210,25 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync(":thumbsup:");
         }
 
-        [Command("prefix")]
-        [Alias("prefix list", "prefixes", "prefixes list")]
-        public async Task PrefixList()
-        {
-            return;
-        }
+        //[Command("prefix")]
+        //[Alias("prefix list", "prefixes", "prefixes list")]
+        //public async Task PrefixList()
+        //{
+        //    return;
+        //}
 
-        [Command("prefix help")]
-        [Alias("help prefix", "prefixes help", "help prefixes", "prefix list help", "help prefix list", "prefixes list help", "help prefixes list", "help prefix set")]
-        public async Task PrefixHelp()
-        {
-            return;
-        }
+        //[Command("prefix help")]
+        //[Alias("help prefix", "prefixes help", "help prefixes", "prefix list help", "help prefix list", "prefixes list help", "help prefixes list", "help prefix set")]
+        //public async Task PrefixHelp()
+        //{
+        //    return;
+        //}
 
-        [Command("prefix set")]
-        public async Task SetPrefix(/*[Remainder]List<string> prefixes*/)
-        {
-            return;
-        }
+        //[Command("prefix set")]
+        //public async Task SetPrefix(/*[Remainder]List<string> prefixes*/)
+        //{
+        //    return;
+        //}
 
         [Command("quit", RunMode = RunMode.Async)]
         [Priority(1000)]
@@ -535,6 +535,7 @@ namespace MinitoriCore.Modules.Standard
 
         [Command("joined")]
         [Hide]
+        [RequireOwner]
         public async Task GetJoinDates([Remainder]string blah)
         {
             StringBuilder output = new StringBuilder();
@@ -549,6 +550,7 @@ namespace MinitoriCore.Modules.Standard
         }
         
         [Command("listroles")]
+        [RequireOwner]
         public async Task ListRoles([Remainder]string role)
         {
             if (role.Length > 0)

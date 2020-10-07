@@ -35,6 +35,7 @@ namespace MinitoriCore
         //private readonly IDependencyMap map = new DependencyMap();
         //private readonly CommandService commands = new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false });
         private ulong updateChannel = 0;
+        private List<ulong> PreventedStars = new List<ulong>();
 
         private Dictionary<ulong, int> posCommandUsage = new Dictionary<ulong, int>();
 
@@ -138,6 +139,9 @@ namespace MinitoriCore
             if (reaction.Emote.Name != "⭐")
                 return;
 
+            //if (PreventedStars.Contains(cache.Id))
+            //    return;
+
             IUserMessage msg;
 
             if (!cache.HasValue)
@@ -152,7 +156,11 @@ namespace MinitoriCore
                 try
                 {
                     await msg.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
-                    await channel.SendMessageAsync($"Prevented self-star by {reaction.User.Value.Mention} *(msg: `{msg.Id}`)*");
+                    if (PreventedStars.Contains(cache.Id))
+                    {
+                        await channel.SendMessageAsync($"Prevented self-star by {reaction.User.Value.Mention} *(msg: `{msg.Id}`)*");
+                        PreventedStars.Add(cache.Id);
+                    }
                 }
                 catch (Exception ex)
                 {
