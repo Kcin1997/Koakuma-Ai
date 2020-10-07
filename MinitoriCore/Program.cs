@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MinitoriCore.Modules.Standard;
 using MinitoriCore.Modules.Splatoon;
 using System.Threading;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace MinitoriCore
 {
@@ -90,6 +91,7 @@ namespace MinitoriCore
             socketClient.GuildAvailable += Client_GuildAvailable;
             socketClient.Disconnected += SocketClient_Disconnected;
             socketClient.MessageReceived += SocketClient_MessageReceived;
+            socketClient.ReactionAdded += SocketClient_ReactionAdded;
             //client.GuildMemberUpdated += Client_UserUpdated;
             // memes
 
@@ -123,6 +125,37 @@ namespace MinitoriCore
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(File.OpenRead("Minitori.png")));
 
             await Task.Delay(-1);
+        }
+
+        private async Task SocketClient_ReactionAdded(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            var guildChannel = channel as IGuildChannel;
+            if (guildChannel == null)
+                return;
+            else if (!config.SelfStarPreventionServers.Contains(guildChannel.GuildId))
+                return;
+
+            IUserMessage msg;
+
+            if (!cache.HasValue)
+            {
+                msg = (IUserMessage)await channel.GetMessageAsync(cache.Id);
+            }
+            else
+                msg = cache.Value;
+
+            if (msg.Author.Id == reaction.UserId)
+            {
+                try
+                {
+                    await msg.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
+                    await channel.SendMessageAsync($"Prevented self-star by {reaction.User.Value.Mention} *(msg: `{msg.Id}`)*");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to remove self-star in {guildChannel.GuildId}");
+                }
+            }
         }
 
         private async Task SocketClient_MessageReceived(SocketMessage msg)

@@ -37,6 +37,9 @@ namespace MinitoriCore
         [JsonProperty("uptime_db")]
         public string UptimeDB { get; set; }
 
+        [JsonProperty("FilterSelfStars")]
+        public List<ulong> SelfStarPreventionServers { get; set; } = new List<ulong>();
+
         public static Config Load()
         {
             if (File.Exists("config.json"))

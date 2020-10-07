@@ -405,6 +405,24 @@ namespace MinitoriCore.Modules.Standard
             });
         }
 
+        [Command("filterstars")]
+        [RequireUserPermission(GuildPermission.ManageGuild)]
+        public async Task ToggleSelfStars()
+        {
+            if (!config.SelfStarPreventionServers.Contains(Context.Guild.Id))
+            {
+                config.SelfStarPreventionServers.Add(Context.Guild.Id);
+                config.Save();
+                await RespondAsync("Self-stars will be removed on this server.");
+            }
+            else
+            {
+                config.SelfStarPreventionServers.Remove(Context.Guild.Id);
+                config.Save();
+                await RespondAsync("Self-stars will be ignored on this server.");
+            }
+        }
+
         [Command("forceleave")]
         [RequireOwner]
         [Hide]
