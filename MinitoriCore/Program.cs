@@ -135,6 +135,9 @@ namespace MinitoriCore
             else if (!config.SelfStarPreventionServers.Contains(guildChannel.GuildId))
                 return;
 
+            if (reaction.Emote.Name != "star")
+                return;
+
             IUserMessage msg;
 
             if (!cache.HasValue)
