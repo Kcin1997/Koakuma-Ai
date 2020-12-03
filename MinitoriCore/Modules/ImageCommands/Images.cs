@@ -322,7 +322,14 @@ namespace MinitoriCore.Modules.ImageCommands
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
 
-                        if (!config.OwnerIds.Contains(context.User.Id)) // check for bot owners 
+                        if (
+                            !(config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
+
+                                ((IGuildUser)Context.User)
+                                    .RoleIds.ToList()
+                                        .Contains(451057945044582400) // Check for /r/kirby mod role
+                            )
+                        )
                             return;
 
                         await DeleteImage(source[0], context, param[0]?.ToString());
