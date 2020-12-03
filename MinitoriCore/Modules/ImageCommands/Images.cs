@@ -324,17 +324,13 @@ namespace MinitoriCore.Modules.ImageCommands
                         var helper = Context.Guild.GetRole(422853409377615872);
                         var admin = Context.Guild.GetRole(190657363798261769);
 
-                        var user = (SocketGuildUser)Context.User;
-
-                        var roles = user.GetRoles();
-                        
-
                         if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
-                            roles.Contains(mod) || // /r/kirby mod role
-                            roles.Contains(helper) || // /r/kirby helpers
-                            roles.Contains(admin)    // /r/kirby admins
+                            ((SocketGuildUser)Context.User).Roles.Contains(mod) || // /r/kirby mod role
+                            ((SocketGuildUser)Context.User).Roles.Contains(helper) || // /r/kirby helpers
+                            ((SocketGuildUser)Context.User).Roles.Contains(admin)    // /r/kirby admins
                         )
                         {
+                            //return;
                             await DeleteImage(source[0], context, param[0]?.ToString());
                         }
                     },
