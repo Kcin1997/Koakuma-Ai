@@ -317,50 +317,17 @@ namespace MinitoriCore.Modules.ImageCommands
                     // Delete image
                     x.AddCommand($"{source[0]} remove", async (context, param, serv, command) =>
                     {
-                        Console.WriteLine($"Started command");
-
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
 
-                        Console.WriteLine($"First check");
-
-                        try
+                        if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
+                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(451057945044582400) || // /r/kirby mod role
+                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(422853409377615872) || // /r/kirby helpers
+                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(190657363798261769)    // /r/kirby admins
+                        )
                         {
-                            var mod = Context.Guild.GetRole(451057945044582400);
-                            var helper = Context.Guild.GetRole(422853409377615872);
-                            var admin = Context.Guild.GetRole(190657363798261769);
-
-                            Console.WriteLine($"Got roles {mod.Name}, {helper.Name}, {admin.Name}");
-
-                            var user = (SocketGuildUser)Context.User;
-
-                            Console.WriteLine($"Got user {user.Username}");
-
-                            var roles = user.GetRoles();
-
-                            Console.WriteLine($"Role count {roles.Count()}");
-
-                            if (roles.Contains(admin))
-                                Console.WriteLine("admin role present");
-
-                            if (roles.Contains(mod))
-                                Console.WriteLine("mod role present");
-
-                            if (roles.Contains(helper))
-                                Console.WriteLine("helper role present");
-
-                            if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
-                                roles.Contains(mod) || // /r/kirby mod role
-                                roles.Contains(helper) || // /r/kirby helpers
-                                roles.Contains(admin)    // /r/kirby admins
-                            )
-                            {
-                                await DeleteImage(source[0], context, param[0]?.ToString());
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"It didnt work son\n{ex.Message}\n{ex.StackTrace}");
+                            //return;
+                            await DeleteImage(source[0], context, param[0]?.ToString());
                         }
                     },
                     command =>
