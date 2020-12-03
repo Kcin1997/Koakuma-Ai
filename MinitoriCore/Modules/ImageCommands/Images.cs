@@ -320,10 +320,14 @@ namespace MinitoriCore.Modules.ImageCommands
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
 
+                        var mod = Context.Guild.GetRole(451057945044582400);
+                        var helper = Context.Guild.GetRole(422853409377615872);
+                        var admin = Context.Guild.GetRole(190657363798261769);
+
                         if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(451057945044582400) || // /r/kirby mod role
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(422853409377615872) || // /r/kirby helpers
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(190657363798261769)    // /r/kirby admins
+                            ((SocketGuildUser)Context.User).Roles.Contains(mod) || // /r/kirby mod role
+                            ((SocketGuildUser)Context.User).Roles.Contains(helper) || // /r/kirby helpers
+                            ((SocketGuildUser)Context.User).Roles.Contains(admin)    // /r/kirby admins
                         )
                         {
                             //return;
