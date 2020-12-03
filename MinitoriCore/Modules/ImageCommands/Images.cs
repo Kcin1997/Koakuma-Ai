@@ -317,7 +317,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     // Delete image
                     x.AddCommand($"{source[0]} remove", async (context, param, serv, command) =>
                     {
-                        await RespondAsync("a");
+                        await Context.Channel.SendMessageAsync("a");
 
                         //await RespondAsync($"Started command");
 
