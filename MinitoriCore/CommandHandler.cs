@@ -79,7 +79,7 @@ namespace MinitoriCore
                             break;
                         default:
                             await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
-                                $"Poke Valen Wheeler#2149 about it if the reason doesn't make sense.\n`{result.Error.Value}`");
+                                $"Poke Valen Wheelerr#2149 about it if the reason doesn't make sense.");
                             Console.WriteLine($"{result.ErrorReason}");
                             break;
                     }
