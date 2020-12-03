@@ -317,12 +317,8 @@ namespace MinitoriCore.Modules.ImageCommands
                     // Delete image
                     x.AddCommand($"{source[0]} remove", async (context, param, serv, command) =>
                     {
-                        await RespondAsync($"Started command");
-
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
-
-                        await RespondAsync($"First check");
 
                         try
                         {
@@ -330,24 +326,10 @@ namespace MinitoriCore.Modules.ImageCommands
                             var helper = Context.Guild.GetRole(422853409377615872);
                             var admin = Context.Guild.GetRole(190657363798261769);
 
-                            await RespondAsync($"Got roles {mod.Name}, {helper.Name}, {admin.Name}");
-
                             var user = (SocketGuildUser)Context.User;
-
-                            await RespondAsync($"Got user {user.Username}");
 
                             var roles = user.GetRoles();
 
-                            await RespondAsync($"Role count {roles.Count()}");
-
-                            if (roles.Contains(admin))
-                                await RespondAsync("admin role present");
-
-                            if (roles.Contains(mod))
-                                await RespondAsync("mod role present");
-
-                            if (roles.Contains(helper))
-                                await RespondAsync("helper role present");
 
                             if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
                                 roles.Contains(mod) || // /r/kirby mod role
