@@ -320,7 +320,7 @@ namespace MinitoriCore.Modules.ImageCommands
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
 
-                        context.Channel.SendMessageAsync($"{param[0]?.ToString()}\n{param[1]?.ToString()}");
+                        context.Channel.SendMessageAsync($"{param[0]?.ToString()}");
 
                         if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
                             ((IGuildUser)context.User).RoleIds.ToList().Contains(451057945044582400) || // /r/kirby mod role
