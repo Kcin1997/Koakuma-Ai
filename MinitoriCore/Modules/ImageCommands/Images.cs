@@ -323,6 +323,8 @@ namespace MinitoriCore.Modules.ImageCommands
                             return;
 
                         Console.WriteLine($"First check");
+                        Console.WriteLine($"Guild: {Context.Guild.Name}");
+                        Console.WriteLine($"{Context.Guild.Roles.Count()}");
 
                         try
                         {
