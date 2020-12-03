@@ -317,51 +317,53 @@ namespace MinitoriCore.Modules.ImageCommands
                     // Delete image
                     x.AddCommand($"{source[0]} remove", async (context, param, serv, command) =>
                     {
-                        await RespondAsync($"Started command");
+                        await RespondAsync("a");
 
-                        if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
-                            return;
+                        //await RespondAsync($"Started command");
 
-                        await RespondAsync($"First check");
+                        //if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
+                        //    return;
 
-                        try
-                        {
-                            var mod = Context.Guild.GetRole(451057945044582400);
-                            var helper = Context.Guild.GetRole(422853409377615872);
-                            var admin = Context.Guild.GetRole(190657363798261769);
+                        //await RespondAsync($"First check");
 
-                            await RespondAsync($"Got roles {mod.Name}, {helper.Name}, {admin.Name}");
+                        //try
+                        //{
+                        //    var mod = Context.Guild.GetRole(451057945044582400);
+                        //    var helper = Context.Guild.GetRole(422853409377615872);
+                        //    var admin = Context.Guild.GetRole(190657363798261769);
 
-                            var user = (SocketGuildUser)Context.User;
+                        //    await RespondAsync($"Got roles {mod.Name}, {helper.Name}, {admin.Name}");
 
-                            await RespondAsync($"Got user {user.Username}");
+                        //    var user = (SocketGuildUser)Context.User;
 
-                            var roles = user.GetRoles();
+                        //    await RespondAsync($"Got user {user.Username}");
 
-                            await RespondAsync($"Role count {roles.Count()}");
+                        //    var roles = user.GetRoles();
 
-                            if (roles.Contains(admin))
-                                await RespondAsync("admin role present");
+                        //    await RespondAsync($"Role count {roles.Count()}");
 
-                            if (roles.Contains(mod))
-                                await RespondAsync("mod role present");
+                        //    if (roles.Contains(admin))
+                        //        await RespondAsync("admin role present");
 
-                            if (roles.Contains(helper))
-                                await RespondAsync("helper role present");
+                        //    if (roles.Contains(mod))
+                        //        await RespondAsync("mod role present");
 
-                            if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
-                                roles.Contains(mod) || // /r/kirby mod role
-                                roles.Contains(helper) || // /r/kirby helpers
-                                roles.Contains(admin)    // /r/kirby admins
-                            )
-                            {
-                                await DeleteImage(source[0], context, param[0]?.ToString());
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            await RespondAsync($"It didnt work son\n{ex.Message}\n{ex.StackTrace}");
-                        }
+                        //    if (roles.Contains(helper))
+                        //        await RespondAsync("helper role present");
+
+                        //    if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
+                        //        roles.Contains(mod) || // /r/kirby mod role
+                        //        roles.Contains(helper) || // /r/kirby helpers
+                        //        roles.Contains(admin)    // /r/kirby admins
+                        //    )
+                        //    {
+                        //        await DeleteImage(source[0], context, param[0]?.ToString());
+                        //    }
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    await RespondAsync($"It didnt work son\n{ex.Message}\n{ex.StackTrace}");
+                        //}
                     },
                     command =>
                     {
