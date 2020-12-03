@@ -212,15 +212,17 @@ namespace MinitoriCore.Modules.ImageCommands
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
 
-                        if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(451057945044582400) || // /r/kirby mod role
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(422853409377615872) || // /r/kirby helpers
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(190657363798261769)    // /r/kirby admins
-                        ) 
-                        {
-                            //return;
-                            await DeleteImage(source[0], context, param[0]?.ToString());
-                        }
+                        if (
+                            !(config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
+
+                                ((IGuildUser)Context.User)
+                                    .RoleIds.ToList()
+                                        .Contains(451057945044582400) // Check for /r/kirby mod role
+                            )
+                        )
+                            return;
+
+                        await DeleteImage(source[0], context, param[0]?.ToString());
                     },
                     command =>
                     {
@@ -320,15 +322,10 @@ namespace MinitoriCore.Modules.ImageCommands
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
 
-                        if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(451057945044582400) || // /r/kirby mod role
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(422853409377615872) || // /r/kirby helpers
-                            ((IGuildUser)Context.User).RoleIds.ToList().Contains(190657363798261769)    // /r/kirby admins
-                        )
-                        {
-                            //return;
-                            await DeleteImage(source[0], context, param[0]?.ToString());
-                        }
+                        if (!config.OwnerIds.Contains(context.User.Id)) // check for bot owners 
+                            return;
+
+                        await DeleteImage(source[0], context, param[0]?.ToString());
                     },
                     command =>
                     {
