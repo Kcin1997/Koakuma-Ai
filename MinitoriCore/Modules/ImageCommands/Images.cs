@@ -448,7 +448,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
             if (!File.Exists($@"./Images/{source}/{file}"))
             {
-                await context.Channel.SendMessageAsync($"I can't find an image named `{file}` in `  Images/{source}`");
+                await context.Channel.SendMessageAsync($"I can't find an image named `{file}` in `Images/{source}`");
                 return;
             }
 
