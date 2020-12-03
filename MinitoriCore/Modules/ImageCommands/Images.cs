@@ -444,12 +444,9 @@ namespace MinitoriCore.Modules.ImageCommands
                 Directory.CreateDirectory($"./Images/removed {source}/");
             }
 
-            Console.WriteLine($"Looking for {file}");
-
             if (!File.Exists($@"./Images/{source}/{file}"))
             {
-                Console.WriteLine($"file not found");
-                await context.Channel.SendMessageAsync($"I can't find an image named `{file}` in `Images/{source}`");
+                await context.Channel.SendMessageAsync($"I can't find an image named `{file}` in `  Images/{source}`");
                 return;
             }
 
