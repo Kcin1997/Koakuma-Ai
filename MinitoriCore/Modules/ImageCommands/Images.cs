@@ -320,22 +320,29 @@ namespace MinitoriCore.Modules.ImageCommands
                         if (!ImageDownloadWhitelist(context.Guild.Id, context.User.Id))
                             return;
 
-                        var mod = Context.Guild.GetRole(451057945044582400);
-                        var helper = Context.Guild.GetRole(422853409377615872);
-                        var admin = Context.Guild.GetRole(190657363798261769);
-
-                        var user = (SocketGuildUser)Context.User;
-
-                        var roles = user.GetRoles();
-                        
-
-                        if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
-                            roles.Contains(mod) || // /r/kirby mod role
-                            roles.Contains(helper) || // /r/kirby helpers
-                            roles.Contains(admin)    // /r/kirby admins
-                        )
+                        try
                         {
-                            await DeleteImage(source[0], context, param[0]?.ToString());
+                            var mod = Context.Guild.GetRole(451057945044582400);
+                            var helper = Context.Guild.GetRole(422853409377615872);
+                            var admin = Context.Guild.GetRole(190657363798261769);
+
+                            var user = (SocketGuildUser)Context.User;
+
+                            var roles = user.GetRoles();
+
+
+                            if (config.OwnerIds.Contains(context.User.Id) || // check for bot owners 
+                                roles.Contains(mod) || // /r/kirby mod role
+                                roles.Contains(helper) || // /r/kirby helpers
+                                roles.Contains(admin)    // /r/kirby admins
+                            )
+                            {
+                                await DeleteImage(source[0], context, param[0]?.ToString());
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            await RespondAsync($"It didnt work son\n{ex.Message}\n{ex.StackTrace}");
                         }
                     },
                     command =>
