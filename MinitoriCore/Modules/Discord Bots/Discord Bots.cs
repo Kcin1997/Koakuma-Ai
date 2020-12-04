@@ -310,10 +310,10 @@ namespace MinitoriCore.Modules.DiscordBots
             //    }
             //}
 
-            if (messages.Any(x => x.Content != VerifMessage))
+            if (!messages.Any(y => y.Content == VerifMessage))
                 await RespondAsync(VerifMessage);
 
-            await ((SocketTextChannel)Context.Channel).DeleteMessagesAsync(messages.Where(x => x.Author.Id != Context.Client.CurrentUser.Id && x.Content != VerifMessage));
+            await ((SocketTextChannel)Context.Channel).DeleteMessagesAsync(messages.Where(x => x.Content != VerifMessage));
         }
 
         [Command("mute")]
