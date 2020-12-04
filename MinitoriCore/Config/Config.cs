@@ -40,6 +40,9 @@ namespace MinitoriCore
         [JsonProperty("FilterSelfStars")]
         public List<ulong> SelfStarPreventionServers { get; set; } = new List<ulong>();
 
+        [JsonProperty("account_age_gate")]
+        public int AgeGate = 0;
+
         public static Config Load()
         {
             if (File.Exists("config.json"))

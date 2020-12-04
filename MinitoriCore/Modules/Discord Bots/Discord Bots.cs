@@ -27,6 +27,19 @@ namespace MinitoriCore.Modules.DiscordBots
         // No embed 178823209217556480
         // Bots 110374777914417152
 
+        private Config config;
+        private const string VerifMessage =
+            "Hi there! If you're seeing this, it means your account got snagged on our automatic user verification system, and a moderator will need to give you access to the server manually.\n\n" +
+            "To best help us verify you, please answer the following questions. Try to be as specific as possible.\n" +
+            "- How did you find this server?\n" +
+            "- Did someone invite you to the server? If so, who?\n" +
+            "- Do you have a specific purpose in joining? Such as finding a bot, developing your own bot, etc?";
+
+        public DiscordBots(Config _config)
+        {
+            config = _config;
+        }
+
         private async Task ChangeRoles(string remainder, ulong role, bool addRole = true)
         {
             try
@@ -229,6 +242,78 @@ namespace MinitoriCore.Modules.DiscordBots
 
                 //await RespondAsync(text);
             }
+        }
+
+        [Command("gate")]
+        [Summary("Change account age gate settings")]
+        public async Task AgeGateSet(int setting = -2149) // yay magic numbers
+        {
+            // return if user is not a mod
+            if (!((SocketGuildUser)Context.User).Roles.Contains(Context.Guild.GetRole(113379036524212224)))
+                return;
+
+            if (setting == -2149)
+            {
+                if (config.AgeGate <= 0)
+                    await RespondAsync("Account age gate is currently disabled.");
+                else
+                    await RespondAsync($"Account age gate is currently set to {config.AgeGate} days");
+
+                return;
+            }
+            else if (config.AgeGate == setting)
+            {
+                await RespondAsync($"Account age gate is already set to {setting} days. No changes made.");
+
+                return;
+            }
+            else
+            {
+                config.AgeGate = setting;
+                config.Save();
+
+                if (setting <= 0)
+                    await RespondAsync($"Account age gate is now disabled.\nNote: This change is not retroactive.");
+                else
+                    await RespondAsync($"Account age gate is now set to {setting} days.\nNote: This change is not retroactive.");
+            }
+        }
+
+        [Command("reset")]
+        [Summary("Reset account age gate channel")]
+        public async Task ChannelReset()
+        {
+            // return if user is not a mod
+            if (!((SocketGuildUser)Context.User).Roles.Contains(Context.Guild.GetRole(113379036524212224)))
+                return;
+
+            // retun if used outside account age gate channel
+            if (Context.Channel.Id != 784226460138995722)
+                return;
+
+            List<IMessage> messages = new List<IMessage>();
+            List<IMessage> temp = new List<IMessage>();
+
+            do
+            {
+                temp = (await Context.Channel.GetMessagesAsync().FlattenAsync()).ToList();
+
+                messages.AddRange(temp);
+
+            } while (temp.Count() == 100);
+
+            foreach (var m in messages)
+            {
+                if (m.Author.Id != Context.Client.CurrentUser.Id && m.Content != VerifMessage)
+                {
+                    await m.DeleteAsync();
+                }
+            }
+
+            if (messages.Any(x => x.Content != VerifMessage))
+                await RespondAsync(VerifMessage);
+
+            await ((SocketTextChannel)Context.Channel).DeleteMessagesAsync(messages.Where(x => x.Author.Id != Context.Client.CurrentUser.Id && x.Content != VerifMessage));
         }
 
         [Command("mute")]
