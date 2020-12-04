@@ -302,13 +302,13 @@ namespace MinitoriCore.Modules.DiscordBots
 
             } while (temp.Count() == 100);
 
-            foreach (var m in messages)
-            {
-                if (m.Author.Id != Context.Client.CurrentUser.Id && m.Content != VerifMessage)
-                {
-                    await m.DeleteAsync();
-                }
-            }
+            //foreach (var m in messages)
+            //{
+            //    if (m.Author.Id != Context.Client.CurrentUser.Id && m.Content != VerifMessage)
+            //    {
+            //        await m.DeleteAsync();
+            //    }
+            //}
 
             if (messages.Any(x => x.Content != VerifMessage))
                 await RespondAsync(VerifMessage);
