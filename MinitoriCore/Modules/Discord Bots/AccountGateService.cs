@@ -46,6 +46,9 @@ namespace MinitoriCore
             if (user.CreatedAt > DateTimeOffset.Now.AddDays(config.AgeGate * -1))
             {
                 await user.AddRoleAsync(user.Guild.GetRole(784226125408763954));
+                await ((SocketTextChannel)user.Guild.GetChannel(467192652463341578)).SendMessageAsync($"`[{DateTimeOffset.Now.ToString("HH:mm:ss")}]` Young account joined:\n" +
+                    $"{user.Username}#{user.Discriminator} ({user.Id}) ({user.Mention})\n" +
+                    $"**Account created** `{user.CreatedAt.ToString("d")} {user.CreatedAt.ToString("T")}`");
             }
         }
     }
