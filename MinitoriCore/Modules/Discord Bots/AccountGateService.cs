@@ -37,6 +37,9 @@ namespace MinitoriCore
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
+            if (user.IsBot)
+                return;
+
             if (user.Guild.Id != 110373943822540800)
                 return;
 
