@@ -103,7 +103,12 @@ namespace MinitoriCore
             }
 
             if (user.AvatarId == null)
-                result |= Filter.NoAvatar;
+            {
+                // only filter accounts for no avatar if they're younger than a month
+                // make this configurable later
+                if (user.CreatedAt > DateTimeOffset.Now.AddMonths(-1))
+                    result |= Filter.NoAvatar;
+            }
 
             if (result > 0)
             {
