@@ -50,13 +50,13 @@ namespace MinitoriCore
 
             //int years = 0;
             //int months = 0;
-            int days = 0;
-            int hours = 0;
-            int minutes = 0;
+            int days = time.Days;
+            int hours = time.Hours;
+            int minutes = time.Minutes;
 
 
             StringBuilder date = new StringBuilder();
-            if (time.Minutes + /*years + months +*/ time.Days + time.Hours > 0)
+            if (minutes + /*years + months +*/ days + hours > 0)
             {
                 //if (time. > 0)
                 //    date.Append($"{years} {((years == 1) ? "year" : "years")} ");
