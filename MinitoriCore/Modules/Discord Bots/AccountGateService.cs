@@ -24,6 +24,17 @@ namespace MinitoriCore
         private IServiceProvider services;
         private Config config;
 
+        [Flags]
+        private enum Filter
+        {
+            NewAccount = 1,
+            NoAvatar = 2,
+            OffensiveUsername = 4,
+            Advertisement = 8,
+            Banned = 16,
+            Impersonation = 32
+        }
+
         public async Task Install(IServiceProvider _services)
         {
             client = _services.GetService<DiscordSocketClient>();
@@ -81,16 +92,21 @@ namespace MinitoriCore
             if (user.Guild.Id != 110373943822540800)
                 return;
 
-            if (config.AgeGate <= 0)
-                return;
+            Filter result = new Filter();
 
-            if (user.CreatedAt > DateTimeOffset.Now.AddDays(config.AgeGate * -1))
+            if (config.AgeGate > 0)
             {
-                await user.AddRoleAsync(user.Guild.GetRole(784226125408763954));
-                await ((SocketTextChannel)user.Guild.GetChannel(784491009249247253)).SendMessageAsync($"`[{DateTimeOffset.Now.ToLocalTime().ToString("HH:mm:ss")}]` Young account joined:\n" +
-                    $"{user.Username}#{user.Discriminator} ({user.Id}) ({user.Mention})\n" +
-                    $"Created {MoreDifferentFancyTime(user.CreatedAt)} ago.");
+                if (user.CreatedAt > DateTimeOffset.Now.AddDays(config.AgeGate * -1))
+                {
+                    result |= Filter.NewAccount;
+                    await user.AddRoleAsync(user.Guild.GetRole(784226125408763954));
+                    await ((SocketTextChannel)user.Guild.GetChannel(784491009249247253)).SendMessageAsync($"`[{DateTimeOffset.Now.ToLocalTime().ToString("HH:mm:ss")}]` Young account joined:\n" +
+                        $"{user.Username}#{user.Discriminator} ({user.Id}) ({user.Mention})\n" +
+                        $"Created {MoreDifferentFancyTime(user.CreatedAt)}ago.");
+                }
             }
+
+            
         }
     }
 }
