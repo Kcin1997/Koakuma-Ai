@@ -97,16 +97,20 @@ namespace MinitoriCore
             if (config.AgeGate > 0)
             {
                 if (user.CreatedAt > DateTimeOffset.Now.AddDays(config.AgeGate * -1))
-                {
                     result |= Filter.NewAccount;
-                    await user.AddRoleAsync(user.Guild.GetRole(784226125408763954));
-                    await ((SocketTextChannel)user.Guild.GetChannel(784491009249247253)).SendMessageAsync($"`[{DateTimeOffset.Now.ToLocalTime().ToString("HH:mm:ss")}]` Young account joined:\n" +
-                        $"{user.Username}#{user.Discriminator} ({user.Id}) ({user.Mention})\n" +
-                        $"Created {MoreDifferentFancyTime(user.CreatedAt)}ago.");
-                }
             }
 
-            
+            if (user.AvatarId == null)
+                result |= Filter.NoAvatar;
+
+            if (result > 0)
+            {
+                await user.AddRoleAsync(user.Guild.GetRole(784226125408763954));
+                await ((SocketTextChannel)user.Guild.GetChannel(784491009249247253)).SendMessageAsync(
+                    $"`[{DateTimeOffset.Now.ToLocalTime().ToString("HH:mm:ss")}]` Filtered account for the following reasons: `{result.ToString()}`\n" +
+                    $"{user.Username}#{user.Discriminator} ({user.Id}) ({user.Mention})\n" +
+                    $"Created {MoreDifferentFancyTime(user.CreatedAt)}ago.");
+            }
         }
     }
 }
