@@ -279,12 +279,6 @@ namespace MinitoriCore.Modules.DiscordBots
             }
         }
 
-        [Command("avatar")]
-        public async Task TestCommand()
-        {
-            await RespondAsync($"AvatarId: {Context.User.AvatarId == null}");
-        }
-
         [Command("reset")]
         [Summary("Reset account age gate channel")]
         public async Task ChannelReset()
