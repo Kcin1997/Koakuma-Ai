@@ -282,7 +282,7 @@ namespace MinitoriCore.Modules.DiscordBots
         [Command("avatar")]
         public async Task TestCommand()
         {
-            await RespondAsync($"AvatarId: {Context.User.AvatarId}\nAvatarUrl: {Context.User.GetAvatarUrl()}\nDefaultAvatarUrl: {Context.User.GetDefaultAvatarUrl()}");
+            await RespondAsync($"AvatarId: {Context.User.AvatarId == null}");
         }
 
         [Command("reset")]
