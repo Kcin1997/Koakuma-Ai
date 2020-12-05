@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 using System.Security.Cryptography;
 using MinitoriCore.Preconditions;
 using Microsoft.Extensions.DependencyInjection;
-
+using NodaTime;
 
 namespace MinitoriCore
 {
@@ -46,24 +46,26 @@ namespace MinitoriCore
 
         private string MoreDifferentFancyTime(DateTimeOffset creationDate)
         {
-            var time = DateTimeOffset.UtcNow - creationDate;
 
-            //int years = 0;
-            //int months = 0;
-            int days = time.Days;
-            int hours = time.Hours;
-            int minutes = time.Minutes;
+            Period period = Period.Between(LocalDateTime.FromDateTime(creationDate.LocalDateTime), LocalDateTime.FromDateTime(DateTime.Now));
+
+            long years = period.Years;
+            long months = period.Months;
+            long days = period.Days;
+            long hours = period.Hours;
+            long minutes = period.Minutes;
+
 
 
             StringBuilder date = new StringBuilder();
-            if (minutes + /*years + months +*/ days + hours > 0)
+            if (minutes + years + months + days + hours > 0)
             {
-                //if (time. > 0)
-                //    date.Append($"{years} {((years == 1) ? "year" : "years")} ");
-                //if (months > 0)
-                //    date.Append($"{months} {((months == 1) ? "month" : "months")} ");
-                //if (months + years < 1)
-                //{
+                if (years > 0)
+                    date.Append($"{years} {((years == 1) ? "year" : "years")} ");
+                if (months > 0)
+                    date.Append($"{months} {((months == 1) ? "month" : "months")} ");
+                if (months + years < 1)
+                {
                     if (days > 0)
                         date.Append($"{days} {((days == 1) ? "day" : "days")} ");
                     if (days < 4)
@@ -76,7 +78,7 @@ namespace MinitoriCore
                         if (minutes > 0)
                             date.Append($"{minutes} {((minutes == 1) ? "minute" : "minutes")} ");
                     }
-                //}
+                }
             }
             else
                 date.Append("less than a minute ");
