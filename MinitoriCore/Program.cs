@@ -31,7 +31,7 @@ namespace MinitoriCore
         private EventStorage events;
         private RankedService rankedService;
         private ServiceProvider map;
-        private AccountGateService gate;
+        //private AccountGateService gate;
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
         //private readonly CommandService commands = new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false });
@@ -68,10 +68,10 @@ namespace MinitoriCore
             events = EventStorage.Load();
             rankedService = new RankedService();
             strings = new RandomStrings();
-            gate = new AccountGateService();
+            //gate = new AccountGateService();
 
             //var map = new DependencyMap();
-            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events).AddSingleton(rankedService).AddSingleton(gate).BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events).AddSingleton(rankedService)/*.AddSingleton(gate)*/.BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
@@ -102,7 +102,7 @@ namespace MinitoriCore
 
             socketClient.UserJoined += Client_UserJoined;
 
-            await gate.Install(map);
+            //await gate.Install(map);
 
             handler = new CommandHandler();
             await handler.Install(map);

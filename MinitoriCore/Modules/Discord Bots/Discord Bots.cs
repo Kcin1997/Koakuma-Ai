@@ -244,40 +244,75 @@ namespace MinitoriCore.Modules.DiscordBots
             }
         }
 
-        [Command("gate")]
-        [Summary("Change account age gate settings")]
-        public async Task AgeGateSet(int setting = -2149) // yay magic numbers
-        {
-            // return if user is not a mod
-            if (!((SocketGuildUser)Context.User).Roles.Contains(Context.Guild.GetRole(113379036524212224)))
-                return;
+        //[Command("gate")]
+        //[Summary("Change account age gate settings")]
+        //public async Task AgeGateSet(int setting = -2149) // yay magic numbers
+        //{
+        //    // return if user is not a mod
+        //    if (!((SocketGuildUser)Context.User).Roles.Contains(Context.Guild.GetRole(113379036524212224)))
+        //        return;
 
-            if (setting == -2149)
-            {
-                if (config.AgeGate <= 0)
-                    await RespondAsync("Account age gate is currently disabled.");
-                else
-                    await RespondAsync($"Account age gate is currently set to {config.AgeGate} days");
+        //    if (setting == -2149)
+        //    {
+        //        if (config.AgeGate <= 0)
+        //            await RespondAsync("Account age gate is currently disabled.");
+        //        else
+        //            await RespondAsync($"Account age gate is currently set to {config.AgeGate} days");
 
-                return;
-            }
-            else if (config.AgeGate == setting)
-            {
-                await RespondAsync($"Account age gate is already set to {setting} days. No changes made.");
+        //        return;
+        //    }
+        //    else if (config.AgeGate == setting)
+        //    {
+        //        await RespondAsync($"Account age gate is already set to {setting} days. No changes made.");
 
-                return;
-            }
-            else
-            {
-                config.AgeGate = setting;
-                config.Save();
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        config.AgeGate = setting;
+        //        config.Save();
 
-                if (setting <= 0)
-                    await RespondAsync($"Account age gate is now disabled.\nNote: This change is not retroactive.");
-                else
-                    await RespondAsync($"Account age gate is now set to {setting} days.\nNote: This change is not retroactive.");
-            }
-        }
+        //        if (setting <= 0)
+        //            await RespondAsync($"Account age gate is now disabled.\nNote: This change is not retroactive.");
+        //        else
+        //            await RespondAsync($"Account age gate is now set to {setting} days.\nNote: This change is not retroactive.");
+        //    }
+        //}
+
+        //[Command("avatargate")]
+        //[Summary("Change avatar gate settings")]
+        //public async Task AvatarGateSet(int setting = -2149) // yay magic numbers
+        //{
+        //    // return if user is not a mod
+        //    if (!((SocketGuildUser)Context.User).Roles.Contains(Context.Guild.GetRole(113379036524212224)))
+        //        return;
+
+        //    if (setting == -2149)
+        //    {
+        //        if (config.AvatarGate <= 0)
+        //            await RespondAsync("Account age gate is currently disabled.");
+        //        else
+        //            await RespondAsync($"Account age gate is currently set to {config.AvatarGate} days");
+
+        //        return;
+        //    }
+        //    else if (config.AvatarGate == setting)
+        //    {
+        //        await RespondAsync($"Account age gate is already set to {setting} days. No changes made.");
+
+        //        return;
+        //    }
+        //    else
+        //    {
+        //        config.AvatarGate = setting;
+        //        config.Save();
+
+        //        if (setting <= 0)
+        //            await RespondAsync($"Account age gate is now disabled.\nNote: This change is not retroactive.");
+        //        else
+        //            await RespondAsync($"Account age gate is now set to {setting} days.\nNote: This change is not retroactive.");
+        //    }
+        //}
 
         [Command("reset")]
         [Summary("Reset account age gate channel")]

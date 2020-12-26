@@ -43,6 +43,12 @@ namespace MinitoriCore
         [JsonProperty("account_age_gate")]
         public int AgeGate = 0;
 
+        [JsonProperty("avatar_age_gate")]
+        public int AvatarGate = 0;
+
+        [JsonProperty("database_connection")]
+        public string DatabaseConnectionString { get; set; } = "";
+
         public static Config Load()
         {
             if (File.Exists("config.json"))

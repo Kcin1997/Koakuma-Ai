@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using MinitoriCore.Preconditions;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using System.Data.SQLite;
 
 namespace MinitoriCore
 {
@@ -34,6 +35,18 @@ namespace MinitoriCore
             Banned = 16,
             Impersonation = 32
         }
+
+        private class LoggedUser
+        {
+            public ulong UserId { get; set; }
+            public bool ApprovedAccess { get; set; }
+            public bool NewAccount { get; set; }
+            public ulong ApprovalModId { get; set; }
+            public Filter DenialReasons { get; set; }
+            public ulong LogMessageId { get; set; }
+            public DateTimeOffset OriginalJoinTime { get; set; }
+            public int JoinCount { get; set; }
+    }
 
         public async Task Install(IServiceProvider _services)
         {
@@ -118,6 +131,35 @@ namespace MinitoriCore
                     $"{user.Username}#{user.Discriminator} ({user.Id}) ({user.Mention})\n" +
                     $"Created {MoreDifferentFancyTime(user.CreatedAt)}ago.");
             }
+        }
+
+        private async Task<bool> InitializeDB()
+        {
+            bool tableExists = false;
+
+            using (SQLiteConnection db = new SQLiteConnection(config.DatabaseConnectionString))
+            {
+                await db.OpenAsync();
+
+                using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name='users';", db))
+                {
+                    if ((await cmd.ExecuteScalarAsync()) != null)
+                        tableExists = true;
+                }
+
+                if (!tableExists)
+                {
+                    using (var cmd = new SQLiteCommand("CREATE TABLE IF NOT EXISTS users " +
+                        "(UserId TEXT NOT NULL PRIMARY KEY, ApprovedAccess INTEGER NOT NULL, NewAccount INTEGER NOT NULL, ApprovalModId TEXT, DenialReasons INTEGER NOT NULL, LogMessage TEXT);", db))
+                    {
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                db.Close();
+            }
+
+            return tableExists;
         }
     }
 }
