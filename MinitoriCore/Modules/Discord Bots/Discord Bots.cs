@@ -423,6 +423,7 @@ namespace MinitoriCore.Modules.DiscordBots
 
         [Command("noreactions")]
         [Summary("Remove a mute from a bot")]
+        [Alias("noreacts")]
         public async Task AddNoReaction([Remainder]string remainder = "")
         {
             if (Context.Guild.Id != 110373943822540800)
