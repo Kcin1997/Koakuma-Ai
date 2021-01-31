@@ -148,6 +148,20 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync($"Blah to you too, {Context.User.Mention}.");
         }
 
+        [Command("echo")]
+        [Summary("Repeats what you say")]
+        [Priority(1000)]
+        public async Task Echo([Remainder]string message)
+        {
+            if (!config.OwnerIds.Contains(Context.User.Id))
+            {
+                await RespondAsync(":no_good::skin-tone-3: You don't have permission to run this command!");
+                return;
+            }
+
+            await RespondAsync(message);
+        }
+
         [Command("getbots", RunMode = RunMode.Async)]
         [Priority(1000)]
         [Summary("na")]
