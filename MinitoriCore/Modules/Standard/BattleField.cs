@@ -44,12 +44,25 @@ namespace MinitoriCore.Modules.Battlefield
 
             StringBuilder output = new StringBuilder();
 
+            int i = 0;
             foreach (var s in servers)
             {
-                output.AppendLine(s.name);
+                output.AppendLine($"{s.name} `{s.ip}:{s.gamePort}`");
+
+                i++;
+                if (i > 10)
+                    break;
             }
 
             await RespondAsync(output.ToString());
+        }
+
+        [Command("server")]
+        private async Task GetServer(string input)
+        {
+            var server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{input}"));
+
+            await RespondAsync($"{server.name}");
         }
     }
 
