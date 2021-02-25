@@ -120,27 +120,28 @@ namespace MinitoriCore.Modules.Battlefield
                     //$"\nServer OS: {server.OS}" +
                     //$"\nBattle Recorder available: {server.BattleRecorder}" +
                     //$"{(server.BattleRecorder ? $"\nDemos link: {server.DemoDownload}" : "")}")
-                    .WithFields(new EmbedFieldBuilder().WithIsInline(true).WithName($"Team 1: {GetFlag(server.Team1)}").WithValue(
-                        $"Password protected: {server.Password}" +
-                        $"\nType: {server.GameType}" +
-                        $"\nTime limit: {server.Timelimit}" +
-                        $"\nRounds per map: {server.RoundsPerMap}" +
-                        $"\nAutobalance: {server.AutoBalance}" +
-                        $"\nFriendly fire: {server.FriendlyFire}" +
-                        $"\nTK Mode: {server.TKMode}" +
-                        $"\nTicket ratio: {server.TicketRatio}" +
-                        $"\nTeam Ratio: {server.TeamRatio}"
-                    ), new EmbedFieldBuilder().WithIsInline(true).WithName($"Team 2: {GetFlag(server.Team2)}").WithValue(
-                        $"Bots: {server.Bots}" +
-                        $"{(server.Bots ? "\nBot count: {server.CoopBotCount}" : "")}" +
-                        $"\nGlobal Unlocks: {server.GlobalUnlocks}" +
-                        $"\nServer FPS: {server.FPS}" +
-                        $"\nVehicles: {(server.NoVehicles == 0 ? "True" : "False")}" +
-                        $"\nDedicated server: {server.Dedicated}" +
-                        $"\nRanked: {server.Ranked}" +
-                        $"\nServer OS: {server.OS}" +
-                        $"\nBattle Recorder available: {server.BattleRecorder}" +
-                        $"{(server.BattleRecorder ? $"\nDemos link: {server.DemoDownload}" : "")}")
+                    .WithFields(
+                        new EmbedFieldBuilder().WithIsInline(true).WithName($"Password protected: {server.Password}").WithValue(
+                            $"\n**Type: {server.GameType}**" +
+                            $"\n**Team 1: {GetFlag(server.Team1)}**" +
+                            $"\n**Team 2: {GetFlag(server.Team2)}**" +
+                            $"\n**Time limit: {server.Timelimit}**" +
+                            $"\n**Rounds per map: {server.RoundsPerMap}**" +
+                            $"\n**Autobalance: {server.AutoBalance}**" +
+                            $"\n**Friendly fire: {server.FriendlyFire}**" +
+                            $"\n**TK Mode: {server.TKMode}**" +
+                            $"\n**Ticket ratio: {server.TicketRatio}**"
+                        ), new EmbedFieldBuilder().WithIsInline(true).WithName($"\nTeam ratio: {server.TeamRatio}").WithValue(
+                            $"**Bots:** {server.Bots}**" +
+                            $"{(server.Bots ? "\n**Bot count: {server.CoopBotCount}**" : "")}" +
+                            $"\n**Global Unlocks: {server.GlobalUnlocks}**" +
+                            $"\n**Server FPS: {server.FPS}**" +
+                            $"\n**Vehicles: {(server.NoVehicles == 0 ? "True" : "False")}**" +
+                            $"\n**Dedicated server: {server.Dedicated}**" +
+                            $"\n**Ranked: {server.Ranked}**" +
+                            $"\n**Server OS: {server.OS}**" +
+                            $"\n**Battle Recorder available: {(server.BattleRecorder ? $"[Download]({server.DemoDownload})" : "False")}**"
+                        )
                     )
                     .Build()
                 );
