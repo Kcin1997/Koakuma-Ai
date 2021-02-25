@@ -141,7 +141,7 @@ namespace MinitoriCore.Modules.Battlefield
                             $"\n**Ranked: {server.Ranked}**" +
                             $"\n**Server OS: {server.OS}**" +
                             $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[**Link**]({server.DemoDownload})" : "False")}"
-                        )
+                        ), new EmbedFieldBuilder().WithIsInline(true).WithName("test").WithValue("```asdf```")
                     )
                     .Build()
                 );
