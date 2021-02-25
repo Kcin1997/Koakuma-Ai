@@ -92,6 +92,9 @@ namespace MinitoriCore.Modules.Battlefield
 
             EmbedBuilder builder = new EmbedBuilder();
 
+            if (server.CommunityLogoUrl != "")
+                builder.ThumbnailUrl = server.CommunityLogoUrl;
+
             await ReplyAsync(embed:
                 builder
                     .WithTitle($"{server.Name} | {server.IP}:{server.GamePort}")
@@ -115,8 +118,7 @@ namespace MinitoriCore.Modules.Battlefield
                     $"\nDedicated server: {server.Dedicated}" +
                     $"\nRanked: {server.Ranked}" +
                     $"\nServer OS: {server.OS}" +
-                    $"\nBattle Recorder available: {server.BattleRecorder}" +
-                    $"\nDemos link: {server.DemoDownload}")
+                    $"\nBattle Recorder available: {server.BattleRecorder}{(server.BattleRecorder ? $"\nDemos link: {server.DemoDownload}" : "")}")
                     .Build()
                 );
         }
@@ -219,7 +221,7 @@ namespace MinitoriCore.Modules.Battlefield
         //[JsonProperty("sponsorLogoUrl")]
         //public string SponsorLogoUrl { get; set; }
         //[JsonProperty("communityLogoUrl")]
-        //public string CommunityLogoUrl { get; set; }
+        public string CommunityLogoUrl { get; set; }
         //[JsonProperty("scorelimit")]
         //public int Scorelimit { get; set; }
         [JsonProperty("ticketratio")]
