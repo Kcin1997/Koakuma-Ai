@@ -120,8 +120,8 @@ namespace MinitoriCore.Modules.Battlefield
                     //$"\nServer OS: {server.OS}" +
                     //$"\nBattle Recorder available: {server.BattleRecorder}" +
                     //$"{(server.BattleRecorder ? $"\nDemos link: {server.DemoDownload}" : "")}")
-                    .WithFields(new EmbedFieldBuilder().WithIsInline(true).WithName("a").WithValue(
-                        $"\nTeam 1: {GetFlag(server.Team1)}" +
+                    .WithFields(new EmbedFieldBuilder().WithIsInline(true).WithName($"Team 1: {GetFlag(server.Team1)}").WithValue(
+                        $"Team 1: {GetFlag(server.Team1)}" +
                         $"\n\nPassword protected: {server.Password}" +
                         $"\nType: {server.GameType}" +
                         $"\nTime limit: {server.Timelimit}" +
@@ -131,8 +131,8 @@ namespace MinitoriCore.Modules.Battlefield
                         $"\nTK Mode: {server.TKMode}" +
                         $"\nTicket ratio: {server.TicketRatio}" +
                         $"\nTeam Ratio: {server.TeamRatio}"
-                    ), new EmbedFieldBuilder().WithIsInline(true).WithName("b").WithValue(
-                        $"\nTeam 2: {GetFlag(server.Team2)}" +
+                    ), new EmbedFieldBuilder().WithIsInline(true).WithName($"Team 2: {GetFlag(server.Team2)}").WithValue(
+                        $"Team 2: {GetFlag(server.Team2)}" +
                         $"\nBots: {server.Bots}" +
                         $"{(server.Bots ? "\nBot count: {server.CoopBotCount}" : "")}" +
                         $"\nGlobal Unlocks: {server.GlobalUnlocks}" +
