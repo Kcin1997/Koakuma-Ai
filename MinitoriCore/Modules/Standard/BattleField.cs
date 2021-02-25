@@ -142,7 +142,8 @@ namespace MinitoriCore.Modules.Battlefield
                             $"\n**Server OS: {server.OS}**" +
                             $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[**Link**]({server.DemoDownload})" : "False")}"
                         ), new EmbedFieldBuilder().WithIsInline(false).WithName("test1").WithValue("```IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII```"
-                        ), new EmbedFieldBuilder().WithIsInline(true).WithName("test2").WithValue("```IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII```")
+                        ), new EmbedFieldBuilder().WithIsInline(true).WithName("test2").WithValue("```IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII```"
+                        ), new EmbedFieldBuilder().WithIsInline(true).WithName("test3s").WithValue("```IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII```")
                     )
                     .Build()
                 );
