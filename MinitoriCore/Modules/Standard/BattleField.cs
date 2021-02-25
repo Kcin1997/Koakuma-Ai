@@ -28,26 +28,42 @@ namespace MinitoriCore.Modules.Battlefield
         {
             using (var client = new HttpClient())
             {
-                var result = await client.GetAsync($"https://api.bflist.io/bf2/v1/{endPoint}");
+                var result = await client.GetAsync($"https://api.bflist.io/bf2/v1/{endPoint}?plainerr=1");
                 if (result.IsSuccessStatusCode)
                     return await result.Content.ReadAsStringAsync();
+                else
+                    throw new Exception(await result.Content.ReadAsStringAsync());
+                    // I'm sure this is going to fail horribly some how, it needs more testing
             }
-
-            return "";
         }
 
+        private string GetFlag(string team)
+        {
+            switch (team)
+            {
+                case "US":
+                    return "<:US:814529984425230336>";
+                case "MEC":
+                    return "<:MEC:814529984399802408>";
+                case "CH":
+                    return "<:CH:814529983975522326>";
+                default:
+                    return "❓";
+            }
+        }
 
         [Command("servers")]
         private async Task GetServers(int page = 0)
         {
-            var servers = JsonConvert.DeserializeObject<List<BF2Server>>(await GetData($"servers{(page > 0? $"/{page}" : "")}"));
+
+            var servers = JsonConvert.DeserializeObject<List<BF2Server>>(await GetData($"servers{(page > 0 ? $"/{page}" : "")}"));
 
             StringBuilder output = new StringBuilder();
 
             int i = 0;
             foreach (var s in servers)
             {
-                output.AppendLine($"{s.name} `{s.ip}:{s.gamePort}`");
+                output.AppendLine($"{s.Name} `{s.IP}:{s.GamePort}`");
 
                 i++;
                 if (i > 10)
@@ -60,81 +76,177 @@ namespace MinitoriCore.Modules.Battlefield
         [Command("server")]
         private async Task GetServer(string input)
         {
-            var server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{input}"));
+            // TODO: Validate input
 
-            await RespondAsync($"{server.name}");
+            BF2Server server;
+
+            try
+            {
+                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{input}"));
+            }
+            catch (Exception ex)
+            {
+                await RespondAsync($"Something went wrong: {ex.Message}");
+                return;
+            }
+
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder
+                .WithTitle($"{server.Name} | {server.IP}:{server.GamePort}")
+                .WithDescription($"**{server.MapName} - {server.OnlinePlayers}/{server.MaxPlayers}**" +
+                $"\n\nPassword protected: {server.Password}" +
+                $"\nType: {server.GameType}" +
+                $"\nTime limit: {server.Timelimit}" +
+                $"\nRounds per map: {server.RoundsPerMap}" +
+                $"\nAutobalance: {server.AutoBalance}" +
+                $"\nFriendly fire: {server.FriendlyFire}" +
+                $"\nTK Mode: {server.TKMode}" +
+                $"\nTicket ratio: {server.TicketRatio}" +
+                $"\nTeam Ratio: {server.TeamRatio}" +
+                $"\nTeam 1: {GetFlag(server.Team1)}" +
+                $"\nTeam 2: {GetFlag(server.Team2)}" +
+                $"\nBots: {server.Bots}" +
+                $"\nGlobal Unlocks: {server.GlobalUnlocks}" +
+                $"\nServer FPS: {server.FPS}" +
+                $"\nBot count: {server.CoopBotCount}" +
+                $"\nVehicles: {(server.NoVehicles == 0? "True" : "False")}" +
+                $"\nDedicated server: {server.Dedicated}" +
+                $"\nRanked: {server.Ranked}" +
+                $"\nServer OS: {server.OS}" +
+                $"\nBattle Recorder available: {server.BattleRecorder}" +
+                $"\nDemos link: {server.DemoDownload}");
         }
     }
 
     public class Team
     {
-        public int index { get; set; }
-        public string label { get; set; }
+        [JsonProperty("index")]
+        public int Index { get; set; }
+        [JsonProperty("label")]
+        public string Label { get; set; }
     }
 
     public class Player
     {
-        public int pid { get; set; }
-        public string name { get; set; }
-        public string tag { get; set; }
-        public int score { get; set; }
-        public int kills { get; set; }
-        public int deaths { get; set; }
-        public int ping { get; set; }
-        public int teamIndex { get; set; }
-        public string teamLabel { get; set; }
-        public bool aibot { get; set; }
+        [JsonProperty("pid")]
+        public int PlayerID { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("tag")]
+        public string Tag { get; set; }
+        [JsonProperty("score")]
+        public int Score { get; set; }
+        [JsonProperty("kills")]
+        public int Kills { get; set; }
+        [JsonProperty("deaths")]
+        public int Deaths { get; set; }
+        [JsonProperty("ping")]
+        public int Ping { get; set; }
+        //[JsonProperty("teamIndex")]
+        //public int teamIndex { get; set; }
+        [JsonProperty("teamLabel")]
+        public string TeamLabel { get; set; }
+        [JsonProperty("aibot")]
+        public bool AIBot { get; set; }
     }
 
     public class BF2Server
     {
-        public string ip { get; set; }
-        public int queryPort { get; set; }
-        public int gamePort { get; set; }
-        public string name { get; set; }
-        public string mapName { get; set; }
-        public int mapSize { get; set; }
-        public int numPlayers { get; set; }
-        public int maxPlayers { get; set; }
-        public List<Team> teams { get; set; }
-        public List<Player> players { get; set; }
-        public bool password { get; set; }
-        public string gameVersion { get; set; }
-        public string gameType { get; set; }
-        public string gameVariant { get; set; }
-        public int timelimit { get; set; }
-        public string roundsPerMap { get; set; }
-        public bool dedicated { get; set; }
-        public bool ranked { get; set; }
-        public bool anticheat { get; set; }
-        public string os { get; set; }
-        public bool battlerecorder { get; set; }
-        public string demoIndex { get; set; }
-        public string demoDownload { get; set; }
-        public bool voip { get; set; }
-        public bool autobalance { get; set; }
-        public bool friendlyfire { get; set; }
-        public string tkmode { get; set; }
-        public int startdelay { get; set; }
-        public int spawntime { get; set; }
-        public string sponsorText { get; set; }
-        public string sponsorLogoUrl { get; set; }
-        public string communityLogoUrl { get; set; }
-        public int scorelimit { get; set; }
-        public int ticketratio { get; set; }
-        public int teamratio { get; set; }
-        public string team1 { get; set; }
-        public string team2 { get; set; }
-        public bool bots { get; set; }
-        public bool pure { get; set; }
-        public bool globalUnlocks { get; set; }
-        public int fps { get; set; }
-        public bool plasma { get; set; }
-        public int reservedSlots { get; set; }
-        public int coopBotRatio { get; set; }
-        public int coopBotCount { get; set; }
-        public int coopBotDiff { get; set; }
-        public int noVehicles { get; set; }
+        [JsonProperty("ip")]
+        public string IP { get; set; }
+        //[JsonProperty("queryPort")]
+        //public int queryPort { get; set; }
+        [JsonProperty("gamePort")]
+        public int GamePort { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("mapName")]
+        public string MapName { get; set; }
+        [JsonProperty("mapSize")]
+        public int MapSize { get; set; }
+        [JsonProperty("numPlayers")]
+        public int OnlinePlayers { get; set; }
+        [JsonProperty("maxPlayers")]
+        public int MaxPlayers { get; set; }
+        [JsonProperty("teams")]
+        public List<Team> Teams { get; set; }
+        [JsonProperty("players")]
+        public List<Player> Players { get; set; }
+        [JsonProperty("password")]
+        public bool Password { get; set; }
+        //[JsonProperty("gameVersion")]
+        //public string GameVersion { get; set; }
+        [JsonProperty("gameType")]
+        public string GameType { get; set; }
+        //[JsonProperty("gameVariant")]
+        //public string GameVariant { get; set; }
+        [JsonProperty("timelimit")]
+        public int Timelimit { get; set; }
+        [JsonProperty("roundsPerMap")]
+        public string RoundsPerMap { get; set; }
+        [JsonProperty("dedicated")]
+        public bool Dedicated { get; set; }
+        [JsonProperty("ranked")]
+        public bool Ranked { get; set; }
+        [JsonProperty("anticheat")]
+        public bool AntiCheat { get; set; }
+        [JsonProperty("os")]
+        public string OS { get; set; }
+        [JsonProperty("battlerecorder")]
+        public bool BattleRecorder { get; set; }
+        //[JsonProperty("demoIndex")]
+        //public string demoIndex { get; set; }
+        [JsonProperty("demoDownload")]
+        public string DemoDownload { get; set; }
+        //[JsonProperty("voip")]
+        //public bool voip { get; set; }
+        [JsonProperty("autobalance")]
+        public bool AutoBalance { get; set; }
+        [JsonProperty("friendlyfire")]
+        public bool FriendlyFire { get; set; }
+        [JsonProperty("tkmode")]
+        public string TKMode { get; set; }
+        //[JsonProperty("startdelay")]
+        //public int StartDelay { get; set; }
+        //[JsonProperty("spawntime")]
+        //public int SpawnTime { get; set; }
+        //[JsonProperty("sponsorText")]
+        //public string SponsorText { get; set; }
+        //[JsonProperty("sponsorLogoUrl")]
+        //public string SponsorLogoUrl { get; set; }
+        //[JsonProperty("communityLogoUrl")]
+        //public string CommunityLogoUrl { get; set; }
+        //[JsonProperty("scorelimit")]
+        //public int Scorelimit { get; set; }
+        [JsonProperty("ticketratio")]
+        public int TicketRatio { get; set; }
+        [JsonProperty("teamratio")]
+        public int TeamRatio { get; set; }
+        [JsonProperty("team1")]
+        public string Team1 { get; set; }
+        [JsonProperty("team2")]
+        public string Team2 { get; set; }
+        [JsonProperty("bots")]
+        public bool Bots { get; set; }
+        [JsonProperty("pure")]
+        public bool Pure { get; set; }
+        [JsonProperty("globalUnlocks")]
+        public bool GlobalUnlocks { get; set; }
+        [JsonProperty("fps")]
+        public int FPS { get; set; }
+        //[JsonProperty("plasma")]
+        //public bool Plasma { get; set; }
+        //[JsonProperty("reservedSlots")]
+        //public int ReservedSlots { get; set; }
+        //[JsonProperty("coopBotRatio")]
+        //public int CoopBotRatio { get; set; }
+        [JsonProperty("coopBotCount")]
+        public int CoopBotCount { get; set; }
+        //[JsonProperty("coopBotDiff")]
+        //public int CoopBotDiff { get; set; }
+        [JsonProperty("noVehicles")]
+        public int NoVehicles { get; set; }
     }
 
 
