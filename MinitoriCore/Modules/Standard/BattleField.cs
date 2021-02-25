@@ -98,52 +98,34 @@ namespace MinitoriCore.Modules.Battlefield
             await ReplyAsync(embed:
                 builder
                     .WithTitle($"{server.Name} | {server.IP}:{server.GamePort}")
-                    .WithDescription($"**{server.MapName} - {server.OnlinePlayers}/{server.MaxPlayers}**")
-                    //$"\nTeam 1: {GetFlag(server.Team1)}" +
-                    //$"\n\nPassword protected: {server.Password}" +
-                    //$"\nType: {server.GameType}" +
-                    //$"\nTime limit: {server.Timelimit}" +
-                    //$"\nRounds per map: {server.RoundsPerMap}" +
-                    //$"\nAutobalance: {server.AutoBalance}" +
-                    //$"\nFriendly fire: {server.FriendlyFire}" +
-                    //$"\nTK Mode: {server.TKMode}" +
-                    //$"\nTicket ratio: {server.TicketRatio}" +
-                    //$"\nTeam Ratio: {server.TeamRatio}" +
-                    //$"\nTeam 2: {GetFlag(server.Team2)}" +
-                    //$"\nBots: {server.Bots}" +
-                    //$"{(server.Bots ? "\nBot count: {server.CoopBotCount}" : "")}" +
-                    //$"\nGlobal Unlocks: {server.GlobalUnlocks}" +
-                    //$"\nServer FPS: {server.FPS}" +
-                    //$"\nVehicles: {(server.NoVehicles == 0 ? "True" : "False")}" +
-                    //$"\nDedicated server: {server.Dedicated}" +
-                    //$"\nRanked: {server.Ranked}" +
-                    //$"\nServer OS: {server.OS}" +
-                    //$"\nBattle Recorder available: {server.BattleRecorder}" +
-                    //$"{(server.BattleRecorder ? $"\nDemos link: {server.DemoDownload}" : "")}")
+                    .WithDescription($"**{server.MapName} - {server.OnlinePlayers}/{server.MaxPlayers}**" +
+                    $"\n\n**Password Protected:** {server.Password}" +
+                    $"\n**Type:** {server.GameType}" +
+                    $"\n**Time Limit:** {server.Timelimit}" +
+                    $"\n**Rounds Per Map:** {server.RoundsPerMap}" +
+                    $"\n**Autobalance:** {server.AutoBalance}" +
+                    $"\n**Friendly Fire:** {server.FriendlyFire}" +
+                    $"\n**TK Mode:** {server.TKMode}" +
+                    $"\n**Ticket Ratio:** {server.TicketRatio}" +
+                    $"\n**Team Ratio:** {server.TeamRatio}" +
+                    $"\n**Team 1:** {GetFlag(server.Team1)}" +
+                    $"\n**Team 2:** {GetFlag(server.Team2)}" +
+                    $"\n**Bots:** {server.Bots}" +
+                    $"{(server.Bots ? "\n**Bot count: {server.CoopBotCount}" : "")}**" +
+                    $"\n**Global Unlocks:** {server.GlobalUnlocks}" +
+                    $"\n**Server FPS:** {server.FPS}" +
+                    $"\n**Vehicles: {(server.NoVehicles == 0 ? "True" : "False")}**" +
+                    $"\n**Dedicated Server:** {server.Dedicated}" +
+                    $"\n**Ranked:** {server.Ranked}" +
+                    $"\n**Server OS:** {server.OS}" +
+                    $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[Link]({server.DemoDownload})" : "False")}")
                     .WithFields(
-                        new EmbedFieldBuilder().WithIsInline(true).WithName($"**Password protected: {server.Password}**").WithValue(
-                            $"\n**Type: {server.GameType}**" +
-                            $"\n**Team 1: {GetFlag(server.Team1)}**" +
-                            $"\n**Team 2: {GetFlag(server.Team2)}**" +
-                            $"\n**Time limit: {server.Timelimit}**" +
-                            $"\n**Rounds per map: {server.RoundsPerMap}**" +
-                            $"\n**Autobalance: {server.AutoBalance}**" +
-                            $"\n**Friendly fire: {server.FriendlyFire}**" +
-                            $"\n**TK Mode: {server.TKMode}**" +
-                            $"\n**Ticket ratio: {server.TicketRatio}**"
-                        ), new EmbedFieldBuilder().WithIsInline(true).WithName($"**Team ratio: {server.TeamRatio}**").WithValue(
-                            $"**Bots: {server.Bots}**" +
-                            $"{(server.Bots ? "\n**Bot count: {server.CoopBotCount}**" : "")}" +
-                            $"\n**Global Unlocks: {server.GlobalUnlocks}**" +
-                            $"\n**Server FPS: {server.FPS}**" +
-                            $"\n**Vehicles: {(server.NoVehicles == 0 ? "True" : "False")}**" +
-                            $"\n**Dedicated server: {server.Dedicated}**" +
-                            $"\n**Ranked: {server.Ranked}**" +
-                            $"\n**Server OS: {server.OS}**" +
-                            $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[**Link**]({server.DemoDownload})" : "False")}"
-                        ), new EmbedFieldBuilder().WithIsInline(false).WithName("test1").WithValue("```IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII```"
-                        ), new EmbedFieldBuilder().WithIsInline(true).WithName("test2").WithValue("```IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII```"
-                        ), new EmbedFieldBuilder().WithIsInline(true).WithName("test3s").WithValue("```IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII```")
+                    new EmbedFieldBuilder().WithIsInline(true).WithName($"**Team 1:** {GetFlag(server.Team1)}").WithValue(
+                        $"```{server.Players.Where(x => x.TeamIndex == 1).Select(x => x.Name).Join("\n")}```"
+                        ),
+                    new EmbedFieldBuilder().WithIsInline(true).WithName($"**Team 2:** {GetFlag(server.Team2)}").WithValue(
+                        $"```{server.Players.Where(x => x.TeamIndex == 2).Select(x => x.Name).Join("\n")}```"
+                        )
                     )
                     .Build()
                 );
@@ -174,8 +156,8 @@ namespace MinitoriCore.Modules.Battlefield
         public int Deaths { get; set; }
         [JsonProperty("ping")]
         public int Ping { get; set; }
-        //[JsonProperty("teamIndex")]
-        //public int teamIndex { get; set; }
+        [JsonProperty("teamIndex")]
+        public int TeamIndex { get; set; }
         [JsonProperty("teamLabel")]
         public string TeamLabel { get; set; }
         [JsonProperty("aibot")]
