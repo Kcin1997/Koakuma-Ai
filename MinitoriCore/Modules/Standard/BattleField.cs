@@ -132,7 +132,7 @@ namespace MinitoriCore.Modules.Battlefield
                             $"\n**TK Mode: {server.TKMode}**" +
                             $"\n**Ticket ratio: {server.TicketRatio}**"
                         ), new EmbedFieldBuilder().WithIsInline(true).WithName($"\nTeam ratio: {server.TeamRatio}").WithValue(
-                            $"**Bots:** {server.Bots}**" +
+                            $"**Bots: {server.Bots}**" +
                             $"{(server.Bots ? "\n**Bot count: {server.CoopBotCount}**" : "")}" +
                             $"\n**Global Unlocks: {server.GlobalUnlocks}**" +
                             $"\n**Server FPS: {server.FPS}**" +
@@ -140,7 +140,7 @@ namespace MinitoriCore.Modules.Battlefield
                             $"\n**Dedicated server: {server.Dedicated}**" +
                             $"\n**Ranked: {server.Ranked}**" +
                             $"\n**Server OS: {server.OS}**" +
-                            $"\n**Battle Recorder available: {(server.BattleRecorder ? $"[Download]({server.DemoDownload})" : "False")}**"
+                            $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[**Link**]({server.DemoDownload})" : "False")}"
                         )
                     )
                     .Build()
