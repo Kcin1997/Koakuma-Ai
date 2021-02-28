@@ -174,7 +174,7 @@ namespace MinitoriCore.Modules.Battlefield
             //int teamwork = 8; // "Teamwork"
             //int kills = 5; // "Kills"
             //int deaths = 6; // "Deaths"
-            int kd = server.Players.Max(x => x.ToString().Length); // "K/D"
+            int kd = server.Players.Max(x => x.KDRatio.ToString().Length); // "K/D"
 
             if (kd < 3)
                 kd = 3;
@@ -225,10 +225,10 @@ namespace MinitoriCore.Modules.Battlefield
                 string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
                     $"{p.Score,-5} {p.Teamwork,-8} {p.Kills,-5} {p.Deaths,-6} {p.KDRatio.ToString().PadRight(kd):N1} {p.Ping,-4}";
 
-                if (output1.Length + temp.Length > 2000)
+                if (output2.Length + temp.Length > 2000)
                 {
                     output2.Append("```");
-                    await RespondAsync(output1.ToString());
+                    await RespondAsync(output2.ToString());
                     output2.Clear();
                     output2.AppendLine("```");
                     output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
