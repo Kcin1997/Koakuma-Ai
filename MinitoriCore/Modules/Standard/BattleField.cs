@@ -174,7 +174,10 @@ namespace MinitoriCore.Modules.Battlefield
             //int teamwork = 8; // "Teamwork"
             //int kills = 5; // "Kills"
             //int deaths = 6; // "Deaths"
-            int kd = server.Players.Select(x => $"{x:N1}").Max(x => x.Length); // "K/D"
+            int kd = server.Players.Max(x => x.ToString().Length); // "K/D"
+
+            if (kd < 3)
+                kd = 3;
             //int ping = 4; // "Ping"
 
             //int maxLength = maxCount + tag + name + score + teamwork + kills + deaths + kd + ping + 8;
@@ -290,7 +293,7 @@ namespace MinitoriCore.Modules.Battlefield
                 if (Deaths == 0)
                     return Kills;
                 else
-                    return (double)Kills / (double)Deaths;
+                    return Math.Round((double)Kills / (double)Deaths, 1);
             }
         }
         public int Ping { get; set; }
