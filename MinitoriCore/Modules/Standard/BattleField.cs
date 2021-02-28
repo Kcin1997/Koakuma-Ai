@@ -90,6 +90,43 @@ namespace MinitoriCore.Modules.Battlefield
                 return;
             }
 
+            int tag = server.Players.Max(x => x.Tag.Length);
+            int name = server.Players.Max(x => x.Name.Length);
+            int kd = server.Players.Max(x => x.KDRatio.ToString("0.0").Length);
+
+            int maxLength = 11 + name + kd;
+
+            StringBuilder output1 = new StringBuilder();
+            StringBuilder output2 = new StringBuilder();
+
+            output1.AppendLine("```");
+            output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
+
+            int index = 1;
+            foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
+            {
+                output1.AppendLine($"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}");
+                index++;
+                if (index > 5)
+                    break;
+            }
+
+            output1.Append("```");
+
+            output2.AppendLine("```");
+            output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
+
+            index = 1;
+            foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
+            {
+                output2.AppendLine($"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}");
+                index++;
+                if (index > 5)
+                    break;
+            }
+
+            output2.Append("```");
+
             EmbedBuilder builder = new EmbedBuilder();
 
             if (server.CommunityLogoUrl != "")
@@ -120,12 +157,8 @@ namespace MinitoriCore.Modules.Battlefield
                     $"\n**Server OS:** {server.OS}" +
                     $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[Link]({server.DemoDownload})" : "False")}")
                     .WithFields(
-                    new EmbedFieldBuilder().WithIsInline(true).WithName($"**Team 1:** {GetFlag(server.Team1)}").WithValue(
-                        $"```{server.Players.Where(x => x.TeamIndex == 1).Select(x => x.Name).Join("\n")}```"
-                        ),
-                    new EmbedFieldBuilder().WithIsInline(true).WithName($"**Team 2:** {GetFlag(server.Team2)}").WithValue(
-                        $"```{server.Players.Where(x => x.TeamIndex == 2).Select(x => x.Name).Join("\n")}```"
-                        )
+                    new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 1:** {GetFlag(server.Team1)}").WithValue(output1.ToString()),
+                    new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 2:** {GetFlag(server.Team2)}").WithValue(output2.ToString())
                     )
                     .Build()
                 );
