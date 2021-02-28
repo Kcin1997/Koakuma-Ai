@@ -174,54 +174,79 @@ namespace MinitoriCore.Modules.Battlefield
             //int teamwork = 8; // "Teamwork"
             //int kills = 5; // "Kills"
             //int deaths = 6; // "Deaths"
-            //int kd = 3; // "K/D"
+            int kd = server.Players.Select(x => $"{x:N1}").Max(x => x.Length); // "K/D"
             //int ping = 4; // "Ping"
 
             //int maxLength = maxCount + tag + name + score + teamwork + kills + deaths + kd + ping + 8;
 
-            int maxLength = 42 + tag + name;
+            int maxLength = 39 + tag + name + kd;
 
             StringBuilder output1 = new StringBuilder();
             StringBuilder output2 = new StringBuilder();
 
             output1.AppendLine("```");
-            output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths K/D Ping");
+            output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
             output1.AppendLine(new string('_', maxLength));
 
             int index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
             {
-                output1.AppendLine($"{index,3}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio,3:N1} {p.Ping,4}");
+                string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+                    $"{p.Score,-5} {p.Teamwork,-8} {p.Kills,-5} {p.Deaths,-6} {p.KDRatio.ToString().PadRight(kd)} {p.Ping,-4}";
 
+                if (output1.Length + temp.Length > 2000)
+                {
+                    output1.Append("```");
+                    await RespondAsync(output1.ToString());
+                    output1.Clear();
+                    output1.AppendLine("```");
+                    output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+                    output1.AppendLine(new string('_', maxLength));
+                }
+
+                output1.AppendLine(temp);
                 index++;
             }
 
-            output1.AppendLine("```");
+            output1.Append("```");
 
+            await RespondAsync(output1.ToString());
 
             output2.AppendLine("```");
-            output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths K/D Ping");
+            output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
             output2.AppendLine(new string('_', maxLength));
 
             index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
             {
-                output2.AppendLine($"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio,3:N1} {p.Ping,4}");
+                string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+                    $"{p.Score,-5} {p.Teamwork,-8} {p.Kills,-5} {p.Deaths,-6} {p.KDRatio.ToString().PadRight(kd)} {p.Ping,-4}";
 
+                if (output1.Length + temp.Length > 2000)
+                {
+                    output2.Append("```");
+                    await RespondAsync(output1.ToString());
+                    output2.Clear();
+                    output2.AppendLine("```");
+                    output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+                    output2.AppendLine(new string('_', maxLength));
+                }
+
+                output2.AppendLine(temp);
                 index++;
             }
 
-            output2.AppendLine("```");
+            output2.Append("```");
 
-            if (output1.Length + output2.Length > 2000)
-            {
-                await RespondAsync(output1.ToString());
-                await RespondAsync(output2.ToString());
-            }
-            else
-                await RespondAsync(output1.ToString() + output2.ToString());
+            await RespondAsync(output2.ToString());
+
+            //if (output1.Length + output2.Length > 2000)
+            //{
+            //    await RespondAsync(output1.ToString());
+            //    await RespondAsync(output2.ToString());
+            //}
+            //else
+            //    await RespondAsync(output1.ToString() + output2.ToString());
 
             //await RespondAsync(output.ToString());
         }
