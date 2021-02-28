@@ -111,7 +111,7 @@ namespace MinitoriCore.Modules.Battlefield
                     $"\n**Team 1:** {GetFlag(server.Team1)}" +
                     $"\n**Team 2:** {GetFlag(server.Team2)}" +
                     $"\n**Bots:** {server.Bots}" +
-                    $"{(server.Bots ? "\n**Bot count: {server.CoopBotCount}" : "")}**" +
+                    $"{(server.Bots ? "\n**Bot count: {server.CoopBotCount}**" : "")}" +
                     $"\n**Global Unlocks:** {server.GlobalUnlocks}" +
                     $"\n**Server FPS:** {server.FPS}" +
                     $"\n**Vehicles: {(server.NoVehicles == 0 ? "True" : "False")}**" +
@@ -129,6 +129,80 @@ namespace MinitoriCore.Modules.Battlefield
                     )
                     .Build()
                 );
+        }
+
+        [Command("scores")]
+        private async Task ScoreBoard(string input)
+        {
+            BF2Server server;
+
+            try
+            {
+                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{input}"));
+            }
+            catch (Exception ex)
+            {
+                await RespondAsync($"Something went wrong: {ex.Message}");
+                return;
+            }
+
+            // max lengths
+
+            int team1 = server.Players.Where(x => x.TeamIndex == 1).Count();
+            int team2 = server.Players.Where(x => x.TeamIndex == 2).Count();
+
+            int maxCount = 0;
+
+            if (team1 > team2)
+                maxCount = team1.ToString().Length + 1;
+            else
+                maxCount = team2.ToString().Length + 1;
+
+            int tag = server.Players.Max(x => x.Tag.Length);
+            int name = server.Players.Max(x => x.Name.Length);
+            int score = server.Players.Max(x => x.Score.ToString().Length);
+            int teamwork = server.Players.Max(x => x.Teamwork.ToString().Length);
+            int kills = server.Players.Max(x => x.Kills.ToString().Length);
+            int deaths = server.Players.Max(x => x.Deaths.ToString().Length);
+            int kd = server.Players.Max(x => x.KDRatio.ToString().Length);
+            int ping = server.Players.Max(x => x.Ping.ToString().Length);
+
+            int maxLength = maxCount + tag + name + score + teamwork + kills + deaths + kd + ping + 8;
+
+            StringBuilder output = new StringBuilder();
+
+            output.AppendLine("```");
+            output.AppendLine(new string('_', maxLength));
+
+            int index = 1;
+            foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
+            {
+                output.AppendLine($"{index.ToString().PadLeft(maxCount)}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+                    $"{p.Score.ToString().PadRight(score)} {p.Teamwork.ToString().PadRight(teamwork)} {p.Kills.ToString().PadRight(kills)} " +
+                    $"{p.Deaths.ToString().PadRight(deaths)} {p.KDRatio.ToString().PadRight(kd)} {p.Ping.ToString().PadRight(ping)}");
+
+                index++;
+            }
+
+            output.AppendLine("```");
+
+
+            output.AppendLine("```");
+            output.AppendLine(new string('_', maxLength));
+
+            index = 1;
+            foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
+            {
+                output.AppendLine($"{index.ToString().PadLeft(maxCount)}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+                    $"{p.Score.ToString().PadRight(score)} {p.Teamwork.ToString().PadRight(teamwork)} {p.Kills.ToString().PadRight(kills)} " +
+                    $"{p.Deaths.ToString().PadRight(deaths)} {p.KDRatio.ToString().PadRight(kd)} {p.Ping.ToString().PadRight(ping)}");
+
+                index++;
+            }
+
+            output.AppendLine("```");
+
+            await RespondAsync(output.ToString());
         }
     }
 
@@ -155,6 +229,24 @@ namespace MinitoriCore.Modules.Battlefield
         [JsonProperty("deaths")]
         public int Deaths { get; set; }
         [JsonProperty("ping")]
+
+        public int Teamwork
+        {
+            get
+            {
+                return Score - (Kills * 2);
+            }
+        }
+        public double KDRatio
+        {
+            get
+            {
+                if (Deaths == 0)
+                    return Kills;
+                else
+                    return (double)Kills / (double)Deaths;
+            }
+        }
         public int Ping { get; set; }
         [JsonProperty("teamIndex")]
         public int TeamIndex { get; set; }
