@@ -187,7 +187,7 @@ namespace MinitoriCore.Modules.Battlefield
             StringBuilder output2 = new StringBuilder();
 
             output1.AppendLine("```");
-            output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadRight(kd)}");
+            output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
 
             int index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
@@ -200,7 +200,7 @@ namespace MinitoriCore.Modules.Battlefield
                     await RespondAsync(output1.ToString());
                     output1.Clear();
                     output1.AppendLine("```");
-                    output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadRight(kd)}");
+                    output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
                     output1.AppendLine(new string('_', maxLength));
                 }
 
@@ -211,6 +211,9 @@ namespace MinitoriCore.Modules.Battlefield
             output1.Append("```");
 
             await RespondAsync(output1.ToString());
+
+            output2.AppendLine("```");
+            output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
 
             index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
@@ -223,7 +226,7 @@ namespace MinitoriCore.Modules.Battlefield
                     await RespondAsync(output2.ToString());
                     output2.Clear();
                     output2.AppendLine("```");
-                    output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadRight(kd)}");
+                    output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
                     output2.AppendLine(new string('_', maxLength));
                 }
 
@@ -236,7 +239,7 @@ namespace MinitoriCore.Modules.Battlefield
             await RespondAsync(output2.ToString());
 
             //output1.AppendLine("```");
-            //output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
             //output1.AppendLine(new string('_', maxLength));
 
             //int index = 1;
@@ -251,7 +254,7 @@ namespace MinitoriCore.Modules.Battlefield
             //        await RespondAsync(output1.ToString());
             //        output1.Clear();
             //        output1.AppendLine("```");
-            //        output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //        output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
             //        output1.AppendLine(new string('_', maxLength));
             //    }
 
@@ -264,7 +267,7 @@ namespace MinitoriCore.Modules.Battlefield
             //await RespondAsync(output1.ToString());
 
             //output2.AppendLine("```");
-            //output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
             //output2.AppendLine(new string('_', maxLength));
 
             //index = 1;
@@ -279,7 +282,7 @@ namespace MinitoriCore.Modules.Battlefield
             //        await RespondAsync(output2.ToString());
             //        output2.Clear();
             //        output2.AppendLine("```");
-            //        output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //        output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
             //        output2.AppendLine(new string('_', maxLength));
             //    }
 
