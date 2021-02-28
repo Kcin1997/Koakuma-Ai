@@ -195,7 +195,7 @@ namespace MinitoriCore.Modules.Battlefield
             foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
             {
                 string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score,-5} {p.Teamwork,-8} {p.Kills,-5} {p.Deaths,-6} {p.KDRatio.ToString().PadRight(kd):N1} {p.Ping,-4}";
+                    $"{p.Score,-5} {p.Teamwork,-8} {p.Kills,-5} {p.Deaths,-6} {p.KDRatio.ToString("#.0").PadRight(kd)} {p.Ping,-4}";
 
                 if (output1.Length + temp.Length > 2000)
                 {
@@ -223,7 +223,7 @@ namespace MinitoriCore.Modules.Battlefield
             foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
             {
                 string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score,-5} {p.Teamwork,-8} {p.Kills,-5} {p.Deaths,-6} {p.KDRatio.ToString().PadRight(kd):N1} {p.Ping,-4}";
+                    $"{p.Score,-5} {p.Teamwork,-8} {p.Kills,-5} {p.Deaths,-6} {p.KDRatio.ToString("#.0").PadRight(kd)} {p.Ping,-4}";
 
                 if (output2.Length + temp.Length > 2000)
                 {
