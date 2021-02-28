@@ -207,7 +207,7 @@ namespace MinitoriCore.Modules.Battlefield
             index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
             {
-                output2.AppendLine($"{index,3}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+                output2.AppendLine($"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
                     $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio,3:N1} {p.Ping,4}");
 
                 index++;
