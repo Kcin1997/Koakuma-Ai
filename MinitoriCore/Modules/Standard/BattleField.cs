@@ -164,7 +164,7 @@ namespace MinitoriCore.Modules.Battlefield
             //int teamwork = server.Players.Max(x => x.Teamwork.ToString().Length);
             //int kills = server.Players.Max(x => x.Kills.ToString().Length);
             //int deaths = server.Players.Max(x => x.Deaths.ToString().Length);
-            //int kd = server.Players.Max(x => x.KDRatio.ToString().Length);
+            //int kd = server.Players.Max(x => x.KDRatio.ToString("0.0").Length);
             //int ping = server.Players.Max(x => x.Ping.ToString().Length);
 
             //int maxCount = 3; // "No."
@@ -174,28 +174,25 @@ namespace MinitoriCore.Modules.Battlefield
             //int teamwork = 8; // "Teamwork"
             //int kills = 5; // "Kills"
             //int deaths = 6; // "Deaths"
-            int kd = server.Players.Max(x => x.KDRatio.ToString("0.0").Length); // "K/D"
+            int kd = server.Players.Max(x => x.KDRatio.ToString("0.0").Length);
 
             if (kd < 3)
                 kd = 3;
             //int ping = 4; // "Ping"
 
-            //int maxLength = maxCount + tag + name + score + teamwork + kills + deaths + kd + ping + 8;
-
-            int maxLength = 39 + tag + name + kd;
+            //int maxLength = 39 + tag + name + kd;
+            int maxLength = 11 + name + kd;
 
             StringBuilder output1 = new StringBuilder();
             StringBuilder output2 = new StringBuilder();
 
             output1.AppendLine("```");
-            output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
-            output1.AppendLine(new string('_', maxLength));
+            output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadRight(kd)}");
 
             int index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
             {
-                string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio.ToString("0.0").PadLeft(kd)} {p.Ping,4}";
+                string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
 
                 if (output1.Length + temp.Length > 2000)
                 {
@@ -203,7 +200,7 @@ namespace MinitoriCore.Modules.Battlefield
                     await RespondAsync(output1.ToString());
                     output1.Clear();
                     output1.AppendLine("```");
-                    output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+                    output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadRight(kd)}");
                     output1.AppendLine(new string('_', maxLength));
                 }
 
@@ -215,15 +212,10 @@ namespace MinitoriCore.Modules.Battlefield
 
             await RespondAsync(output1.ToString());
 
-            output2.AppendLine("```");
-            output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
-            output2.AppendLine(new string('_', maxLength));
-
             index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
             {
-                string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio.ToString("0.0").PadLeft(kd)} {p.Ping,4}";
+                string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
 
                 if (output2.Length + temp.Length > 2000)
                 {
@@ -231,7 +223,7 @@ namespace MinitoriCore.Modules.Battlefield
                     await RespondAsync(output2.ToString());
                     output2.Clear();
                     output2.AppendLine("```");
-                    output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+                    output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadRight(kd)}");
                     output2.AppendLine(new string('_', maxLength));
                 }
 
@@ -243,15 +235,61 @@ namespace MinitoriCore.Modules.Battlefield
 
             await RespondAsync(output2.ToString());
 
-            //if (output1.Length + output2.Length > 2000)
-            //{
-            //    await RespondAsync(output1.ToString());
-            //    await RespondAsync(output2.ToString());
-            //}
-            //else
-            //    await RespondAsync(output1.ToString() + output2.ToString());
+            //output1.AppendLine("```");
+            //output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //output1.AppendLine(new string('_', maxLength));
 
-            //await RespondAsync(output.ToString());
+            //int index = 1;
+            //foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
+            //{
+            //    string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+            //        $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio.ToString("0.0").PadLeft(kd)} {p.Ping,4}";
+
+            //    if (output1.Length + temp.Length > 2000)
+            //    {
+            //        output1.Append("```");
+            //        await RespondAsync(output1.ToString());
+            //        output1.Clear();
+            //        output1.AppendLine("```");
+            //        output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //        output1.AppendLine(new string('_', maxLength));
+            //    }
+
+            //    output1.AppendLine(temp);
+            //    index++;
+            //}
+
+            //output1.Append("```");
+
+            //await RespondAsync(output1.ToString());
+
+            //output2.AppendLine("```");
+            //output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //output2.AppendLine(new string('_', maxLength));
+
+            //index = 1;
+            //foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
+            //{
+            //    string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+            //        $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio.ToString("0.0").PadLeft(kd)} {p.Ping,4}";
+
+            //    if (output2.Length + temp.Length > 2000)
+            //    {
+            //        output2.Append("```");
+            //        await RespondAsync(output2.ToString());
+            //        output2.Clear();
+            //        output2.AppendLine("```");
+            //        output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadRight(kd)} Ping");
+            //        output2.AppendLine(new string('_', maxLength));
+            //    }
+
+            //    output2.AppendLine(temp);
+            //    index++;
+            //}
+
+            //output2.Append("```");
+
+            //await RespondAsync(output2.ToString());
         }
     }
 
