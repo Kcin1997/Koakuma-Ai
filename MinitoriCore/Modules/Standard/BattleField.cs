@@ -148,61 +148,82 @@ namespace MinitoriCore.Modules.Battlefield
 
             // max lengths
 
-            int team1 = server.Players.Where(x => x.TeamIndex == 1).Count();
-            int team2 = server.Players.Where(x => x.TeamIndex == 2).Count();
+            //int team1 = server.Players.Where(x => x.TeamIndex == 1).Count();
+            //int team2 = server.Players.Where(x => x.TeamIndex == 2).Count();
 
-            int maxCount = 0;
+            //int maxCount = 0;
 
-            if (team1 > team2)
-                maxCount = team1.ToString().Length + 1;
-            else
-                maxCount = team2.ToString().Length + 1;
+            //if (team1 > team2)
+            //    maxCount = team1.ToString().Length + 1;
+            //else
+            //    maxCount = team2.ToString().Length + 1;
 
+            //int tag = server.Players.Max(x => x.Tag.Length);
+            //int name = server.Players.Max(x => x.Name.Length);
+            //int score = server.Players.Max(x => x.Score.ToString().Length);
+            //int teamwork = server.Players.Max(x => x.Teamwork.ToString().Length);
+            //int kills = server.Players.Max(x => x.Kills.ToString().Length);
+            //int deaths = server.Players.Max(x => x.Deaths.ToString().Length);
+            //int kd = server.Players.Max(x => x.KDRatio.ToString().Length);
+            //int ping = server.Players.Max(x => x.Ping.ToString().Length);
+
+            //int maxCount = 3; // "No."
             int tag = server.Players.Max(x => x.Tag.Length);
             int name = server.Players.Max(x => x.Name.Length);
-            int score = server.Players.Max(x => x.Score.ToString().Length);
-            int teamwork = server.Players.Max(x => x.Teamwork.ToString().Length);
-            int kills = server.Players.Max(x => x.Kills.ToString().Length);
-            int deaths = server.Players.Max(x => x.Deaths.ToString().Length);
-            int kd = server.Players.Max(x => x.KDRatio.ToString().Length);
-            int ping = server.Players.Max(x => x.Ping.ToString().Length);
+            //int score = 5; // "Score"
+            //int teamwork = 8; // "Teamwork"
+            //int kills = 5; // "Kills"
+            //int deaths = 6; // "Deaths"
+            //int kd = 3; // "K/D"
+            //int ping = 4; // "Ping"
 
-            int maxLength = maxCount + tag + name + score + teamwork + kills + deaths + kd + ping + 8;
+            //int maxLength = maxCount + tag + name + score + teamwork + kills + deaths + kd + ping + 8;
 
-            StringBuilder output = new StringBuilder();
+            int maxLength = 42 + tag + name;
 
-            output.AppendLine("```");
-            output.AppendLine(new string('_', maxLength));
+            StringBuilder output1 = new StringBuilder();
+            StringBuilder output2 = new StringBuilder();
+
+            output1.AppendLine("```");
+            output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths K/D Ping");
+            output1.AppendLine(new string('_', maxLength));
 
             int index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
             {
-                output.AppendLine($"{index.ToString().PadLeft(maxCount)}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score.ToString().PadRight(score)} {p.Teamwork.ToString().PadRight(teamwork)} {p.Kills.ToString().PadRight(kills)} " +
-                    $"{p.Deaths.ToString().PadRight(deaths)} {p.KDRatio.ToString().PadRight(kd)} {p.Ping.ToString().PadRight(ping)}");
+                output1.AppendLine($"{index,3}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+                    $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio,3:N1} {p.Ping,4}");
 
                 index++;
             }
 
-            output.AppendLine("```");
+            output1.AppendLine("```");
 
 
-            output.AppendLine("```");
-            output.AppendLine(new string('_', maxLength));
+            output2.AppendLine("```");
+            output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths K/D Ping");
+            output2.AppendLine(new string('_', maxLength));
 
             index = 1;
             foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
             {
-                output.AppendLine($"{index.ToString().PadLeft(maxCount)}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-                    $"{p.Score.ToString().PadRight(score)} {p.Teamwork.ToString().PadRight(teamwork)} {p.Kills.ToString().PadRight(kills)} " +
-                    $"{p.Deaths.ToString().PadRight(deaths)} {p.KDRatio.ToString().PadRight(kd)} {p.Ping.ToString().PadRight(ping)}");
+                output2.AppendLine($"{index,3}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
+                    $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio,3:N1} {p.Ping,4}");
 
                 index++;
             }
 
-            output.AppendLine("```");
+            output2.AppendLine("```");
 
-            await RespondAsync(output.ToString());
+            if (output1.Length + output2.Length > 2000)
+            {
+                await RespondAsync(output1.ToString());
+                await RespondAsync(output2.ToString());
+            }
+            else
+                await RespondAsync(output1.ToString() + output2.ToString());
+
+            //await RespondAsync(output.ToString());
         }
     }
 
