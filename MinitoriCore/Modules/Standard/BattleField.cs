@@ -40,6 +40,9 @@ namespace MinitoriCore.Modules.Battlefield
 
         private bool ValidateAddress(string address)
         {
+            if (!address.Contains(':'))
+                return false;
+
             // this could probably be a lot better but it works and it's simple
             string ip = address.Split(':')[0];
             string port = address.Split(':')[1];
@@ -184,6 +187,8 @@ namespace MinitoriCore.Modules.Battlefield
         [Command("scores")]
         private async Task ScoreBoard(string address, int team = 0)
         {
+            // TODO: Add team names/numbers to scoreboard
+
             if (!ValidateAddress(address))
             {
                 await RespondAsync("That doesn't appear to be a valid server address to me.");
