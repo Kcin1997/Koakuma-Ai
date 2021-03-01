@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.Security.Cryptography;
 using MinitoriCore.Preconditions;
 using System.Net.Http;
+using System.Net;
 
 namespace MinitoriCore.Modules.Battlefield
 {
@@ -35,6 +36,18 @@ namespace MinitoriCore.Modules.Battlefield
                     throw new Exception(await result.Content.ReadAsStringAsync());
                     // I'm sure this is going to fail horribly some how, it needs more testing
             }
+        }
+
+        private bool ValidateAddress(string address)
+        {
+            // this could probably be a lot better but it works and it's simple
+            string ip = address.Split(':')[0];
+            string port = address.Split(':')[1];
+
+            if (IPAddress.TryParse(ip, out _) && int.TryParse(port, out _))
+                return true;
+            else
+                return false;
         }
 
         private string GetFlag(string team)
@@ -74,15 +87,19 @@ namespace MinitoriCore.Modules.Battlefield
         }
 
         [Command("server")]
-        private async Task GetServer(string input)
+        private async Task GetServer(string address)
         {
-            // TODO: Validate input
+            if (!ValidateAddress(address))
+            {
+                await RespondAsync("That doesn't appear to be a valid server address to me.");
+                return;
+            }    
 
             BF2Server server;
 
             try
             {
-                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{input}"));
+                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{address}"));
             }
             catch (Exception ex)
             {
@@ -156,22 +173,34 @@ namespace MinitoriCore.Modules.Battlefield
                     $"\n**Ranked:** {server.Ranked}" +
                     $"\n**Server OS:** {server.OS}" +
                     $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[Link]({server.DemoDownload})" : "False")}")
-                    .WithFields(
-                    new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 1:** {GetFlag(server.Team1)}").WithValue(output1.ToString()),
-                    new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 2:** {GetFlag(server.Team2)}").WithValue(output2.ToString())
-                    )
+                    //.WithFields(
+                    //new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 1:** {GetFlag(server.Team1)}").WithValue(output1.ToString()),
+                    //new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 2:** {GetFlag(server.Team2)}").WithValue(output2.ToString())
+                    //)
                     .Build()
                 );
         }
 
         [Command("scores")]
-        private async Task ScoreBoard(string input)
+        private async Task ScoreBoard(string address, int team = 0)
         {
+            if (!ValidateAddress(address))
+            {
+                await RespondAsync("That doesn't appear to be a valid server address to me.");
+                return;
+            }
+
+            if (team > 2 || team < 0)
+            {
+                await RespondAsync("That isn't a valid team. Select team 1 or 2.");
+                return;
+            }
+
             BF2Server server;
 
             try
             {
-                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{input}"));
+                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{address}"));
             }
             catch (Exception ex)
             {
@@ -218,58 +247,64 @@ namespace MinitoriCore.Modules.Battlefield
 
             StringBuilder output1 = new StringBuilder();
             StringBuilder output2 = new StringBuilder();
-
-            output1.AppendLine("```");
-            output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-
             int index = 1;
-            foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
-            {
-                string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
 
-                if (output1.Length + temp.Length > 2000)
+            if (team == 0 || team == 1)
+            {
+                output1.AppendLine("```");
+                output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
+
+                foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
                 {
-                    output1.Append("```");
-                    await RespondAsync(output1.ToString());
-                    output1.Clear();
-                    output1.AppendLine("```");
-                    output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-                    output1.AppendLine(new string('_', maxLength));
+                    string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
+
+                    if (output1.Length + temp.Length > 2000)
+                    {
+                        output1.Append("```");
+                        await RespondAsync(output1.ToString());
+                        output1.Clear();
+                        output1.AppendLine("```");
+                        output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
+                        output1.AppendLine(new string('_', maxLength));
+                    }
+
+                    output1.AppendLine(temp);
+                    index++;
                 }
 
-                output1.AppendLine(temp);
-                index++;
+                output1.Append("```");
+
+                await RespondAsync(output1.ToString());
             }
 
-            output1.Append("```");
-
-            await RespondAsync(output1.ToString());
-
-            output2.AppendLine("```");
-            output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-
-            index = 1;
-            foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
+            if (team == 0 || team == 2)
             {
-                string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
+                output2.AppendLine("```");
+                output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
 
-                if (output2.Length + temp.Length > 2000)
+                index = 1;
+                foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
                 {
-                    output2.Append("```");
-                    await RespondAsync(output2.ToString());
-                    output2.Clear();
-                    output2.AppendLine("```");
-                    output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-                    output2.AppendLine(new string('_', maxLength));
+                    string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
+
+                    if (output2.Length + temp.Length > 2000)
+                    {
+                        output2.Append("```");
+                        await RespondAsync(output2.ToString());
+                        output2.Clear();
+                        output2.AppendLine("```");
+                        output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
+                        output2.AppendLine(new string('_', maxLength));
+                    }
+
+                    output2.AppendLine(temp);
+                    index++;
                 }
 
-                output2.AppendLine(temp);
-                index++;
+                output2.Append("```");
+
+                await RespondAsync(output2.ToString());
             }
-
-            output2.Append("```");
-
-            await RespondAsync(output2.ToString());
 
             //output1.AppendLine("```");
             //output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
