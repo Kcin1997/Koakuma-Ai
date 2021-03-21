@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 using MinitoriCore.Preconditions;
 using System.Net.Http;
 using System.Net;
+using System.Web;
 
 namespace MinitoriCore.Modules.Battlefield
 {
@@ -55,6 +56,8 @@ namespace MinitoriCore.Modules.Battlefield
 
         private string GetFlag(string team)
         {
+            // Swap emotes out with local copies
+
             switch (team)
             {
                 case "US":
@@ -68,35 +71,158 @@ namespace MinitoriCore.Modules.Battlefield
             }
         }
 
-        [Command("servers")]
-        private async Task GetServers(int page = 0)
+        private string[] FormatScoreBoard(IEnumerable<BF2Player> players, bool VerboseOutput = false)
         {
+            List<string> output = new List<string>();
 
-            var servers = JsonConvert.DeserializeObject<List<BF2Server>>(await GetData($"servers{(page > 0 ? $"/{page}" : "")}"));
+            //int maxCount = 3; // "No."
+            int tag = players.Max(x => x.Tag.Length);
+
+            if (tag < 3)
+                tag = 3;
+
+            int name = players.Max(x => x.Name.Length);
+            //int score = 5; // "Score"
+            //int teamwork = 8; // "Teamwork"
+            //int kills = 5; // "Kills"
+            //int deaths = 6; // "Deaths"
+            int kd = players.Max(x => x.KDRatio.ToString("0.0").Length);
+
+            if (kd < 3)
+                kd = 3;
+
+            //int ping = 4; // "Ping"
+
+            int maxLength;
+            string key;
+
+            if (VerboseOutput)
+            {
+                maxLength = 39 + tag + name + kd;
+                key = $"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping";
+            }
+            else
+            {
+                maxLength = 11 + name + kd;
+                key = $"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}";
+            }
+
+            StringBuilder builder = new StringBuilder();
+            int index = 1;
+            //⎯
+            builder.AppendLine($"```\n{key}\n{new string('─', maxLength)}");
+
+            foreach (var p in players.OrderByDescending(x => x.Score))
+            {
+                string temp = "";
+
+                if (VerboseOutput)
+                    temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} {p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio.ToString("0.0").PadLeft(kd)} {p.Ping,4}";
+                else
+                    temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
+
+                if (builder.Length + temp.Length > 1024)
+                {
+                    builder.Append("```");
+                    output.Add(builder.ToString());
+                    builder.Clear();
+                    builder.AppendLine($"```\n{key}\n{new string('_', maxLength)}");
+                }
+
+                builder.AppendLine(temp);
+                index++;
+            }
+
+            builder.Append("```");
+
+            output.Add(builder.ToString());
+
+            return output.ToArray();
+        }
+
+        [Command("servers")]
+        private async Task GetServers(int psuedoPage = 1)
+        {
+            if (psuedoPage < 0)
+            {
+                await RespondAsync("You cannot use negative values");
+                return;
+            }
+
+            if (psuedoPage == 0)
+                psuedoPage = 1;
+
+            var position = psuedoPage * 10;
+            var pageOffset = (position - 10) / 50;
+            if (pageOffset > 0)
+                position %= 50;
+
+
+            string content = "";
+            List<BF2Server> servers;
+            BF2Status stats;
+            var totalPages = 0;
+
+            try
+            {
+                stats = JsonConvert.DeserializeObject<BF2Status>(await GetData($"livestats"));
+            }
+            catch (Exception ex)
+            {
+                await RespondAsync($"Something went wrong: {ex.Message}");
+                return;
+            }
+
+            try
+            {
+                servers = JsonConvert.DeserializeObject<List<BF2Server>>(await GetData($"servers"));
+            }
+            catch (Exception ex)
+            {
+                await RespondAsync($"Something went wrong: {ex.Message}");
+                return;
+            }
+
+            totalPages = stats.ServerCount / 10;
+
+            if (stats.ServerCount % 10 > 0)
+                totalPages++;
+
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder.Title = $"BF2 Servers, Page {psuedoPage}/{totalPages}";
+            builder.Description= $"**Servers:** {stats.ServerCount}\n**Players:** {stats.PlayerCount}\n⠀"; // extra linebreak with blank unicode character (U+2800) for extra padding on mobile
 
             StringBuilder output = new StringBuilder();
+            //output.AppendLine($"Page {psuedoPage}/{totalPages * 5}");
 
             int i = 0;
-            foreach (var s in servers)
+            foreach (var s in servers.Skip(position - 10))
             {
-                output.AppendLine($"{s.Name} `{s.IP}:{s.GamePort}`");
+                //output.AppendLine($"{s.Name} `{s.IP}:{s.GamePort}` {s.OnlinePlayers}/{s.MaxPlayers}");
+                builder.AddField(new EmbedFieldBuilder().WithIsInline(true).WithName($"**{s.Name}**")
+                    .WithValue($"`{s.IP}:{s.GamePort}`" +
+                                $"\n**Players:** {s.OnlinePlayers}**/**{s.MaxPlayers}" +
+                                $"{(s.OnlinePlayers > 0 && s.Players.Count(x => x.AIBot) > 0? $" ({s.Players.Count(x => x.AIBot)} bots)" : "")}" + // Display bot count, but only if there's real players online
+                                $"\n**Password:** {s.Password}\n⠀")); // same as above
 
                 i++;
-                if (i > 10)
+                if (i > 9)
                     break;
             }
 
-            await RespondAsync(output.ToString());
+            //await RespondAsync(output.ToString());
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("server")]
-        private async Task GetServer(string address)
+        private async Task GetServer(string address, [Remainder]string remainder = "")
         {
             if (!ValidateAddress(address))
             {
-                await RespondAsync("That doesn't appear to be a valid server address to me.");
+                await RespondAsync($"{address} doesn't appear to be a valid server address.");
                 return;
-            }    
+            }
 
             BF2Server server;
 
@@ -110,44 +236,87 @@ namespace MinitoriCore.Modules.Battlefield
                 return;
             }
 
-            int tag = server.Players.Max(x => x.Tag.Length);
-            int name = server.Players.Max(x => x.Name.Length);
-            int kd = server.Players.Max(x => x.KDRatio.ToString("0.0").Length);
-
-            int maxLength = 11 + name + kd;
-
-            StringBuilder output1 = new StringBuilder();
-            StringBuilder output2 = new StringBuilder();
-
-            output1.AppendLine("```");
-            output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-
-            int index = 1;
-            foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
-            {
-                output1.AppendLine($"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}");
-                index++;
-                if (index > 5)
-                    break;
-            }
-
-            output1.Append("```");
-
-            output2.AppendLine("```");
-            output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-
-            index = 1;
-            foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
-            {
-                output2.AppendLine($"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}");
-                index++;
-                if (index > 5)
-                    break;
-            }
-
-            output2.Append("```");
-
             EmbedBuilder builder = new EmbedBuilder();
+
+            if (remainder != "")
+            {
+                if (server.Players.Count() == 0)
+                {
+                    await ReplyAsync("That server is empty, or does not report scoreboard information.");
+                    return;
+                }
+
+                remainder = remainder.ToLower();
+
+                int teamIndex = 0;
+                bool verbose = false;
+
+                if (remainder.Contains("verbose"))
+                {
+                    verbose = true;
+                    remainder = remainder.Remove("verbose").Trim();
+                }
+                
+                switch (remainder)
+                {
+                    case "1":
+                    case "one":
+                    case "team1":
+                    case "team 1":
+                    case "team one":
+                        teamIndex = 1;
+                        break;
+                    case "2":
+                    case "two":
+                    case "team2":
+                    case "team 2":
+                    case "team two":
+                        teamIndex = 2;
+                        break;
+                    case "mec":
+                    case "us":
+                    case "ch":
+                        if (server.Team1 == remainder.ToUpper())
+                            teamIndex = 1;
+                        else if (server.Team2 == remainder.ToUpper())
+                            teamIndex = 2;
+                        else
+                            teamIndex = -1;
+                        break;
+                    default:
+                        teamIndex = -1;
+                        break;
+                }
+
+                if (teamIndex == -1)
+                {
+                    await RespondAsync($"There is no team associated with `{remainder}` in this game.");
+                    return;
+                }
+
+                
+                var scores = FormatScoreBoard(server.Players.Where(x => x.TeamIndex == teamIndex), verbose);
+                List<EmbedFieldBuilder> pages = new List<EmbedFieldBuilder>();
+
+                for (int i = 0; i < scores.Length; i++)
+                {
+                    if (i == 0)
+                        pages.Add(new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team {teamIndex}:** {GetFlag(teamIndex == 1 ? server.Team1 : server.Team2)}").WithValue(scores[i]));
+                    else
+                        pages.Add(new EmbedFieldBuilder().WithIsInline(false).WithName($"[Page {i + 1}]").WithValue(scores[i]));
+                }
+
+
+                await ReplyAsync(embed:
+                    builder
+                        .WithTitle($"{server.Name} | {server.IP}:{server.GamePort}")
+                        .WithDescription($"**{server.MapName} - {server.OnlinePlayers}/{server.MaxPlayers}**")
+                        .WithFields(pages)
+                        .Build()
+                    );
+
+                return;
+            }
 
             if (server.CommunityLogoUrl != "")
                 builder.ThumbnailUrl = server.CommunityLogoUrl;
@@ -168,7 +337,7 @@ namespace MinitoriCore.Modules.Battlefield
                     $"\n**Team 1:** {GetFlag(server.Team1)}" +
                     $"\n**Team 2:** {GetFlag(server.Team2)}" +
                     $"\n**Bots:** {server.Bots}" +
-                    $"{(server.Bots ? "\n**Bot count: {server.CoopBotCount}**" : "")}" +
+                    $"{(server.Bots ? $"\n**Bot count:** {server.Players.Count(x => x.AIBot)}" : "")}" +
                     $"\n**Global Unlocks:** {server.GlobalUnlocks}" +
                     $"\n**Server FPS:** {server.FPS}" +
                     $"\n**Vehicles: {(server.NoVehicles == 0 ? "True" : "False")}**" +
@@ -176,36 +345,32 @@ namespace MinitoriCore.Modules.Battlefield
                     $"\n**Ranked:** {server.Ranked}" +
                     $"\n**Server OS:** {server.OS}" +
                     $"\n**Battle Recorder available:** {(server.BattleRecorder ? $"[Link]({server.DemoDownload})" : "False")}")
-                    //.WithFields(
-                    //new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 1:** {GetFlag(server.Team1)}").WithValue(output1.ToString()),
-                    //new EmbedFieldBuilder().WithIsInline(false).WithName($"**Team 2:** {GetFlag(server.Team2)}").WithValue(output2.ToString())
-                    //)
                     .Build()
                 );
         }
 
-        [Command("scores")]
-        private async Task ScoreBoard(string address, int team = 0)
+        [Command("player")]
+        private async Task GetPlayer(string username)
         {
-            // TODO: Add team names/numbers to scoreboard
-
-            if (!ValidateAddress(address))
-            {
-                await RespondAsync("That doesn't appear to be a valid server address to me.");
-                return;
-            }
-
-            if (team > 2 || team < 0)
-            {
-                await RespondAsync("That isn't a valid team. Select team 1 or 2.");
-                return;
-            }
-
+            BF2Player player;
             BF2Server server;
 
             try
             {
-                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"servers/{address}"));
+                player = JsonConvert.DeserializeObject<BF2Player>(await GetData($"players/{HttpUtility.UrlEncode(username)}")); // Unsure if UrlEncode will break certain usernames.
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Player not found")
+                    await RespondAsync($"Player name {username} does not exist, or player is not online.");
+                else
+                    await RespondAsync($"Something went wrong: {ex.Message}");
+                return;
+            }
+
+            try
+            {
+                server = JsonConvert.DeserializeObject<BF2Server>(await GetData($"players/{HttpUtility.UrlEncode(username)}/server"));
             }
             catch (Exception ex)
             {
@@ -213,163 +378,33 @@ namespace MinitoriCore.Modules.Battlefield
                 return;
             }
 
-            // max lengths
+            EmbedBuilder builder = new EmbedBuilder();
 
-            //int team1 = server.Players.Where(x => x.TeamIndex == 1).Count();
-            //int team2 = server.Players.Where(x => x.TeamIndex == 2).Count();
-
-            //int maxCount = 0;
-
-            //if (team1 > team2)
-            //    maxCount = team1.ToString().Length + 1;
-            //else
-            //    maxCount = team2.ToString().Length + 1;
-
-            //int tag = server.Players.Max(x => x.Tag.Length);
-            //int name = server.Players.Max(x => x.Name.Length);
-            //int score = server.Players.Max(x => x.Score.ToString().Length);
-            //int teamwork = server.Players.Max(x => x.Teamwork.ToString().Length);
-            //int kills = server.Players.Max(x => x.Kills.ToString().Length);
-            //int deaths = server.Players.Max(x => x.Deaths.ToString().Length);
-            //int kd = server.Players.Max(x => x.KDRatio.ToString("0.0").Length);
-            //int ping = server.Players.Max(x => x.Ping.ToString().Length);
-
-            //int maxCount = 3; // "No."
-            int tag = server.Players.Max(x => x.Tag.Length);
-            int name = server.Players.Max(x => x.Name.Length);
-            //int score = 5; // "Score"
-            //int teamwork = 8; // "Teamwork"
-            //int kills = 5; // "Kills"
-            //int deaths = 6; // "Deaths"
-            int kd = server.Players.Max(x => x.KDRatio.ToString("0.0").Length);
-
-            if (kd < 3)
-                kd = 3;
-            //int ping = 4; // "Ping"
-
-            //int maxLength = 39 + tag + name + kd;
-            int maxLength = 11 + name + kd;
-
-            StringBuilder output1 = new StringBuilder();
-            StringBuilder output2 = new StringBuilder();
-            int index = 1;
-
-            if (team == 0 || team == 1)
-            {
-                output1.AppendLine("```");
-                output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-
-                foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
-                {
-                    string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
-
-                    if (output1.Length + temp.Length > 2000)
-                    {
-                        output1.Append("```");
-                        await RespondAsync(output1.ToString());
-                        output1.Clear();
-                        output1.AppendLine("```");
-                        output1.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-                        output1.AppendLine(new string('_', maxLength));
-                    }
-
-                    output1.AppendLine(temp);
-                    index++;
-                }
-
-                output1.Append("```");
-
-                await RespondAsync(output1.ToString());
-            }
-
-            if (team == 0 || team == 2)
-            {
-                output2.AppendLine("```");
-                output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-
-                index = 1;
-                foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
-                {
-                    string temp = $"{index,2}. {p.Name.PadRight(name)} {p.Score,5} {p.KDRatio.ToString("0.0").PadLeft(kd)}";
-
-                    if (output2.Length + temp.Length > 2000)
-                    {
-                        output2.Append("```");
-                        await RespondAsync(output2.ToString());
-                        output2.Clear();
-                        output2.AppendLine("```");
-                        output2.AppendLine($"No. {"Name".PadRight(name)} Score {"K/D".PadLeft(kd)}");
-                        output2.AppendLine(new string('_', maxLength));
-                    }
-
-                    output2.AppendLine(temp);
-                    index++;
-                }
-
-                output2.Append("```");
-
-                await RespondAsync(output2.ToString());
-            }
-
-            //output1.AppendLine("```");
-            //output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
-            //output1.AppendLine(new string('_', maxLength));
-
-            //int index = 1;
-            //foreach (var p in server.Players.Where(x => x.TeamIndex == 1).OrderByDescending(x => x.Score))
-            //{
-            //    string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-            //        $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio.ToString("0.0").PadLeft(kd)} {p.Ping,4}";
-
-            //    if (output1.Length + temp.Length > 2000)
-            //    {
-            //        output1.Append("```");
-            //        await RespondAsync(output1.ToString());
-            //        output1.Clear();
-            //        output1.AppendLine("```");
-            //        output1.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
-            //        output1.AppendLine(new string('_', maxLength));
-            //    }
-
-            //    output1.AppendLine(temp);
-            //    index++;
-            //}
-
-            //output1.Append("```");
-
-            //await RespondAsync(output1.ToString());
-
-            //output2.AppendLine("```");
-            //output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
-            //output2.AppendLine(new string('_', maxLength));
-
-            //index = 1;
-            //foreach (var p in server.Players.Where(x => x.TeamIndex == 2).OrderByDescending(x => x.Score))
-            //{
-            //    string temp = $"{index,2}. {p.Tag.PadLeft(tag)} {p.Name.PadRight(name)} " +
-            //        $"{p.Score,5} {p.Teamwork,8} {p.Kills,5} {p.Deaths,6} {p.KDRatio.ToString("0.0").PadLeft(kd)} {p.Ping,4}";
-
-            //    if (output2.Length + temp.Length > 2000)
-            //    {
-            //        output2.Append("```");
-            //        await RespondAsync(output2.ToString());
-            //        output2.Clear();
-            //        output2.AppendLine("```");
-            //        output2.AppendLine($"No. {"Tag".PadLeft(tag)} {"Name".PadRight(name)} Score Teamwork Kills Deaths {"K/D".PadLeft(kd)} Ping");
-            //        output2.AppendLine(new string('_', maxLength));
-            //    }
-
-            //    output2.AppendLine(temp);
-            //    index++;
-            //}
-
-            //output2.Append("```");
-
-            //await RespondAsync(output2.ToString());
+            await ReplyAsync(embed: builder
+                .WithTitle($"**{player.Tag}{(player.Tag.Length > 0? " " : "")}{player.Name}**") // ternary operator to add space *only* if a tag exists
+                .WithDescription($"**Score:** {player.Score}" +
+                                $"\n**Kills:** {player.Kills}" +
+                                $"\n**Deaths:** {player.Deaths}" +
+                                $"{(player.AIBot ? "\n**AI Bot:** True" : "")}" +
+                                $"\n**Ping:** {player.Ping}" +
+                                $"\n**Team:** {GetFlag(player.TeamLabel)}" +
+                                $"\n\n**Server:** {server.Name}" +
+                                $"\n**Address:** {server.IP}:{server.GamePort}" +
+                                $"\n**Players:** {server.OnlinePlayers}/{server.MaxPlayers}")
+                .WithFooter($"Player ID: {player.PlayerID}")
+                .Build());
         }
     }
 
-    public class Team
+    public class BF2Status
+    {
+        [JsonProperty("servers")]
+        public int ServerCount { get; set; }
+        [JsonProperty("players")]
+        public int PlayerCount { get; set; }
+    }
+
+    public class BF2Team
     {
         [JsonProperty("index")]
         public int Index { get; set; }
@@ -377,7 +412,7 @@ namespace MinitoriCore.Modules.Battlefield
         public string Label { get; set; }
     }
 
-    public class Player
+    public class BF2Player
     {
         [JsonProperty("pid")]
         public int PlayerID { get; set; }
@@ -438,9 +473,9 @@ namespace MinitoriCore.Modules.Battlefield
         [JsonProperty("maxPlayers")]
         public int MaxPlayers { get; set; }
         [JsonProperty("teams")]
-        public List<Team> Teams { get; set; }
+        public List<BF2Team> Teams { get; set; }
         [JsonProperty("players")]
-        public List<Player> Players { get; set; }
+        public List<BF2Player> Players { get; set; }
         [JsonProperty("password")]
         public bool Password { get; set; }
         //[JsonProperty("gameVersion")]
@@ -507,12 +542,12 @@ namespace MinitoriCore.Modules.Battlefield
         //public bool Plasma { get; set; }
         //[JsonProperty("reservedSlots")]
         //public int ReservedSlots { get; set; }
-        //[JsonProperty("coopBotRatio")]
-        //public int CoopBotRatio { get; set; }
+        [JsonProperty("coopBotRatio")]
+        public int CoopBotRatio { get; set; }
         [JsonProperty("coopBotCount")]
         public int CoopBotCount { get; set; }
-        //[JsonProperty("coopBotDiff")]
-        //public int CoopBotDiff { get; set; }
+        [JsonProperty("coopBotDiff")]
+        public int CoopBotDiff { get; set; }
         [JsonProperty("noVehicles")]
         public int NoVehicles { get; set; }
     }
