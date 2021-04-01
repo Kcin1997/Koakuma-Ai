@@ -146,7 +146,7 @@ namespace MinitoriCore.Modules.ImageCommands
                 foreach (string[] source in new string[][] {
                     new string[] { "poyo", "kirby", "gorb" },
                     new string[] { "ddd", "dedede", "🐧" },
-                    new string[] { "metaborb", "metaknight", "borb", "⚔️", "🛡️", "🗡️", "🔪", "🛡", "🗡" },
+                    new string[] { "metaborb", "metaknight", "borb", "⚔️", "🛡️", "🗡️", "🔪", "🛡", "🗡", "🍴", "🥄" },
                     new string[] { "bandana", "waddee", "waddle" },
                     new string[] { "egg", "lor", "🥚", "👑" },
                     new string[] { "spiderman", "taranza", "spid", "🕷️", "🕸️", "🕷", "🕸" },
@@ -159,7 +159,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "onion", "witch", "gryll", "🧅" },
                     new string[] { "queen", "secc", "sectonia", "🐝", "👗", "🪞" },
                     new string[] { "helper", "helpers", "helpful", "friendship", "friendo", "👋", "👍", "👌" },
-                    new string[] { "moretsu", "manga", "mungu", "kirbymanga", "🥭", "📰", "🗞️" },
+                    new string[] { "moretsu", "manga", "mungu", "kirbymanga", "🥭", "📰", "🗞️", "🗞" },
                     new string[] { "grenpa", "mommy", "🧓", "👴", "👵" },
                     new string[] { "eye", "eyeborb", "badsphere", "👁️", "👀", "👁‍🗨", "👁" },
                     new string[] { "dad", "father", "baddad", "haltman", "daddy", "🤑", "💸", "💰", "💵", "💲" },
