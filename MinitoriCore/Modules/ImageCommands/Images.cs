@@ -348,7 +348,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
                 foreach (string[] source in new string[][] {
                     new string[] { "desu" },
-                    new string[] { "teto" } })
+                    new string[] { "teto", "bread" } })
                 {
                     // Upload image
                     x.AddCommand(source[0], async (context, param, serv, command) =>
