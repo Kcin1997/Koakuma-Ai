@@ -344,10 +344,11 @@ namespace MinitoriCore.Modules.ImageCommands
 
             commands.CreateModuleAsync("", x =>
             {
-                x.Name = "Rozen Maiden";
+                x.Name = "Misc";
 
                 foreach (string[] source in new string[][] {
-                    new string[] { "desu" } })
+                    new string[] { "desu" },
+                    new string[] { "teto" } })
                 {
                     // Upload image
                     x.AddCommand(source[0], async (context, param, serv, command) =>
@@ -503,7 +504,7 @@ namespace MinitoriCore.Modules.ImageCommands
                 Directory.CreateDirectory($"./Images/{source}/");
             }
 
-            int fileCount = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.')))).Count();
+            int fileCount = Directory.GetFiles($@"./Images/{source}/", "*.*", SearchOption.AllDirectories).Where(x => valid.Contains(x.Substring(x.LastIndexOf('.')))).Count();
 
             if (fileCount == 0)
             {
