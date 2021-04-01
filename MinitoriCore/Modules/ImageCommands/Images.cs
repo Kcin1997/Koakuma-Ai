@@ -148,7 +148,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "ddd", "dedede" },
                     new string[] { "metaborb", "metaknight", "borb" },
                     new string[] { "bandana", "waddee", "waddle" },
-                    new string[] { "egg", "lor" },
+                    new string[] { "egg", "lor", "🥚" },
                     new string[] { "spiderman", "taranza", "spid" },
                     new string[] { "squeak", "squek" },
                     new string[] { "soos", "susie", "familyproblems" },
