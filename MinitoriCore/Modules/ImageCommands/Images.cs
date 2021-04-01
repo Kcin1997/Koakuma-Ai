@@ -482,7 +482,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     await msg.DeleteAsync();
                     await context.Message.DeleteAsync();
                 });
-                
+
                 return;
             }
 
@@ -504,17 +504,18 @@ namespace MinitoriCore.Modules.ImageCommands
                 Directory.CreateDirectory($"./Images/{source}/");
             }
 
-            int fileCount = Directory.GetFiles($@"./Images/{source}/", "*.*", SearchOption.AllDirectories).Where(x => valid.Contains(x.Substring(x.LastIndexOf('.')))).Count();
+            var dir = Directory.GetFiles($@"./Images/{source}/", "*.*", SearchOption.AllDirectories).Where(x => valid.Contains(x.Substring(x.LastIndexOf('.'))));
+            //int fileCount = .Count();
 
-            if (fileCount == 0)
+            if (dir.Count() == 0)
             {
                 await context.Channel.SendMessageAsync($"There are no files in the {source} folder yet! Use the `{source} add` command to add some!");
                 return;
             }
-            else if (fileCount == 1)
-                file = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.')))).OrderBy(x => asdf.Next()).FirstOrDefault();
-            else if (fileCount > 1)
-                file = Directory.GetFiles($@"./Images/{source}/", "*.*").Where(x => valid.Contains(x.Substring(x.LastIndexOf('.'))) && lastImage[source][context.Channel.Id] != x).OrderBy(x => asdf.Next()).FirstOrDefault();
+            else if (dir.Count() == 1)
+                file = dir.FirstOrDefault();
+            else if (dir.Count() > 1)
+                file = dir.OrderBy(x => asdf.Next()).FirstOrDefault(x => lastImage[source][context.Channel.Id] != x);
 
             await context.Channel.SendFileAsync(file);
 
