@@ -186,6 +186,12 @@ namespace MinitoriCore
             if (channel.Guild.Id != 110373943822540800)
                 return;
 
+            if (msg.Content.Contains("dHUKVIH8rnk"))
+            {
+                await msg.DeleteAsync();
+                await msg.Channel.SendMessageAsync($"{msg.Author.Mention} yes, we already know, you're very original.");
+            }
+
             // basically every channel that isn't #general or a testing channel in dbots
             if (channel.Id == 468690756899438603 || channel.Id == 110374153562886144 || channel.Id == 631313666851078145 || channel.Id == 520832612739186688 || channel.Id == 715318925281460235)
             {

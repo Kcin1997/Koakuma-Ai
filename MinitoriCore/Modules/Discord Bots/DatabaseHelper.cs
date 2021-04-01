@@ -18,6 +18,4 @@ namespace MinitoriCore
 
         
     }
-
-    
 }
