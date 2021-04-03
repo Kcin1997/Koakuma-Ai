@@ -347,6 +347,24 @@ namespace MinitoriCore.Modules.ImageCommands
             {
                 x.Name = "Misc";
 
+                // reserved
+                x.AddCommand("❔", async (context, param, serv, command) =>
+                {
+                    try
+                    {
+                        await UploadImage("../", context);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.StackTrace);
+                    }
+                },
+                command =>
+                {
+                    command.Summary = $"*this is a horrible idea*";
+                    command.AddPrecondition(new HideAttribute());
+                });
+
                 foreach (string[] source in new string[][] {
                     new string[] { "desu" },
                     new string[] { "teto", "bread", "🍞", "🥖" } })
