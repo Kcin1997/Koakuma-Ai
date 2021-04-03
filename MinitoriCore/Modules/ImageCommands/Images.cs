@@ -352,7 +352,7 @@ namespace MinitoriCore.Modules.ImageCommands
                 {
                     try
                     {
-                        await UploadImage("../", context);
+                        await UploadImage("", context);
                     }
                     catch (Exception ex)
                     {
@@ -524,6 +524,9 @@ namespace MinitoriCore.Modules.ImageCommands
             }
 
             var dir = Directory.GetFiles($@"./Images/{source}/", "*.*", SearchOption.AllDirectories).Where(x => valid.Contains(x.Substring(x.LastIndexOf('.'))));
+
+            if (source == "")
+                dir = dir.Where(x => !x.Contains("removed ") && !x.Contains($"Splatoon{Path.DirectorySeparatorChar}") && !x.Contains($"old_awoo{Path.DirectorySeparatorChar}"));
             //int fileCount = .Count();
 
             if (dir.Count() == 0)
