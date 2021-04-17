@@ -42,6 +42,8 @@ namespace MinitoriCore.Modules.DiscordBots
 
         private async Task Client_MessageReceived(SocketMessage msg)
         {
+            Console.Write("e");
+
             if (!watchBots)
                 return;
 
