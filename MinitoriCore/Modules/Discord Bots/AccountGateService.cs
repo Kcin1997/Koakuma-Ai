@@ -46,7 +46,7 @@ namespace MinitoriCore
             public ulong LogMessageId { get; set; }
             public DateTimeOffset OriginalJoinTime { get; set; }
             public int JoinCount { get; set; }
-    }
+        }
 
         public async Task Install(IServiceProvider _services)
         {

@@ -28,6 +28,7 @@ namespace MinitoriCore.Modules.DiscordBots
         // Bots 110374777914417152
 
         private Config config;
+        private DiscordBotsService dbotsService;
         private const string VerifMessage =
             "Hi there! If you're seeing this, it means your account got snagged on our automatic user verification system, and a moderator will need to give you access to the server manually.\n\n" +
             "To best help us verify you, please answer the following questions. Try to be as specific as possible.\n" +
@@ -35,9 +36,10 @@ namespace MinitoriCore.Modules.DiscordBots
             "- Did someone invite you to the server? If so, who?\n" +
             "- Do you have a specific purpose in joining? Such as finding a bot, developing your own bot, etc?";
 
-        public DiscordBots(Config _config)
+        public DiscordBots(Config _config, DiscordBotsService _dbotsService)
         {
             config = _config;
+            dbotsService = _dbotsService;
         }
 
         private async Task ChangeRoles(string remainder, ulong role, bool addRole = true)
@@ -163,21 +165,21 @@ namespace MinitoriCore.Modules.DiscordBots
                 StringBuilder output = new StringBuilder();
 
                 if (addRole)
-                    output.Append($"Added `{r.Name}` to the following bot");
+                    output.Append($"Added `{r.Name}` to the following ");
                 else
-                    output.Append($"Removed `{r.Name}` from the following bot");
+                    output.Append($"Removed `{r.Name}` from the following ");
 
-                if (roledBots.Count() > 1)
-                    output.Append("s:\n");
+                if (roledBots.Count > 1)
+                    output.Append($"{roledBots.Count} bots:\n");
                 else
-                    output.Append(":\n");
+                    output.Append("bot:\n");
 
-                output.AppendLine(string.Join(", ", roledBots.Select(x => $"**{x.Username}#{x.Discriminator}**")));
+                output.AppendLine("**" + string.Join(", ", roledBots.Select(x => $"{x.Username}#{x.Discriminator}")) + "**");
 
-                if (unroledBots.Count() > 0)
+                if (unroledBots.Count > 0)
                 {
-                    if (unroledBots.Count() > 1)
-                        output.Append("These bots ");
+                    if (unroledBots.Count > 1)
+                        output.Append($"These {unroledBots.Count} bots ");
                     else
                         output.Append("This bot ");
 
@@ -186,7 +188,7 @@ namespace MinitoriCore.Modules.DiscordBots
                     else
                         output.AppendLine("didn't have that role to start:");
 
-                    output.AppendLine(string.Join(", ", unroledBots.Select(x => $"**{x.Username}#{x.Discriminator}**")));
+                    output.AppendLine("**" + string.Join(", ", unroledBots.Select(x => $"{x.Username}#{x.Discriminator}")) + "**");
                 }
 
                 await RespondAsync(output.ToString().Trim());
@@ -349,6 +351,48 @@ namespace MinitoriCore.Modules.DiscordBots
                 await RespondAsync(VerifMessage);
 
             await ((SocketTextChannel)Context.Channel).DeleteMessagesAsync(messages.Where(x => x.Content != VerifMessage));
+        }
+
+        [Command("watchstart")]
+        public async Task StartMuteWatch()
+        {
+            if (Context.Guild.Id != 110373943822540800)
+                return;
+
+            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(407326634819977217) ||
+                ((IGuildUser)Context.User).RoleIds.ToList().Contains(113379036524212224))
+            {
+                if (!dbotsService.CheckWatch())
+                {
+                    dbotsService.EnableWatch();
+                    await RespondAsync("Now watching <#744813231452979220> for bots to mute. Please only use single character prefixes while this is active.");
+                }
+                else
+                {
+                    await RespondAsync("Already watching <#744813231452979220> for bots. Did you intend to use `;watchend`?");
+                }
+            }
+        }
+
+        [Command("watchend")]
+        public async Task EndMuteWatch()
+        {
+            if (Context.Guild.Id != 110373943822540800)
+                return;
+
+            if (((IGuildUser)Context.User).RoleIds.ToList().Contains(407326634819977217) ||
+                ((IGuildUser)Context.User).RoleIds.ToList().Contains(113379036524212224))
+            {
+                if (dbotsService.CheckWatch())
+                {
+                    var bots = dbotsService.EndWatch();
+                    await ChangeRoles(bots.Select(x => x.ToString()).Join(" ") + "Single character or otherwise common prefix. This does not mean the bot has done anything wrong, we do this to keep the chat channels in this server clean. This does not affect your listing in any way, don't panic.", 132106771975110656);
+                }
+                else
+                {
+                    await RespondAsync("Watch was not running.");
+                }
+            }
         }
 
         [Command("mute")]
