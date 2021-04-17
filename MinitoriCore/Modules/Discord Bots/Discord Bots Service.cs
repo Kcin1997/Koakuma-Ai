@@ -42,8 +42,6 @@ namespace MinitoriCore.Modules.DiscordBots
 
         private async Task Client_MessageReceived(SocketMessage msg)
         {
-            Console.Write("e");
-
             if (!watchBots)
                 return;
 
@@ -64,15 +62,11 @@ namespace MinitoriCore.Modules.DiscordBots
             var user = msg.Author as SocketGuildUser;
             var roles = user.Roles.Select(x => x.Id).ToList();
 
-            Console.WriteLine($"Seen {user.Username}");
-
             if (!roles.Contains(110374777914417152)) // check for bot role
                 return;
 
             if (roles.Any(x => ignoreRoles.Contains(x)))
                 return;
-
-            Console.WriteLine($"Adding {user.Username}");
 
             bots.Add(user.Id);
         }

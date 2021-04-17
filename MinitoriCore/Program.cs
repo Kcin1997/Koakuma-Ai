@@ -107,6 +107,7 @@ namespace MinitoriCore
             socketClient.UserJoined += Client_UserJoined;
 
             //await gate.Install(map);
+            await discordBotsService.Install(map);
 
             handler = new CommandHandler();
             await handler.Install(map);
