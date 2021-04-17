@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 //using MinitoriCore.Modules.UptimeTracker;
 using MinitoriCore.Modules.Standard;
 using MinitoriCore.Modules.Splatoon;
+using MinitoriCore.Modules.DiscordBots;
 using System.Threading;
 using System.Runtime.InteropServices.ComTypes;
 
@@ -31,6 +32,7 @@ namespace MinitoriCore
         private EventStorage events;
         private RankedService rankedService;
         private ServiceProvider map;
+        private DiscordBotsService discordBotsService;
         //private AccountGateService gate;
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
@@ -68,10 +70,12 @@ namespace MinitoriCore
             events = EventStorage.Load();
             rankedService = new RankedService();
             strings = new RandomStrings();
+            discordBotsService = new DiscordBotsService();
             //gate = new AccountGateService();
 
+
             //var map = new DependencyMap();
-            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events).AddSingleton(rankedService)/*.AddSingleton(gate)*/.BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events).AddSingleton(rankedService).AddSingleton(discordBotsService)/*.AddSingleton(gate)*/.BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
