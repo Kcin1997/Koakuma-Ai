@@ -386,6 +386,7 @@ namespace MinitoriCore.Modules.DiscordBots
                 if (dbotsService.CheckWatch())
                 {
                     var bots = dbotsService.EndWatch();
+                    RespondAsync($"Attempting to mute {bots.Count} bots");
                     await ChangeRoles(bots.Select(x => x.ToString()).Join(" ") + "Single character or otherwise common prefix. This does not mean the bot has done anything wrong, we do this to keep the chat channels in this server clean. This does not affect your listing in any way, don't panic.", 132106771975110656);
                 }
                 else
