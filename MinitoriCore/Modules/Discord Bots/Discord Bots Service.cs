@@ -68,6 +68,9 @@ namespace MinitoriCore.Modules.DiscordBots
             if (roles.Any(x => ignoreRoles.Contains(x)))
                 return;
 
+            if (bots.Contains(user.Id))
+                return;
+
             bots.Add(user.Id);
         }
 
