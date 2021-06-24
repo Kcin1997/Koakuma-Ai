@@ -24,9 +24,10 @@ namespace MinitoriCore
         private DiscordSocketClient client;
         private IServiceProvider services;
         private Config config;
+        private DatabaseHelper dbhelper;
 
         [Flags]
-        private enum Filter
+        public enum Filter
         {
             NewAccount = 1,
             NoAvatar = 2,
@@ -36,14 +37,14 @@ namespace MinitoriCore
             Impersonation = 32
         }
 
-        private class LoggedUser
+        public class LoggedUser
         {
             public ulong UserId { get; set; }
             public bool ApprovedAccess { get; set; }
             public bool NewAccount { get; set; }
-            public ulong ApprovalModId { get; set; }
+            public ulong? ApprovalModId { get; set; }
             public Filter DenialReasons { get; set; }
-            public ulong LogMessageId { get; set; }
+            public ulong? LogMessageId { get; set; }
             public DateTimeOffset OriginalJoinTime { get; set; }
             public int JoinCount { get; set; }
         }
@@ -52,6 +53,7 @@ namespace MinitoriCore
         {
             client = _services.GetService<DiscordSocketClient>();
             config = _services.GetService<Config>();
+            dbhelper = _services.GetService<DatabaseHelper>();
             services = _services;
 
             client.UserJoined += Client_UserJoined;
@@ -127,7 +129,7 @@ namespace MinitoriCore
             {
                 await user.AddRoleAsync(user.Guild.GetRole(784226125408763954));
                 await ((SocketTextChannel)user.Guild.GetChannel(784491009249247253)).SendMessageAsync(
-                    $"`[{DateTimeOffset.Now.ToLocalTime().ToString("HH:mm:ss")}]` Filtered account for the following reasons: `{result.ToString()}`\n" +
+                    $"`[{DateTimeOffset.Now.ToLocalTime().ToString("HH:mm:ss")}]` Filtered account for the following reasons: `{result}`\n" +
                     $"{user.Username}#{user.Discriminator} ({user.Id}) ({user.Mention})\n" +
                     $"Created {MoreDifferentFancyTime(user.CreatedAt)}ago.");
             }
@@ -150,7 +152,8 @@ namespace MinitoriCore
                 if (!tableExists)
                 {
                     using (var cmd = new SQLiteCommand("CREATE TABLE IF NOT EXISTS users " +
-                        "(UserId TEXT NOT NULL PRIMARY KEY, ApprovedAccess INTEGER NOT NULL, NewAccount INTEGER NOT NULL, ApprovalModId TEXT, DenialReasons INTEGER NOT NULL, LogMessage TEXT);", db))
+                        "(UserId TEXT NOT NULL PRIMARY KEY, ApprovedAccess INTEGER NOT NULL, NewAccount INTEGER NOT NULL, ApprovalModId TEXT, " +
+                        "DenialReasons INTEGER NOT NULL, LogMessage TEXT, OriginalJoinTime TEXT NOT NULL, JoinCount INTEGER NOT NULL);", db))
                     {
                         await cmd.ExecuteNonQueryAsync();
                     }

@@ -150,7 +150,7 @@ namespace MinitoriCore.Modules.ImageCommands
                     new string[] { "bandana", "waddee", "waddle" },
                     new string[] { "egg", "lor", "🥚", "👑" },
                     new string[] { "spiderman", "taranza", "spid", "🕷️", "🕸️", "🕷", "🕸" },
-                    new string[] { "squeak", "squek", "🐭", "🐁", "🪤" },
+                    new string[] { "squeak", "squek", "🐭", "🐁", "🪤", "🧀" },
                     new string[] { "soos", "susie", "familyproblems", "👪" },
                     new string[] { "adeleine", "artist", "ado", "🖌️", "🖌" },
                     new string[] { "randomfairy", "ribbon", "🧚", "🧚‍♂️", "🧚‍♀️", "🎀", "🎗️", "🎗" },
