@@ -148,6 +148,12 @@ namespace MinitoriCore.Modules.Standard
             await RespondAsync($"Blah to you too, {Context.User.Mention}.");
         }
 
+        [Command("!p")]
+        public async Task why()
+        {
+            await RespondAsync("!p");
+        }
+
         [Command("echo")]
         [Summary("Repeats what you say")]
         [Priority(1000)]
