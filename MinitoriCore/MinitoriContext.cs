@@ -155,6 +155,10 @@ namespace MinitoriCore
         IUser ICommandContext.User => User;
         IMessageChannel ICommandContext.Channel => Channel;
         IDiscordClient ICommandContext.Client => Client;
+        public string Prefix { get; set; }
+        public IGuildUser GuildUser { get; set; }
+        public InteractionData InteractionData { get; set; }
+        public CommandInfo Command { get; set; }
 
         public bool IsHelp { get; set; }
 

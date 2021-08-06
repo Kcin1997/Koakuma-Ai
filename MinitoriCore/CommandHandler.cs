@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.Commands.Builders;
 using Discord.WebSocket;
-using Discord.Addons.EmojiTools;
 using Microsoft.Extensions.DependencyInjection;
 using MinitoriCore.Modules.ImageCommands;
 //using Minitori.Modules.HelpModule;

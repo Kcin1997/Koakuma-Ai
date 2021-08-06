@@ -137,9 +137,15 @@ namespace MinitoriCore
             await Task.Delay(-1);
         }
 
-        private async Task SocketClient_ReactionAdded(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task SocketClient_ReactionAdded(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction)
         {
-            var guildChannel = channel as IGuildChannel;
+            IGuildChannel guildChannel;
+
+            if (channel.HasValue)
+                guildChannel = channel.Value as IGuildChannel;
+            else
+                guildChannel = socketClient.GetChannel(channel.Id) as IGuildChannel;
+
             if (guildChannel == null)
                 return;
             else if (!config.SelfStarPreventionServers.Contains(guildChannel.GuildId))
@@ -153,22 +159,22 @@ namespace MinitoriCore
 
             IUserMessage msg;
 
-            if (!cache.HasValue)
+            if (!message.HasValue)
             {
-                msg = (IUserMessage)await channel.GetMessageAsync(cache.Id);
+                msg = (IUserMessage)(await channel.GetOrDownloadAsync()).GetMessageAsync(message.Id);
             }
             else
-                msg = cache.Value;
+                msg = message.Value;
 
             if (msg.Author.Id == reaction.UserId)
             {
                 try
                 {
                     await msg.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
-                    if (PreventedStars.Contains(cache.Id))
+                    if (PreventedStars.Contains(message.Id))
                     {
-                        await channel.SendMessageAsync($"Prevented self-star by {reaction.User.Value.Mention} *(msg: `{msg.Id}`)*");
-                        PreventedStars.Add(cache.Id);
+                        await (await channel.GetOrDownloadAsync()).SendMessageAsync($"Prevented self-star by {reaction.User.Value.Mention} *(msg: `{msg.Id}`)*");
+                        PreventedStars.Add(message.Id);
                     }
                 }
                 catch (Exception ex)
