@@ -47,7 +47,10 @@ namespace MinitoriCore
             socketClient = new DiscordSocketClient(new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Verbose,
-                AlwaysDownloadUsers = true
+                AlwaysDownloadUsers = true,
+                GatewayIntents = GatewayIntents.GuildBans | GatewayIntents.DirectMessages | GatewayIntents.DirectMessageReactions | 
+                GatewayIntents.GuildBans | GatewayIntents.GuildEmojis | GatewayIntents.GuildMembers | GatewayIntents.GuildPresences | GatewayIntents.GuildMessageReactions | 
+                GatewayIntents.GuildMessages | GatewayIntents.Guilds
             });
             socketClient.Log += Log;
 
