@@ -44,7 +44,18 @@ namespace MinitoriCore
             // Don't handle the command if it is a system message
             var message = parameterMessage as SocketUserMessage;
             if (message == null) return;
-            if (message.Author.IsBot) return;
+            if (message.Author.IsWebhook)
+            {
+                var channel = message.Channel as SocketGuildChannel;
+
+                if (channel == null)
+                    return;
+
+                if (channel.Guild.Id != 221782522520928268)
+                    return;
+            }
+            else
+                if (message.Author.IsBot) return;
 
             // Mark where the prefix ends and the command begins
             int argPos = 0;
