@@ -442,6 +442,9 @@ namespace MinitoriCore.Modules.ImageCommands
             if (config.OwnerIds.Contains(user))
                 return true;
 
+            if (user == 366649052357591044) // ibx34#2800 from discord bots
+                return true;
+
             switch (server)
             {
                 case 103028520011190272: // RoboNitori
