@@ -571,26 +571,40 @@ namespace MinitoriCore.Modules.Standard
         
         [Command("listroles")]
         [RequireOwner]
-        public async Task ListRoles([Remainder]string role)
+        public async Task ListRoles()
         {
-            if (role.Length > 0)
-            {
-                var r = Context.Guild.Roles.FirstOrDefault(x => x.Name == role);
-                if (r != null)
-                    await RespondAsync($"```{r.Id} | {r.Name}```");
-                else
-                    await RespondAsync($"I can't find a role named `{role}`!");
+            Dictionary<ulong, int> roleCounts = new Dictionary<ulong, int>();
 
-                return;
+            foreach (var r in Context.Guild.Roles)
+            {
+                var role = Context.Guild.GetRole(r.Id);
+                roleCounts[r.Id] = Context.Guild.Users.Count(x => x.Roles.Contains(role));
             }
+
+
+
+            //if (role.Length > 0)
+            //{
+            //    var r = Context.Guild.Roles.FirstOrDefault(x => x.Name == role);
+            //    if (r != null)
+            //        await RespondAsync($"```{r.Id} | {r.Name}```");
+            //    else
+            //        await RespondAsync($"I can't find a role named `{role}`!");
+
+            //    return;
+            //}
 
             StringBuilder output = new StringBuilder();
             output.Append("```");
 
-            foreach (var r in Context.Guild.Roles)
+            foreach (var kv in roleCounts.OrderByDescending(x => x.Value))
             {
-                output.AppendLine($"{r.Id} | {r.Name}");
+                var role = Context.Guild.GetRole(kv.Key);
+                output.AppendLine($"{kv.Value} | {role.Name}");
             }
+
+            output.AppendLine("___________________________________");
+            output.AppendLine($"Unapproved users: {roleCounts[132720341058453504] - roleCounts[346373986604810240]}");
 
             output.Append("```");
 
