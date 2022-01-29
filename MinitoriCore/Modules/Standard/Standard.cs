@@ -592,6 +592,7 @@ namespace MinitoriCore.Modules.Standard
                 {
                     Task.Run(async () =>
                     {
+                        await RespondAsync($"Kicking {totalUnverified} users without an access role...");
                         foreach (var user in Context.Guild.Users.OrderBy(x => x.JoinedAt))
                         {
                             if (user.Roles.Count() == 1)
@@ -600,6 +601,7 @@ namespace MinitoriCore.Modules.Standard
                                 await Task.Delay(1000);
                             }
                         }
+                        await RespondAsync("Done!");
                     });
                 }
                 else
