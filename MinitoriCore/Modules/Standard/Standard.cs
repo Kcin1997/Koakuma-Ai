@@ -571,6 +571,7 @@ namespace MinitoriCore.Modules.Standard
 
         [Command("unverified")]
         [RequireOwner]
+        [RequireGuild(132720341058453504)]
         public async Task KickUnverified(int unverified = -1)
         {
             int totalUnverified = 0;
