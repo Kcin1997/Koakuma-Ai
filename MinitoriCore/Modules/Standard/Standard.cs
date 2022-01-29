@@ -584,7 +584,30 @@ namespace MinitoriCore.Modules.Standard
                 }
             }
 
-            await RespondAsync($"Total unverified users: {totalUnverified}");
+            if (unverified == -1)
+                await RespondAsync($"Total unverified users: {totalUnverified}");
+            else
+            {
+                if (unverified == totalUnverified)
+                {
+                    Task.Run(async () =>
+                    {
+                        foreach (var user in Context.Guild.Users.OrderBy(x => x.JoinedAt))
+                        {
+                            if (user.Roles.Count() == 1)
+                            {
+                                await user.KickAsync();
+                                await Task.Delay(1000);
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    await RespondAsync("Nope, not the right count.");
+                    return;
+                }
+            }
         }
         
         [Command("listroles")]
