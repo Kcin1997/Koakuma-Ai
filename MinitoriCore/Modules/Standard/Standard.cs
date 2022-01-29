@@ -568,6 +568,23 @@ namespace MinitoriCore.Modules.Standard
 
             await RespondAsync(output.ToString());
         }
+
+        [Command("unverified")]
+        [RequireOwner]
+        public async Task KickUnverified(int unverified = -1)
+        {
+            int totalUnverified = 0;
+
+            foreach (var user in Context.Guild.Users)
+            {
+                if (user.Roles.Count() == 1)
+                {
+                    totalUnverified++;
+                }
+            }
+
+            await RespondAsync($"Total unverified users: {totalUnverified}");
+        }
         
         [Command("listroles")]
         [RequireOwner]
