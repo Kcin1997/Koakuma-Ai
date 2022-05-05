@@ -21,6 +21,7 @@ namespace MinitoriCore
         private IServiceProvider services;
         private Config config;
         private ImageCommands images;
+        private const string DevSnowflake = "343646756338139136";
 
         public async Task Install(IServiceProvider _services)
         {
@@ -78,10 +79,10 @@ namespace MinitoriCore
                     switch (result.Error.Value)
                     {
                         case CommandError.ParseFailed:
-                            await message.Channel.SendMessageAsync($"**Something went wrong:** That isn't an actual number!");
+                            await message.Channel.SendMessageAsync($"**Something went very wrong:** That isn't an actual number!");
                             break;
                         case CommandError.BadArgCount:
-                            //await message.Channel.SendMessageAsync($"**Something went wrong:** You're missing some parts of that command!");
+                            await message.Channel.SendMessageAsync($"**Something went wrong:** You're missing some parts of that command!");
                             break;
                         case CommandError.UnknownCommand:
                             break;
@@ -89,7 +90,7 @@ namespace MinitoriCore
                             break;
                         default:
                             await message.Channel.SendMessageAsync($"**Something went wrong:** `{result.ErrorReason}`\n" +
-                                $"Poke Valen Wheeler#2149 about it if the reason doesn't make sense.");
+                                $"Poke <@{DevSnowflake}> about it if the reason doesn't make sense.");
                             Console.WriteLine($"{result.ErrorReason}");
                             break;
                     }

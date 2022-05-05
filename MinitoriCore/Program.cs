@@ -23,6 +23,7 @@ namespace MinitoriCore
         static void Main(string[] args) =>
             new Program().RunAsync().GetAwaiter().GetResult();
 
+        private const long guildID = 110373943822540800;
         private DiscordSocketClient socketClient;
         private DiscordRestClient restClient;
         private Config config;
@@ -197,7 +198,7 @@ namespace MinitoriCore
             if (channel == null)
                 return;
 
-            if (channel.Guild.Id != 110373943822540800)
+            if (channel.Guild.Id != guildID)
                 return;
 
             //if (msg.Content.Contains("dHUKVIH8rnk"))
