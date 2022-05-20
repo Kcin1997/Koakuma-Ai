@@ -688,18 +688,18 @@ namespace MinitoriCore.Modules.Standard
             if (user.Id == 102528327251656704) // Googie2149
                 user = (IGuildUser)Context.User;
 
-            int count = strings.RandomInteger(0, 100);
+            int count = RandomUtil.Int(0, 100);
             string objects = "a horrible error that should never happen";
 
             if (count < 60)
-                objects = strings.objects[strings.RandomInteger(0, strings.objects.Length)];
+                objects = strings.objects[RandomUtil.Int(0, strings.objects.Length)];
             else if (count > 60 && count < 85)
-                objects = $"{strings.objects[strings.RandomInteger(0, strings.objects.Length)]} " +
-                    $"and {strings.objects[strings.RandomInteger(0, strings.objects.Length)]}";
+                objects = $"{strings.objects[RandomUtil.Int(0, strings.objects.Length)]} " +
+                    $"and {strings.objects[RandomUtil.Int(0, strings.objects.Length)]}";
             else if (count > 85)
-                objects = $"{strings.objects[strings.RandomInteger(0, strings.objects.Length)]}, " +
-                    $"{strings.objects[strings.RandomInteger(0, strings.objects.Length)]}, " +
-                    $"and {strings.objects[strings.RandomInteger(0, strings.objects.Length)]}";
+                objects = $"{strings.objects[RandomUtil.Int(0, strings.objects.Length)]}, " +
+                    $"{strings.objects[RandomUtil.Int(0, strings.objects.Length)]}, " +
+                    $"and {strings.objects[RandomUtil.Int(0, strings.objects.Length)]}";
 
             await RespondAsync($"*throws {objects} at {user.Mention}*");
         }
