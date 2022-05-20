@@ -25,7 +25,7 @@ namespace MinitoriCore
             }
         }
 
-        private RNGCryptoServiceProvider rand = new RNGCryptoServiceProvider();
+        private readonly RandomNumberGenerator rand = RandomNumberGenerator.Create();
 
         public int RandomInteger(int min, int max)
         {

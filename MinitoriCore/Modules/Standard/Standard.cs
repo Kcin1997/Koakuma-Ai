@@ -637,7 +637,7 @@ namespace MinitoriCore.Modules.Standard
             //    return;
             //}
 
-            StringBuilder output = new StringBuilder();
+            StringBuilder output = new();
             output.Append("```");
 
             foreach (var kv in roleCounts.OrderByDescending(x => x.Value))
