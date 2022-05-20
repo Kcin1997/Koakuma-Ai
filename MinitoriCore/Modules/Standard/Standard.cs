@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -20,14 +21,15 @@ namespace MinitoriCore.Modules.Standard
 {
     public class Standard : MinitoriModule
     {
+        private const long ORIGINAL_DEV = 102528327251656704;  // Googie2149
         private RandomStrings strings;
 
         private EventStorage events;
         private Config config;
         private CommandService commands;
         private IServiceProvider services;
-        private Dictionary<ulong, bool> rotate = new Dictionary<ulong, bool>();
-        private Dictionary<ulong, float> angle = new Dictionary<ulong, float>();
+        private Dictionary<ulong, bool> rotate = new();
+        private Dictionary<ulong, float> angle = new();
         private DiscordSocketClient socketClient;
 
         public Standard(RandomStrings _strings, EventStorage _events, CommandService _commands, IServiceProvider _services, Config _config, DiscordSocketClient _socketClient)
@@ -40,30 +42,10 @@ namespace MinitoriCore.Modules.Standard
             socketClient = _socketClient;
         }
 
-        private RNGCryptoServiceProvider rand = new RNGCryptoServiceProvider();
-
-        private int RandomInteger(int min, int max)
-        {
-            uint scale = uint.MaxValue;
-            while (scale == uint.MaxValue)
-            {
-                // Get four random bytes.
-                byte[] four_bytes = new byte[4];
-                rand.GetBytes(four_bytes);
-
-                // Convert that into an uint.
-                scale = BitConverter.ToUInt32(four_bytes, 0);
-            }
-
-            // Add min to the scaled difference between max and min.
-            return (int)(min + (max - min) *
-                (scale / (double)uint.MaxValue));
-        }
-
         //[Command("emergencyban")]
         //public async Task EmergencyBan(ulong UserId = 0)
         //{
-        //    if (Context.User.Id != 102528327251656704)
+        //    if (Context.User.Id != ORIGINAL_DEV)
         //    {
         //        return;
         //    }
@@ -155,7 +137,7 @@ namespace MinitoriCore.Modules.Standard
         }
 
         [Command("echo")]
-        [Summary("Repeats what you say")]
+        [Summary("Repeats what you say.  Must be Bot Owner.")]
         [Priority(1000)]
         public async Task Echo([Remainder]string message)
         {
@@ -407,7 +389,7 @@ namespace MinitoriCore.Modules.Standard
         {
             Task.Run(async () =>
             {
-                StringBuilder output = new StringBuilder();
+                StringBuilder output = new();
                 foreach (var guild in socketClient.Guilds)
                 {
                     var percentage = (Convert.ToDouble(guild.Users.Count(x => x.IsBot)) / (guild.Users.Count())) * 100;
@@ -616,7 +598,7 @@ namespace MinitoriCore.Modules.Standard
         [RequireOwner]
         public async Task ListRoles()
         {
-            Dictionary<ulong, int> roleCounts = new Dictionary<ulong, int>();
+            Dictionary<ulong, int> roleCounts = new();
 
             foreach (var r in Context.Guild.Roles)
             {
@@ -685,7 +667,7 @@ namespace MinitoriCore.Modules.Standard
             else
                 user = (IGuildUser)Context.User;
 
-            if (user.Id == 102528327251656704) // Googie2149
+            if (user.Id == ORIGINAL_DEV)
                 user = (IGuildUser)Context.User;
 
             int count = RandomUtil.Int(0, 100);
@@ -712,9 +694,35 @@ namespace MinitoriCore.Modules.Standard
             string[] choices = remainder.Split(';').Where(x => x.Trim().Length > 0).ToArray();
             
             if (choices[0] != "")
-                await RespondAsync($"I choose **{choices[RandomInteger(0, choices.Length)].Trim()}**");
+                await RespondAsync($"I choose **{choices[RandomUtil.Int(0, choices.Length)].Trim()}**");
             else
                 await RespondAsync("What do you want me to do with this?");
+        }
+
+        [Command("roll")]
+        [Summary("roll dice")]
+        public async Task DiceRoller([Remainder] string remainder = "")
+        {
+            if (RegEx.isRoll(remainder)) 
+            {
+                try
+                {
+                    int commentIndex = remainder.IndexOf('#');
+                    string roll = (commentIndex == -1) ? remainder : remainder[..commentIndex];
+                    string title = (commentIndex != -1) ? remainder[commentIndex..] : "Roll";
+                    String result = RegEx.parseRolls(roll);
+                    var finalValue = new DataTable().Compute(result, null);
+                    await RespondAsync($"Rolling ``{roll}``\n{title} : ``{result}``\n = **{finalValue}**");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    throw ex;
+                }
+                
+            }
+            else
+                await RespondAsync("Not a valid roll command");
         }
 
         //[Command("gardedede")]

@@ -41,7 +41,7 @@ namespace MinitoriCore
         private ulong updateChannel = 0;
         private List<ulong> PreventedStars = new();
 
-        private Dictionary<ulong, int> posCommandUsage = new Dictionary<ulong, int>();
+        private Dictionary<ulong, int> posCommandUsage = new();
 
         private async Task RunAsync()
         {
