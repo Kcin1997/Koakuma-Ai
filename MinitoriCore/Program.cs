@@ -183,7 +183,7 @@ namespace MinitoriCore
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to remove self-star in {guildChannel.GuildId}");
+                    Console.WriteLine($"Failed to remove self-star in {guildChannel.GuildId}.\n Trace: {ex}");
                 }
             }
         }
