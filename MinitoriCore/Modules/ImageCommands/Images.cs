@@ -119,20 +119,20 @@ namespace MinitoriCore.Modules.ImageCommands
             }
 
             await RespondAsync(
-                $"Time: {Ranking.Time.ToString()}\n" +
-                $"Score: {Ranking.Score.ToString()}\n" +
+                $"Time: {Ranking.Time}\n" +
+                $"Score: {Ranking.Score}\n" +
                 $"Level: {Ranking.Level}\n" +
                 $"P1: {Ranking.P1}\n" +
                 $"P2: {Ranking.P2}\n" +
                 $"P3: {Ranking.P3}\n" +
                 $"P4: {Ranking.P4}\n" +
-                $"Amiibo: {Ranking.Amiibo.ToString()}\n" +
-                $"Group: {Ranking.Group.ToString()}");
+                $"Amiibo: {Ranking.Amiibo}\n" +
+                $"Group: {Ranking.Group}\n");
         }
 
-        private Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new Dictionary<ulong, Dictionary<ulong, DateTime>>();
-        private Dictionary<string, Dictionary<ulong, string>> lastImage = new Dictionary<string, Dictionary<ulong, string>>();
-        private Config config;
+        private readonly Dictionary<ulong, Dictionary<ulong, DateTime>> cooldown = new();
+        private readonly Dictionary<string, Dictionary<ulong, string>> lastImage = new();
+        private readonly Config config;
 
         public ImageCommands(CommandService commands, IServiceProvider services, Config _config)
         {
@@ -510,7 +510,7 @@ namespace MinitoriCore.Modules.ImageCommands
                 return;
             }
 
-            Random asdf = new Random();
+            Random asdf = new();
             string[] valid = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
             string file = "";
 
@@ -528,13 +528,13 @@ namespace MinitoriCore.Modules.ImageCommands
                 Directory.CreateDirectory($"./Images/{source}/");
             }
 
-            var dir = Directory.GetFiles($@"./Images/{source}/", "*.*", SearchOption.AllDirectories).Where(x => valid.Contains(x.Substring(x.LastIndexOf('.'))));
+            var dir = Directory.GetFiles($@"./Images/{source}/", "*.*", SearchOption.AllDirectories).Where(x => valid.Contains(x[x.LastIndexOf('.')..]));
 
             if (source == "")
                 dir = dir.Where(x => !x.Contains("removed ") && !x.Contains($"Splatoon{Path.DirectorySeparatorChar}") && !x.Contains($"old_awoo{Path.DirectorySeparatorChar}"));
             //int fileCount = .Count();
 
-            if (dir.Count() == 0)
+            if (!dir.Any())
             {
                 await context.Channel.SendMessageAsync($"There are no files in the {source} folder yet! Use the `{source} add` command to add some!");
                 return;
@@ -571,13 +571,12 @@ namespace MinitoriCore.Modules.ImageCommands
 
         private async Task DownloadImage(string source, ICommandContext context, string url)
         {
-            string image = "";
-
+            string image;
             if (url != null)
                 image = url;
             else
             {
-                if (context.Message.Attachments.Count() > 0)
+                if (context.Message.Attachments.Any())
                     image = context.Message.Attachments.First().Url;
                 else
                 {
@@ -591,8 +590,8 @@ namespace MinitoriCore.Modules.ImageCommands
                 Directory.CreateDirectory($"./Images/{source}/");
             }
 
-            string ext = image.Substring(image.LastIndexOf('.'));
-            string file = image.Substring(image.LastIndexOf('/') + 1);
+            string ext = image[image.LastIndexOf('.')..];
+            string file = image[(image.LastIndexOf('/') + 1)..];
 
             string[] valid = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
 
@@ -601,7 +600,7 @@ namespace MinitoriCore.Modules.ImageCommands
                 if (file == "unknown.png" || file == "image0.jpg" || file == "image0.png")
                 {
                     do
-                        file = $".{context.User.Id} - {Path.GetRandomFileName().Substring(0, 8)}{ext}";
+                        file = $".{context.User.Id} - {Path.GetRandomFileName()[..8]}{ext}";
                     while (File.Exists($@"./Images/{source}/{file}"));
                 }
 
@@ -612,7 +611,7 @@ namespace MinitoriCore.Modules.ImageCommands
 
                 if (!File.Exists($@"./Images/{source}/{file}"))
                 {
-                    using (WebClient client = new WebClient())
+                    using (WebClient client = new())
                     {
                         client.DownloadFile(new Uri(image), $@"./Images/{source}/{file}");
                         await context.Channel.SendMessageAsync("Downloaded!");

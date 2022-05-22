@@ -27,8 +27,8 @@ namespace MinitoriCore.Modules.DiscordBots
         // No embed 178823209217556480
         // Bots 110374777914417152
 
-        private Config config;
-        private DiscordBotsService dbotsService;
+        private readonly Config config;
+        private readonly DiscordBotsService dbotsService;
         private const string VerifMessage =
             "Hi there! If you're seeing this, it means your account got snagged on our automatic user verification system, and a moderator will need to give you access to the server manually.\n\n" +
             "To best help us verify you, please answer the following questions. Try to be as specific as possible.\n" +
@@ -54,8 +54,7 @@ namespace MinitoriCore.Modules.DiscordBots
                 foreach (var s in new List<string>(args))
                 {
                     var id = s.TrimStart('<').TrimStart('@').TrimStart('!').TrimEnd('>');
-                    ulong temp;
-                    if (ulong.TryParse(id, out temp))
+                    if (ulong.TryParse(id, out ulong temp))
                     {
                         var user = Context.Guild.GetUser(temp);
 
@@ -68,7 +67,7 @@ namespace MinitoriCore.Modules.DiscordBots
                         break;
                 }
 
-                if (users.Count() == 0)
+                if (!users.Any())
                 {
                     await RespondAsync("You need to mention some bots for this to work!");
                     return;
@@ -155,14 +154,14 @@ namespace MinitoriCore.Modules.DiscordBots
                     }
                 }
 
-                if (roledBots.Count() == 0)
+                if (!roledBots.Any())
                 {
                     await RespondAsync("None of those mentioned were affected.");
                     return;
                 }
 
                 // I probably shouldn't care this much about formatting
-                StringBuilder output = new StringBuilder();
+                StringBuilder output = new();
 
                 if (addRole)
                     output.Append($"Added `{r.Name}` to the following ");
@@ -195,6 +194,7 @@ namespace MinitoriCore.Modules.DiscordBots
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 //string exMessage;
                 
                 //if (ex != null)
@@ -328,8 +328,8 @@ namespace MinitoriCore.Modules.DiscordBots
             if (Context.Channel.Id != 784226460138995722)
                 return;
 
-            List<IMessage> messages = new List<IMessage>();
-            List<IMessage> temp = new List<IMessage>();
+            List<IMessage> messages = new();
+            List<IMessage> temp = new();
 
             do
             {
@@ -337,7 +337,7 @@ namespace MinitoriCore.Modules.DiscordBots
 
                 messages.AddRange(temp);
 
-            } while (temp.Count() == 100);
+            } while (temp.Count == 100);
 
             //foreach (var m in messages)
             //{

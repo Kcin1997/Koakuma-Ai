@@ -18,8 +18,8 @@ namespace MinitoriCore.Modules.Standard
 {
     public class Snowball : MinitoriModule
     {
-        private EventStorage events;
-        private Dictionary<ulong, bool> rotate = new Dictionary<ulong, bool>();
+        private readonly EventStorage events;
+        private readonly Dictionary<ulong, bool> rotate = new();
 
         public Snowball(EventStorage _events)
         {
@@ -74,7 +74,7 @@ namespace MinitoriCore.Modules.Standard
             IGuildUser user = null;
             string message = ""; // store the message later to be intelligent about when to yell at them for having the role or not
 
-            if (Context.Message.MentionedUserIds.Count() == 1)
+            if (Context.Message.MentionedUserIds.Count == 1)
             {
                 if (Context.Message.MentionedUserIds.FirstOrDefault() != Context.Client.CurrentUser.Id)
                     user = Context.Guild.GetUser(Context.Message.MentionedUserIds.FirstOrDefault());
@@ -83,7 +83,7 @@ namespace MinitoriCore.Modules.Standard
                     message = "Hey, you sure you want to throw snowballs at your supplier";
                 }
             }
-            else if (Context.Message.MentionedUserIds.Count() > 1)
+            else if (Context.Message.MentionedUserIds.Count > 1)
             {
                 foreach (var u in Context.Message.MentionedUserIds)
                 {
@@ -149,8 +149,8 @@ namespace MinitoriCore.Modules.Standard
                     return;
                 }
 
-                if (Context.Guild.Id == 132720341058453504 && 
-                    user.RoleIds.Where(x => x != 132720341058453504).Count() == 0) // In /r/Kirby, don't involve people that don't have the friends role
+                if (Context.Guild.Id == 132720341058453504 &&
+                    !user.RoleIds.Where(x => x != 132720341058453504).Any()) // In /r/Kirby, don't involve people that don't have the friends role
                 {
                     await RespondAsync("Sorry, that person hasn't gained access to the server yet. Why were you trying to hit them 🤔");
                     return;
@@ -178,7 +178,7 @@ namespace MinitoriCore.Modules.Standard
                 }
                 else
                 {
-                    Random rand = new Random((int)(Context.User.Id + user.Id + Convert.ToUInt64(DateTime.Now.Ticks)));
+                    Random rand = new((int)(Context.User.Id + user.Id + Convert.ToUInt64(DateTime.Now.Ticks)));
 
                     var chance = rand.Next(1, 101);
 
@@ -225,12 +225,12 @@ namespace MinitoriCore.Modules.Standard
         {
             //Task.Run(async () =>
             //{
-            StringBuilder output = new StringBuilder();
+            StringBuilder output = new();
             //output.Append("```");
 
             int spaces = 0;
 
-            if (Context.Message.MentionedUserIds.Count() > 0)
+            if (Context.Message.MentionedUserIds.Count > 0)
             {
                 spaces = Context.Message.MentionedUserIds.Select(x => ((SocketGuild)Context.Guild).GetUser(x)?.Username).OrderByDescending(x => x?.Length).FirstOrDefault().Length;
 
@@ -239,8 +239,8 @@ namespace MinitoriCore.Modules.Standard
                     var user = Context.Guild.GetUser(kv.Key);
                     var name = user == null ? kv.Key.ToString() : user.Username;
 
-                    output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("00")} Hits | {kv.Value.Misses.ToString("00")} Missed | " +
-                        $"{kv.Value.Dodged.ToString("00")} Dodged | {kv.Value.Caught.ToString("00")} Caught");
+                    output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits:00} Hits | {kv.Value.Misses:00} Missed | " +
+                        $"{kv.Value.Dodged:00} Dodged | {kv.Value.Caught:00} Caught");
                 }
             }
             else
@@ -252,8 +252,8 @@ namespace MinitoriCore.Modules.Standard
                     var user = Context.Guild.GetUser(kv.Key);
                     var name = user == null ? kv.Key.ToString() : user.Username;
 
-                    output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits.ToString("000")} Hits | {kv.Value.Misses.ToString("000")} Missed | " +
-                        $"{kv.Value.Dodged.ToString("000")} Dodged | {kv.Value.Caught.ToString("000")} Caught");
+                    output.AppendLine($"{name}{new string(' ', spaces - name.Length)} | {kv.Value.Hits:000} Hits | {kv.Value.Misses:000} Missed | " +
+                        $"{kv.Value.Dodged:000} Dodged | {kv.Value.Caught:000} Caught");
                 }
             }
 

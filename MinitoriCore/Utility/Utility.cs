@@ -52,8 +52,9 @@ namespace MinitoriCore
                         throw;
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
+                    Console.WriteLine($"Trace: {ex}");
                    //Log.Error(e);
                 }
             }
