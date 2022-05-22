@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -20,15 +21,16 @@ namespace MinitoriCore.Modules.Standard
 {
     public class Standard : MinitoriModule
     {
-        private RandomStrings strings;
+        private const long ORIGINAL_DEV = 102528327251656704;  // Googie2149
+        private readonly RandomStrings strings;
 
-        private EventStorage events;
-        private Config config;
-        private CommandService commands;
-        private IServiceProvider services;
-        private Dictionary<ulong, bool> rotate = new Dictionary<ulong, bool>();
-        private Dictionary<ulong, float> angle = new Dictionary<ulong, float>();
-        private DiscordSocketClient socketClient;
+        private readonly EventStorage events;
+        private readonly Config config;
+        private readonly CommandService commands;
+        private readonly IServiceProvider services;
+        private readonly Dictionary<ulong, bool> rotate = new();
+        private readonly Dictionary<ulong, float> angle = new();
+        private readonly DiscordSocketClient socketClient;
 
         public Standard(RandomStrings _strings, EventStorage _events, CommandService _commands, IServiceProvider _services, Config _config, DiscordSocketClient _socketClient)
         {
@@ -40,30 +42,10 @@ namespace MinitoriCore.Modules.Standard
             socketClient = _socketClient;
         }
 
-        private RNGCryptoServiceProvider rand = new RNGCryptoServiceProvider();
-
-        private int RandomInteger(int min, int max)
-        {
-            uint scale = uint.MaxValue;
-            while (scale == uint.MaxValue)
-            {
-                // Get four random bytes.
-                byte[] four_bytes = new byte[4];
-                rand.GetBytes(four_bytes);
-
-                // Convert that into an uint.
-                scale = BitConverter.ToUInt32(four_bytes, 0);
-            }
-
-            // Add min to the scaled difference between max and min.
-            return (int)(min + (max - min) *
-                (scale / (double)uint.MaxValue));
-        }
-
         //[Command("emergencyban")]
         //public async Task EmergencyBan(ulong UserId = 0)
         //{
-        //    if (Context.User.Id != 102528327251656704)
+        //    if (Context.User.Id != ORIGINAL_DEV)
         //    {
         //        return;
         //    }
@@ -79,8 +61,8 @@ namespace MinitoriCore.Modules.Standard
         {
             Context.IsHelp = true;
 
-            StringBuilder output = new StringBuilder();
-            Dictionary<string, List<string>> modules = new Dictionary<string, List<string>>();
+            StringBuilder output = new();
+            Dictionary<string, List<string>> modules = new();
             //StringBuilder module = new StringBuilder();
             //var SeenModules = new List<string>();
             //int i = 0;
@@ -149,13 +131,13 @@ namespace MinitoriCore.Modules.Standard
         }
 
         [Command("!p")]
-        public async Task why()
+        public async Task Why()
         {
             await RespondAsync("!p");
         }
 
         [Command("echo")]
-        [Summary("Repeats what you say")]
+        [Summary("Repeats what you say.  Must be Bot Owner.")]
         [Priority(1000)]
         public async Task Echo([Remainder]string message)
         {
@@ -191,16 +173,16 @@ namespace MinitoriCore.Modules.Standard
                         botAccounts.Add(u);
                 }
 
-                StringBuilder output = new StringBuilder();
+                StringBuilder output = new();
 
-                output.AppendLine($"**I found {botAccounts.Count()} bot accounts in the server.**");
+                output.AppendLine($"**I found {botAccounts.Count} bot accounts in the server.**");
                 output.AppendLine("Note: This is *only* bot accounts, this would not include a user account with a bot attached.");
                 output.AppendLine("```");
 
                 foreach (var b in botAccounts)
                 {
                     output.AppendLine($"{b.Username}#{b.Discriminator} [{b.Id}] | " +
-                        $"Joined at {b.JoinedAt.Value.ToLocalTime().ToString("d")} {b.JoinedAt.Value.ToLocalTime().ToString("T")}");
+                        $"Joined at {b.JoinedAt.Value.ToLocalTime():d} {b.JoinedAt.Value.ToLocalTime():T}");
                 }
 
                 
@@ -397,7 +379,7 @@ namespace MinitoriCore.Modules.Standard
         [Summary("Take a guess")]
         public async Task ServerCount()
         {
-            await RespondAsync($"I am currently in {Context.Client.Guilds.Count()} servers.");
+            await RespondAsync($"I am currently in {Context.Client.Guilds.Count} servers.");
         }
 
         [Command("botcollections")]
@@ -407,10 +389,10 @@ namespace MinitoriCore.Modules.Standard
         {
             Task.Run(async () =>
             {
-                StringBuilder output = new StringBuilder();
+                StringBuilder output = new();
                 foreach (var guild in socketClient.Guilds)
                 {
-                    var percentage = (Convert.ToDouble(guild.Users.Count(x => x.IsBot)) / (guild.Users.Count())) * 100;
+                    var percentage = (Convert.ToDouble(guild.Users.Count(x => x.IsBot)) / (guild.Users.Count)) * 100;
 
                     if (percentage < 30)
                         continue;
@@ -558,12 +540,12 @@ namespace MinitoriCore.Modules.Standard
         [RequireOwner]
         public async Task GetJoinDates([Remainder]string blah)
         {
-            StringBuilder output = new StringBuilder();
+            StringBuilder output = new();
 
             foreach (var u in Context.Message.MentionedUserIds)
             {
                 var user = ((SocketGuild)Context.Guild).GetUser(u);
-                output.AppendLine($"{user.Username} - `{user.JoinedAt.Value.ToLocalTime().ToString("d")} {user.JoinedAt.Value.ToLocalTime().ToString("T")}`");
+                output.AppendLine($"{user.Username} - `{user.JoinedAt.Value.ToLocalTime():d} {user.JoinedAt.Value.ToLocalTime():T}`");
             }
 
             await RespondAsync(output.ToString());
@@ -578,7 +560,7 @@ namespace MinitoriCore.Modules.Standard
 
             foreach (var user in Context.Guild.Users)
             {
-                if (user.Roles.Count() == 1)
+                if (user.Roles.Count == 1)
                 {
                     totalUnverified++;
                 }
@@ -595,7 +577,7 @@ namespace MinitoriCore.Modules.Standard
                         await RespondAsync($"Kicking {totalUnverified} users without an access role...");
                         foreach (var user in Context.Guild.Users.OrderBy(x => x.JoinedAt))
                         {
-                            if (user.Roles.Count() == 1)
+                            if (user.Roles.Count == 1)
                             {
                                 await user.KickAsync();
                                 await Task.Delay(1000);
@@ -616,7 +598,7 @@ namespace MinitoriCore.Modules.Standard
         [RequireOwner]
         public async Task ListRoles()
         {
-            Dictionary<ulong, int> roleCounts = new Dictionary<ulong, int>();
+            Dictionary<ulong, int> roleCounts = new();
 
             foreach (var r in Context.Guild.Roles)
             {
@@ -637,7 +619,7 @@ namespace MinitoriCore.Modules.Standard
             //    return;
             //}
 
-            StringBuilder output = new StringBuilder();
+            StringBuilder output = new();
             output.Append("```");
 
             foreach (var kv in roleCounts.OrderByDescending(x => x.Value))
@@ -660,14 +642,14 @@ namespace MinitoriCore.Modules.Standard
         {
             IGuildUser user = null;
 
-            if (Context.Message.MentionedUserIds.Count() == 1)
+            if (Context.Message.MentionedUserIds.Count == 1)
             {
                 if (Context.Message.MentionedUserIds.FirstOrDefault() == ((SocketGuild)Context.Guild).CurrentUser.Id)
                     user = (IGuildUser)Context.Message.Author;
                 else
                     user = Context.Guild.GetUser(Context.Message.MentionedUserIds.FirstOrDefault());
             }
-            else if (Context.Message.MentionedUserIds.Count() > 1)
+            else if (Context.Message.MentionedUserIds.Count > 1)
             {
                 foreach (var u in Context.Message.MentionedUserIds)
                 {
@@ -685,21 +667,21 @@ namespace MinitoriCore.Modules.Standard
             else
                 user = (IGuildUser)Context.User;
 
-            if (user.Id == 102528327251656704) // Googie2149
+            if (user.Id == ORIGINAL_DEV)
                 user = (IGuildUser)Context.User;
 
-            int count = strings.RandomInteger(0, 100);
+            int count = RandomUtil.Int(0, 100);
             string objects = "a horrible error that should never happen";
 
             if (count < 60)
-                objects = strings.objects[strings.RandomInteger(0, strings.objects.Length)];
+                objects = strings.objects[RandomUtil.Int(0, strings.objects.Length)];
             else if (count > 60 && count < 85)
-                objects = $"{strings.objects[strings.RandomInteger(0, strings.objects.Length)]} " +
-                    $"and {strings.objects[strings.RandomInteger(0, strings.objects.Length)]}";
+                objects = $"{strings.objects[RandomUtil.Int(0, strings.objects.Length)]} " +
+                    $"and {strings.objects[RandomUtil.Int(0, strings.objects.Length)]}";
             else if (count > 85)
-                objects = $"{strings.objects[strings.RandomInteger(0, strings.objects.Length)]}, " +
-                    $"{strings.objects[strings.RandomInteger(0, strings.objects.Length)]}, " +
-                    $"and {strings.objects[strings.RandomInteger(0, strings.objects.Length)]}";
+                objects = $"{strings.objects[RandomUtil.Int(0, strings.objects.Length)]}, " +
+                    $"{strings.objects[RandomUtil.Int(0, strings.objects.Length)]}, " +
+                    $"and {strings.objects[RandomUtil.Int(0, strings.objects.Length)]}";
 
             await RespondAsync($"*throws {objects} at {user.Mention}*");
         }
@@ -712,9 +694,35 @@ namespace MinitoriCore.Modules.Standard
             string[] choices = remainder.Split(';').Where(x => x.Trim().Length > 0).ToArray();
             
             if (choices[0] != "")
-                await RespondAsync($"I choose **{choices[RandomInteger(0, choices.Length)].Trim()}**");
+                await RespondAsync($"I choose **{choices[RandomUtil.Int(0, choices.Length)].Trim()}**");
             else
                 await RespondAsync("What do you want me to do with this?");
+        }
+
+        [Command("roll")]
+        [Summary("roll dice")]
+        public async Task DiceRoller([Remainder] string remainder = "")
+        {
+            if (RegEx.isRoll(remainder)) 
+            {
+                try
+                {
+                    int commentIndex = remainder.IndexOf('#');
+                    string roll = (commentIndex == -1) ? remainder : remainder[..commentIndex];
+                    string title = (commentIndex != -1) ? remainder[(commentIndex + 1)..] : "Roll";
+                    String result = RegEx.parseRolls(roll);
+                    var finalValue = new DataTable().Compute(result, null);
+                    await RespondAsync($"Rolling ``{roll}``\n__{title}__ : ``{result}``\n = **{finalValue}**");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    throw;
+                }
+                
+            }
+            else
+                await RespondAsync("Not a valid roll command");
         }
 
         //[Command("gardedede")]
@@ -747,56 +755,56 @@ namespace MinitoriCore.Modules.Standard
 #region bot list classes
     public class BotListing
     {
-        public ulong user_id { get; set; }
-        public string name { get; set; }
-        public List<ulong> owner_ids { get; set; }
-        public string prefix { get; set; }
+        public ulong UserId { get; set; }
+        public string Name { get; set; }
+        public List<ulong> OwnerIds { get; set; }
+        public string Prefix { get; set; }
         public string Error { get; set; }
     }
 
 
     public class SearchResults
     {
-        public int total_results { get; set; }
-        public string analytics_id { get; set; }
-        public List<List<Message>> messages { get; set; }
+        public int TotalResults { get; set; }
+        public string AnalyticsId { get; set; }
+        public List<List<Message>> Messages { get; set; }
     }
 
     public class Author
     {
-        public string username { get; set; }
-        public string discriminator { get; set; }
-        public bool bot { get; set; }
-        public string id { get; set; }
-        public object avatar { get; set; }
+        public string Username { get; set; }
+        public string Discriminator { get; set; }
+        public bool Bot { get; set; }
+        public string ID { get; set; }
+        public object Avatar { get; set; }
     }
 
     public class Mention
     {
-        public string username { get; set; }
-        public string discriminator { get; set; }
-        public string id { get; set; }
-        public string avatar { get; set; }
-        public bool? bot { get; set; }
+        public string Username { get; set; }
+        public string Discriminator { get; set; }
+        public string ID { get; set; }
+        public string Avatar { get; set; }
+        public bool? Bot { get; set; }
     }
 
     public class Message
     {
-        public List<object> attachments { get; set; }
-        public bool tts { get; set; }
-        public List<object> embeds { get; set; }
-        public string timestamp { get; set; }
-        public bool mention_everyone { get; set; }
-        public string id { get; set; }
-        public bool pinned { get; set; }
-        public object edited_timestamp { get; set; }
-        public Author author { get; set; }
-        public List<string> mention_roles { get; set; }
-        public string content { get; set; }
-        public string channel_id { get; set; }
-        public List<Mention> mentions { get; set; }
-        public int type { get; set; }
-        public bool? hit { get; set; }
+        public List<object> Attachments { get; set; }
+        public bool TTS { get; set; }
+        public List<object> Embeds { get; set; }
+        public string Timestamp { get; set; }
+        public bool MentionEveryone { get; set; }
+        public string ID { get; set; }
+        public bool Pinned { get; set; }
+        public object EditedTimestamp { get; set; }
+        public Author Author { get; set; }
+        public List<string> MentionRoles { get; set; }
+        public string Content { get; set; }
+        public string ChannelID { get; set; }
+        public List<Mention> Mentions { get; set; }
+        public int Type { get; set; }
+        public bool? Hit { get; set; }
     }
 #endregion
 }

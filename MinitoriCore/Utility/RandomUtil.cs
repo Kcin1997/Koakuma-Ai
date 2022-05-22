@@ -29,6 +29,18 @@ namespace MinitoriCore
             return (int)(min + (max - min) * (scale / (double)uint.MaxValue));
         }
 
+        public static string dice(int count, int die)
+        {
+            if (count > 100) throw new Exception("Too Many Dice");
+            string output = "";
+            for (int i = 0; i < count; i++)
+            {
+                output += (Int(0, die) + 1);
+                if (i + 1 < count) output += '+';
+            }
+            return output;
+        }
+
     }
 
 }

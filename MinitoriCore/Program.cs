@@ -39,9 +39,9 @@ namespace MinitoriCore
         //private readonly IDependencyMap map = new DependencyMap();
         //private readonly CommandService commands = new CommandService(new CommandServiceConfig { CaseSensitiveCommands = false });
         private ulong updateChannel = 0;
-        private List<ulong> PreventedStars = new List<ulong>();
+        private List<ulong> PreventedStars = new();
 
-        private Dictionary<ulong, int> posCommandUsage = new Dictionary<ulong, int>();
+        private Dictionary<ulong, int> posCommandUsage = new();
 
         private async Task RunAsync()
         {
@@ -183,7 +183,7 @@ namespace MinitoriCore
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to remove self-star in {guildChannel.GuildId}");
+                    Console.WriteLine($"Failed to remove self-star in {guildChannel.GuildId}.\n Trace: {ex}");
                 }
             }
         }
@@ -348,6 +348,7 @@ namespace MinitoriCore
                 case LogSeverity.Warning: color = ConsoleColor.Yellow; break;
                 case LogSeverity.Info: color = ConsoleColor.White; break;
                 case LogSeverity.Verbose: color = ConsoleColor.Gray; break;
+                case LogSeverity.Critical: color = ConsoleColor.Magenta;break;
                 case LogSeverity.Debug: default: color = ConsoleColor.DarkGray; break;
             }
 
@@ -391,7 +392,7 @@ namespace MinitoriCore
                 return Task.CompletedTask;
 
             //Build message
-            StringBuilder builder = new StringBuilder(text.Length + (sourceName?.Length ?? 0) + (exMessage?.Length ?? 0) + 5);
+            StringBuilder builder = new(text.Length + (sourceName?.Length ?? 0) + (exMessage?.Length ?? 0) + 5);
             if (sourceName != null)
             {
                 builder.Append('[');
