@@ -722,7 +722,7 @@ namespace MinitoriCore.Modules.Standard
                 
             }
             else
-                await RespondAsync("Not a valid roll command");
+                await RespondAsync("Not a valid roll command.  For performance reasons, rolling more than 99 dice is not allowed.");
         }
 
         //[Command("gardedede")]
