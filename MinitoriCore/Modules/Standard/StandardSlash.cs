@@ -4,17 +4,34 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Discord.Net;
+using Discord.Interactions;
 using System.Threading.Tasks;
 
 namespace MinitoriCore.Modules.Standard
 {
-    public class StandardSlash
+    public class StandardSlash : InteractionModuleBase
     {
-        private DiscordSocketClient client;
-        private const long deco = 185220517773574144;
+        [SlashCommand("blah", "Blah!")]
+        public async Task Blah()
+        {
+            await RespondAsync($"Blah to you too, {Context.User.Mention}.");
+        }
 
+        [SlashCommand("echo", "Echo an input")]
+        public async Task Echo(string input)
+        {
+            await RespondAsync(input);
+        }
+
+
+        override public void OnModuleBuilding(InteractionService interactionService, ModuleInfo module)
+        {
+            Console.WriteLine("Modules Built");
+        }
+
+        override public void BeforeExecute(ICommandInfo info)
+        {
+            Console.WriteLine($"Command {info.MethodName} Called.");
+        }
     }
 }

@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Discord.Rest;
-using Discord.Commands;
+using Discord.Interactions;
 using Discord.Net;
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,7 @@ namespace MinitoriCore
         private RankedService rankedService;
         private ServiceProvider map;
         private DiscordBotsService discordBotsService;
+        private InteractionService interactionService;
         //private AccountGateService gate;
         //private IServiceProvider services;
         //private readonly IDependencyMap map = new DependencyMap();
@@ -77,11 +79,12 @@ namespace MinitoriCore
             rankedService = new RankedService();
             strings = new RandomStrings();
             discordBotsService = new DiscordBotsService();
+            interactionService = new InteractionService(restClient);
             //gate = new AccountGateService();
 
 
             //var map = new DependencyMap();
-            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events).AddSingleton(rankedService).AddSingleton(discordBotsService)/*.AddSingleton(gate)*/.BuildServiceProvider();
+            map = new ServiceCollection().AddSingleton(socketClient).AddSingleton(config).AddSingleton(strings).AddSingleton(events).AddSingleton(rankedService).AddSingleton(discordBotsService)./*.AddSingleton(gate)*/BuildServiceProvider();
 
             //await ConfigureServicesAsync(map);
 
@@ -140,7 +143,21 @@ namespace MinitoriCore
 
             //await client.CurrentUser.ModifyAsync(x => x.Avatar = new Image(File.OpenRead("Minitori.png")));
             socketClient.Ready += GuildCommandService;
-            socketClient.SlashCommandExecuted += SlashCommandHandler;
+            //socketClient.SlashCommandExecuted += SlashCommandHandler;
+            interactionService = new InteractionService(restClient);
+            await interactionService.AddModulesAsync(Assembly.GetEntryAssembly(), null);
+
+#if DEBUG
+            await interactionService.RegisterCommandsToGuildAsync(deco);
+#else
+    await interactionService.RegisterCommandsGloballyAsync();
+#endif
+            socketClient.InteractionCreated += async interaction =>
+            {
+                var scope = map.CreateScope();
+                var ctx = new SocketInteractionContext(socketClient, interaction);
+                await interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
+            };
             await Task.Delay(-1);
         }
 
@@ -368,7 +385,7 @@ namespace MinitoriCore
                 // Using the ready event is a simple implementation for the sake of the example. Suitable for testing and development.
                 // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
             }
-            catch (ApplicationCommandException exception)
+            catch (HttpException exception)
             {
                 // If our command was invalid, we should catch an ApplicationCommandException. This exception contains the path of the error as well as the error message. You can serialize the Error field in the exception to get a visual of where your error is.
 
@@ -377,6 +394,7 @@ namespace MinitoriCore
             }
         }
 
+        // Slash Command Tester
         private async Task SlashCommandHandler(SocketSlashCommand command)
         {
             await command.RespondAsync($"You executed {command.Data.Name}");
