@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Data;
 using System.Text.Json.Serialization;
 using Discord;
 using Discord.Interactions;
@@ -24,14 +25,29 @@ namespace MinitoriCore.Modules.Standard
         }
 
 
-        override public void OnModuleBuilding(InteractionService interactionService, ModuleInfo module)
+        [SlashCommand("roll", "Roll Dice")]
+        public async Task DiceRoller(string rollCommand)
         {
-            Console.WriteLine("Modules Built");
-        }
+            if (RegEx.isRoll(rollCommand))
+            {
+                try
+                {
+                    int commentIndex = rollCommand.IndexOf('#');
+                    string roll = (commentIndex == -1) ? rollCommand : rollCommand[..commentIndex];
+                    string title = (commentIndex != -1) ? rollCommand[(commentIndex + 1)..] : "Roll";
+                    String result = RegEx.parseRolls(roll);
+                    var finalValue = new DataTable().Compute(result, null);
+                    await RespondAsync($"Rolling ``{roll}``\n__{title}__ : ``{result}``\n = **{finalValue}**");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                    throw;
+                }
 
-        override public void BeforeExecute(ICommandInfo info)
-        {
-            Console.WriteLine($"Command {info.MethodName} Called.");
+            }
+            else
+                await RespondAsync("Not a valid roll command.  For performance reasons, rolling more than 99 dice is not allowed.");
         }
     }
 }
